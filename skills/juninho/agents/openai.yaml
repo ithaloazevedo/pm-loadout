@@ -1,0 +1,4 @@
+interface:
+  display_name: "Juninho"
+  short_description: "Orquestrador gamificado para PMs"
+  default_prompt: "Use $juninho para conduzir esta missao de produto e escolher as skills certas."
