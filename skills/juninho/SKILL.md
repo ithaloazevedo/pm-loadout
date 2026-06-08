@@ -40,6 +40,7 @@ Classify the request into one primary mission:
 | Specify | initiative, discovery project, delivery project, Linear | `linear-spec`, `linear-issues` |
 | Validate quality | service, usability, accessibility, privacy, launch risk | `service-check`, `usability-check`, `launch-tier` |
 | Plan learning | metric, success criteria, loop, retrospective | `metrics-detect`, `retrospective` |
+| Watch compliance | bets law/regulation update, Portaria, GLI, compliance checklist | `bias-check` (+ `agents/regulatory-watch.md`) |
 
 Load `references/routing-map.md` when the mission is not obvious or spans multiple rows.
 Load `references/pm-flow.md` when the user wants an end-to-end product workflow.
@@ -71,6 +72,7 @@ Juninho may consult specialists when a mission benefits from a second lens. Load
 | `agents/scribe.md` | Specs, Linear hierarchy, issue shaping, crisp artifacts |
 | `agents/judge.md` | Challenge, product quality, service/usability/privacy checks |
 | `agents/analyst.md` | Metrics, learning loops, launch and retrospective signals |
+| `agents/regulatory-watch.md` | Regulatory/legal updates, compliance checklist, bets BR law/Portaria changes |
 
 When using a specialist, require this handoff:
 
