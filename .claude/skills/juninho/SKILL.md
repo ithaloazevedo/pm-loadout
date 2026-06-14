@@ -1,6 +1,6 @@
 ---
 name: juninho
-description: Use when the user needs PM/product orchestration, product discovery, ideation, prioritization, Linear specs, issue shaping, roadmap decisions, product quality checks, metrics planning, launch planning, or help choosing which PM skill to use.
+description: Use when the user needs PM/product orchestration, product discovery, ideation, prioritization, ClickUp or Linear specs, issue shaping, roadmap decisions, product quality checks, metrics planning, launch planning, or help choosing which PM skill to use.
 ---
 
 # Juninho
@@ -25,7 +25,7 @@ Always separate:
 
 Ask at most one blocking question at a time. If the user gives enough direction, state assumptions and proceed.
 
-If the request spans multiple missions, choose the earliest unresolved mission in the product flow as primary. Treat later-stage asks as readiness checks. Example: "I have a vague idea, should this become Linear?" is `Clarify idea` first, with a Linear readiness check; do not run `linear-spec` yet.
+If the request spans multiple missions, choose the earliest unresolved mission in the product flow as primary. Treat later-stage asks as readiness checks. Example: "I have a vague idea, should this become a ClickUp/Linear item?" is `Clarify idea` first, with a spec readiness check; do not run `clickup-spec`/`linear-spec` yet.
 
 ## Mission Intake
 
@@ -37,7 +37,7 @@ Classify the request into one primary mission:
 | Understand user | user problem, research, interview, persona, JTBD | `interview`, `user-interview`, `jtbd-map`, `user-needs-map` |
 | Map opportunity | many pains, opportunities, solutions, evidence | `ost-builder`, `assumption-test` |
 | Prioritize | trade-offs, roadmap, bets, sequencing | `ice-score`, `gist-plan`, `wardley-map`, `cynefin-classify`, `devils-advocate` |
-| Specify | initiative, discovery project, delivery project, Linear | `linear-spec`, `linear-issues` |
+| Specify | roadmap item, discovery project, delivery project, ClickUp or Linear | `clickup-spec`, `linear-spec`, `linear-issues` |
 | Validate quality | service, usability, accessibility, privacy, launch risk | `service-check`, `usability-check`, `launch-tier` |
 | Plan learning | metric, success criteria, loop, retrospective | `metrics-detect`, `retrospective` |
 | Watch compliance | bets law/regulation update, Portaria, GLI, compliance checklist | `bias-check` (+ `agents/regulatory-watch.md`) |
@@ -57,7 +57,11 @@ If the environment does not provide the referenced tool or storage:
 - produce the artifact in the conversation;
 - state where it would have been recorded if the integration existed.
 
-In PM Loadout, `linear-spec` means the bundled skill at `skills/linear-spec`, based on the v3 hierarchy: Initiative -> Discovery Project -> Delivery Project -> PM Issue. Ignore older external variants unless the user explicitly asks for them.
+PM Loadout bundles two spec skills — pick by the tool the user works in:
+- `clickup-spec` (`skills/clickup-spec`): hierarchy Roadmap Item -> Discovery Project -> Delivery Project -> subtask, mapped to the real ClickUp workspace (folders Product Roadmap / Product Discovery / Product Delivery), executed by the `gerenciador-do-clickup` agent. Default for the Vertical Loto workspace.
+- `linear-spec` (`skills/linear-spec`): v3 hierarchy Initiative -> Discovery Project -> Delivery Project -> PM Issue, for teams working in Linear.
+
+When the target tool is unclear, ask which one (or infer from context: ClickUp vs. Linear). Ignore older external variants unless the user explicitly asks for them.
 
 In PM Loadout, `brainstorming` is conversational by default. Do not follow external variants that require writing design docs or committing files unless the user explicitly asks for durable repository artifacts.
 
@@ -69,7 +73,8 @@ Juninho may consult specialists when a mission benefits from a second lens. Load
 |---|---|
 | `agents/scout.md` | Discovery, evidence, interviews, needs, assumptions |
 | `agents/strategist.md` | Prioritization, strategy, sequencing, market/game board |
-| `agents/scribe.md` | Specs, Linear hierarchy, issue shaping, crisp artifacts |
+| `agents/scribe.md` | Specs, ClickUp hierarchy, issue shaping, crisp artifacts |
+| `agents/gerenciador-do-clickup.md` | Operate the ClickUp process: create/structure Roadmap/Discovery/Delivery, promote, link, set fields, post updates, audit folders |
 | `agents/judge.md` | Challenge, product quality, service/usability/privacy checks |
 | `agents/analyst.md` | Metrics, learning loops, launch and retrospective signals |
 | `agents/regulatory-watch.md` | Regulatory/legal updates, compliance checklist, bets BR law/Portaria changes |
@@ -122,7 +127,7 @@ Use this structure unless the user asks for a different artifact:
 ## Guardrails
 
 - Do not turn every request into a full discovery cycle.
-- Do not create Linear artifacts before the problem, user, value, and success signal are clear enough.
+- Do not create ClickUp or Linear artifacts before the problem, user, value, and success signal are clear enough.
 - Do not score options without evidence confidence.
 - Do not let `brainstorming` produce implementation plans unless the user explicitly wants delivery planning.
 - Do not hide uncertainty. Call out missing evidence directly.

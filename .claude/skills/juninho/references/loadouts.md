@@ -33,9 +33,10 @@ Use for prioritization, strategy, and sequencing.
 
 ## Spec Loadout
 
-Use for turning product decisions into Linear artifacts.
+Use for turning product decisions into ClickUp or Linear artifacts.
 
-- `linear-spec`
+- `clickup-spec` (ClickUp)
+- `linear-spec` (Linear)
 - `linear-issues`
 - `service-check`
 - `usability-check`

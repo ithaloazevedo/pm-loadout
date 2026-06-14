@@ -12,7 +12,7 @@ O ponto de entrada recomendado e o `$juninho`: um orquestrador que identifica a 
 | Ideacao | `brainstorming`, `bias-check`, `devils-advocate` |
 | Discovery | `interview`, `user-interview`, `jtbd-map`, `user-needs-map`, `assumption-test`, `ost-builder` |
 | Estrategia | `gist-plan`, `ice-score`, `wardley-map`, `cynefin-classify` |
-| Especificacao | `linear-spec`, `linear-issues` |
+| Especificacao | `clickup-spec`, `linear-spec`, `linear-issues` |
 | Qualidade | `service-check`, `usability-check`, `launch-tier` |
 | Aprendizado | `metrics-detect`, `retrospective` |
 
@@ -20,47 +20,52 @@ O ponto de entrada recomendado e o `$juninho`: um orquestrador que identifica a 
 
 - `Scout`: discovery, necessidades, entrevistas, suposicoes e oportunidades.
 - `Strategist`: priorizacao, estrategia, sequenciamento e trade-offs.
-- `Scribe`: specs, Linear e artefatos claros.
+- `Scribe`: specs e artefatos claros.
+- `Gerenciador do ClickUp`: opera o processo no ClickUp (Roadmap, Discovery, Delivery), executa a `clickup-spec`.
 - `Judge`: critica, qualidade, riscos e vieses.
 - `Analyst`: metricas, lancamento, aprendizado e retrospectiva.
+- `Regulatory Watch`: atualizacoes legais/regulatorias de bets BR e checklist de compliance.
 
 ## Instalar
 
-Clone o repositorio:
+A fonte canonica das skills e agentes e a pasta `.claude/` na raiz do repo. Clone o repositorio:
 
 ```powershell
 git clone https://github.com/ithaloazevedo/pm-loadout.git
 cd pm-loadout
 ```
 
-No Windows:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
-```
-
 No macOS/Linux:
 
 ```bash
-bash scripts/install.sh
+bash scripts/install.sh           # instala no Claude Code (~/.claude)
+bash scripts/install.sh --codex   # tambem no Codex (~/.codex)
 ```
 
-Os instaladores copiam `skills/*` para `~/.codex/skills` ou para `$CODEX_HOME/skills`.
+No Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1            # Claude Code
+powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -Codex     # tambem no Codex
+```
+
+Os instaladores copiam `.claude/skills/*` para `~/.claude/skills` (e os agentes para `~/.claude/agents`).
+Alternativamente, ao trabalhar dentro do proprio repo, as skills e agentes em `.claude/` ja sao reconhecidos pelo Claude Code sem instalar nada.
 
 ## Como usar
 
 Comece pelo Juninho:
 
 ```text
-$juninho
-Tenho uma ideia de produto e quero transformar isso em uma iniciativa no Linear.
+/juninho
+Tenho uma ideia de produto e quero transformar isso em um item de roadmap no ClickUp.
 ```
 
 Ou chame uma skill diretamente quando ja souber o que precisa:
 
 ```text
-$linear-spec
-Crie uma iniciativa para...
+/clickup-spec create
+Crie um item de roadmap para...
 ```
 
 ## Nota sobre modo standalone

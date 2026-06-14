@@ -6,7 +6,8 @@
 |---|---|
 | `juninho` | Orchestrates PM workflows and specialist agents. |
 | `brainstorming` | Turns vague ideas into clearer product direction. |
-| `linear-spec` | Structures initiatives, discovery projects, delivery projects, and PM issues. |
+| `clickup-spec` | Structures ClickUp roadmap items, discovery projects, delivery projects, and subtasks. |
+| `linear-spec` | Structures Linear initiatives, discovery projects, delivery projects, and PM issues. |
 | `linear-issues` | Shapes PM work into Linear issues. |
 | `bias-check` | Reduces decision and research bias. |
 | `devils-advocate` | Challenges premature certainty and weak narratives. |

@@ -21,8 +21,8 @@ This is the default end-to-end product flow. Juninho should enter at the user's 
    - Output: prioritized bet, rationale, trade-offs
 
 5. Shape work
-   - Skills: `linear-spec`, `linear-issues`
-   - Output: initiative, discovery project, delivery project, PM issue, acceptance shape
+   - Skills: `clickup-spec` (ClickUp) or `linear-spec` (Linear), `linear-issues`
+   - Output: roadmap item / initiative, discovery project, delivery project, subtask / PM issue, acceptance shape
 
 6. Check quality and readiness
    - Skills: `service-check`, `usability-check`, `launch-tier`

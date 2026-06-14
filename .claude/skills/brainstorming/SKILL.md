@@ -32,7 +32,7 @@ Ask at most one blocking question at a time. If enough context exists, state ass
 | opportunity space | `ost-builder`, `assumption-test` |
 | multiple options | `ice-score`, `devils-advocate`, `gist-plan` |
 | strategic uncertainty | `cynefin-classify`, `wardley-map` |
-| ready product artifact | `linear-spec`, `linear-issues` |
+| ready product artifact | `clickup-spec`, `linear-spec`, `linear-issues` |
 | quality/readiness question | `service-check`, `usability-check`, `launch-tier` |
 | success measurement | `metrics-detect` |
 

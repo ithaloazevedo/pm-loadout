@@ -6,7 +6,7 @@ Some imported skills were originally written for broader agent frameworks. They 
 - `/mycelium:*` commands;
 - `CLAUDE_PLUGIN_ROOT`;
 - Claude-specific tools such as `Read`;
-- Linear MCP tools.
+- ClickUp or Linear MCP tools.
 
 In PM Loadout, these are optional integrations, not hard requirements.
 
@@ -34,4 +34,4 @@ Juninho should detect these cases and keep the flow useful:
 
 - treat persistence as best-effort;
 - avoid claiming files or tools were updated when they were not;
-- keep the PM-facing artifact complete enough to copy into Linear, Notion, Docs, or another system.
+- keep the PM-facing artifact complete enough to copy into ClickUp, Linear, Notion, Docs, or another system.
