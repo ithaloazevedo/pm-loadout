@@ -169,7 +169,7 @@ Se não: apresente o Markdown final pronto para colar.
 
 Só grave após o "sim". Use os IDs de [references/clickup-config.md](references/clickup-config.md).
 
-**3. Vínculo** — vincule o item ao nível acima/abaixo via `clickup_add_task_link` e cite no corpo (Portfólio / Discovery / Links).
+**3. Vínculo** — vincule o item ao nível acima/abaixo via `clickup_add_task_link` (pertencimento) e, **sempre que vincular Discovery/Delivery a um Roadmap Item, atualize também a seção 🗂️ Portfólio de Projetos do Roadmap Item** (nome + link `VL-XXXXX`). Use `clickup_add_task_dependency` apenas quando houver ordem real (alimenta Gantt). Detalhe e guardrail em [references/clickup-method.md](references/clickup-method.md) → "Vínculos entre níveis".
 
 **4. Update (comentário)** — pergunte se deve postar um comentário-update narrativo (contexto → decisão → próximo passo). Modelos em [references/clickup-method.md](references/clickup-method.md). Confirme o rascunho antes de postar.
 
@@ -196,7 +196,7 @@ Compare o Discovery com o que o template de Delivery exige. Peça só o que falt
 Pré-preencha com os dados do Discovery. Campo **Discovery:** aponta para a task de origem. Apresente para aprovação, depois:
 > "Posso criar este Projeto de Delivery no ClickUp agora?"
 
-Se sim → resolva/crie a lista do folder Delivery, `clickup_create_task`, e **vincule os três níveis** com `clickup_add_task_link`: Delivery ↔ Discovery (origem) e Delivery ↔ Roadmap Item (pai). Retorne o link.
+Se sim → resolva/crie a lista do folder Delivery, `clickup_create_task`, e **vincule os três níveis** com `clickup_add_task_link`: Delivery ↔ Discovery (origem) e Delivery ↔ Roadmap Item (pai). **Atualize a seção 🗂️ Portfólio de Projetos do Roadmap Item** com o novo Delivery (nome + link). Retorne o link.
 
 ### Passo 4: Updates duplos (comentários)
 Sugira dois comentários e pergunte se deseja postar ambos, um, ou nenhum:
@@ -300,6 +300,14 @@ Exiba:
 6. **Diferença vs. Linear**: o Roadmap Item é o contêiner estratégico; vínculos são por linked task; priorização (RICE/MoSCoW/Horizonte) vive no folder Roadmap.
 
 ---
+
+## Guardrails
+
+- **Macro, não micro.** O escopo é Roadmap Item, Discovery e Delivery. **Evite criar subtasks e tarefas micro** — a quebra fina (passos de implementação, checklist) é da squad/designer, não da spec de produto. Se a decomposição for inevitável, limite a poucas frentes macro (UCs principais, grandes frentes de build); nunca um item por micro-passo. Sinais de micro demais: cabe em < 1 dia, é passo técnico isolado, ou não tem valor de usuário próprio → use **checklist na tarefa-pai**, não subtask.
+- **Vínculo sempre espelhado no corpo.** Nunca crie um linked task sem atualizar a seção 🗂️ Portfólio do Roadmap Item.
+- **Linked task ≠ dependência.** Pertencimento é `add_task_link`; ordem/bloqueio é `add_task_dependency`. Não troque um pelo outro.
+- **Não usar** *Tasks in Multiple Lists* nem o campo *Relationship* — decisão de modelagem para manter o vínculo simples.
+- Três ações exigem **confirmação explícita**: criar task, gravar custom fields de priorização, postar comentário.
 
 ## Referência Técnica: Tratamento de Argumentos
 

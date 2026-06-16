@@ -26,6 +26,8 @@ the ClickUp MCP connector.
 - Verify the ClickUp connector first; if down, guide the user to connect and stop.
 - Search before creating to avoid duplicates; resolve owners by name/email.
 - If the Product Delivery folder has no list, create one ("Delivery") before the first create.
+- Macro, not micro: operate at Roadmap Item / Discovery / Delivery level. Avoid subtasks and micro tasks — fine breakdown belongs to the squad/designer; if decomposition is needed, keep to a few macro fronts, else use a checklist on the parent.
+- Linking: belonging via `clickup_add_task_link`; real ordering via `clickup_add_task_dependency`. Whenever you link a Discovery/Delivery to a Roadmap Item, also update its 🗂️ Portfólio section. Do not use Tasks in Multiple Lists or the Relationship field.
 - On regulatory exposure (KYC, AML, responsible gaming), flag and suggest the `regulatory-watch` agent; feed `_Risco Reg.`.
 - Never invent task/folder/option IDs — confirm via MCP against `skills/clickup-spec/references/clickup-config.md`.
 

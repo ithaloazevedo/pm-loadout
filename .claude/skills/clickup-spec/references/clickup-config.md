@@ -79,8 +79,12 @@ Herdados do space, sem os campos de priorização do Roadmap:
 ## Convenções
 
 - **Custom ID** das tasks: `VL-XXXXX` (gerado automaticamente). Use em links: `https://app.clickup.com/t/9006076935/VL-XXXXX`.
-- **Relacionamento entre níveis**: não há parent nativo cross-folder. Vincule via `clickup_add_task_link`
-  (linked tasks) e referencie no corpo (seção 🗂️ Portfólio / 🔗 Links / **Discovery:**).
-- **Subtasks**: use parent-child dentro do mesmo folder (ex: UCs e edge cases sob o Discovery; subtasks de build sob o épico de Delivery).
+- **Vínculo entre níveis**: não há parent nativo cross-folder. Três mecanismos, cada um para um propósito
+  (detalhe e guardrail em [clickup-method.md](clickup-method.md) → "Vínculos entre níveis"):
+  - **Linked task** (`clickup_add_task_link`) — vínculo de **pertencimento**, sempre presente (Discovery/Delivery → Roadmap Item; Delivery → Discovery de origem).
+  - **Dependência** (`clickup_add_task_dependency`, `waiting_on`/`blocking`) — só quando há **ordem real**; alimenta Gantt/Timeline.
+  - **Subtask** (campo `parent` no create) — decomposição **macro** na mesma lista; usar com parcimônia (ver guardrail).
+- **Sempre espelhar no corpo**: ao criar um linked task, atualize a seção 🗂️ Portfólio de Projetos do Roadmap Item.
+- **Não usamos**: *Tasks in Multiple Lists* nem o campo *Relationship* (decisão de modelagem — manter o vínculo simples).
 - **Updates**: ClickUp não tem "Activity Update" como o Linear. O equivalente é um **comentário** na task
   (`clickup_create_task_comment`).

@@ -46,6 +46,8 @@ no corpo. Priorização (RICE/MoSCoW/Horizonte/Squad) só existe no folder Roadm
 - **Busque antes de criar** para evitar duplicatas (`clickup_filter_tasks` / `clickup_search`).
 - **Resolva donos** por nome/email (`clickup_find_member_by_name` / `clickup_resolve_assignees`) antes de atribuir.
 - **Delivery sem lista**: se o folder Product Delivery não tiver lista, crie uma ("Delivery") antes do primeiro create.
+- **Macro, não micro**: opere no nível de Roadmap Item / Discovery / Delivery. Evite criar subtasks e tarefas micro — a quebra fina é da squad/designer. Se precisar decompor, poucas frentes macro; senão, checklist na tarefa-pai.
+- **Vínculo**: pertencimento via `clickup_add_task_link`; ordem real via `clickup_add_task_dependency`. **Sempre que vincular Discovery/Delivery a um Roadmap Item, atualize a seção 🗂️ Portfólio do item.** Não usar Tasks in Multiple Lists nem campo Relationship.
 - **Risco regulatório (bets BR)**: ao tocar em itens com exposição legal (KYC, AML, responsible gaming), sinalize e sugira acionar o agente `regulatory-watch` antes de fechar a spec; alimente o campo `_Risco Reg.`.
 - **Não invente IDs** de task, folder ou option. Se um ID divergir do config, confirme via MCP e avise.
 - **Conteúdo em português**; termos técnicos consolidados em inglês.

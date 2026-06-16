@@ -19,6 +19,31 @@
 | Issue / Milestone | **Subtask** sob o item pai (UC, edge case, build) |
 | Activity Update | **Comentário** na task (`clickup_create_task_comment`) |
 
+## Vínculos entre níveis
+
+Não há parent nativo cruzando folders. Três mecanismos, **cada um para um propósito** — não são concorrentes:
+
+| Mecanismo | Tool | Quando usar |
+|-----------|------|-------------|
+| **Linked task** ("relacionado") | `clickup_add_task_link` | Vínculo de **pertencimento**, sempre presente: toda tarefa de Discovery/Delivery → seu Roadmap Item; toda Delivery → seu Discovery de origem. É o vínculo-base. |
+| **Dependência** (`waiting_on` / `blocking`) | `clickup_add_task_dependency` | **Apenas** quando há ordem real (uma tarefa espera ou bloqueia outra). Alimenta as views Gantt/Timeline do folder Roadmap. Nunca use no lugar do linked task de pertencimento. |
+| **Subtask** (parent-child) | campo `parent` no `clickup_create_task` | Decomposição **macro** dentro da mesma lista. Usar com parcimônia — ver guardrail abaixo. |
+
+Decisão de modelagem: **não usamos** *Tasks in Multiple Lists* nem o campo *Relationship*. O vínculo fica
+simples e legível — linked task (sistema) + Portfólio no corpo (humano).
+
+### Boa prática — espelhar sempre no Portfólio
+Sempre que vincular uma tarefa de **Discovery ou Delivery** a um **Roadmap Item** por linked task, **atualize
+também a seção 🗂️ Portfólio de Projetos do Roadmap Item**, adicionando a linha com nome + link `VL-XXXXX`. O
+linked task dá o vínculo de sistema; o Portfólio é o índice legível e a fonte de verdade humana. **Os dois
+andam juntos — nunca crie o vínculo sem atualizar o corpo** (vale para `create` e `promote`).
+
+### Guardrail — macro, não micro
+- O escopo da `clickup-spec` é **macro**: Roadmap Item, Discovery e Delivery. Mantenha tarefas no nível de projeto/aposta.
+- **Evite criar subtasks e tarefas micro.** A quebra fina (passos de implementação, itens de checklist) é da squad/designer, não da spec de produto.
+- Se a decomposição for inevitável, limite a **poucas frentes macro** (ex: UCs principais, grandes frentes de build) — nunca um item por micro-passo.
+- Sinais de que virou micro demais: cabe em < 1 dia, é um passo técnico isolado, ou não tem valor de usuário próprio. Nesse caso, use **checklist dentro da tarefa-pai**, não uma subtask.
+
 ## Automação de Custom Fields (Roadmap Item)
 
 Política: **sugerir e preencher com confirmação**. Proponha valores derivados do contexto, mostre a
