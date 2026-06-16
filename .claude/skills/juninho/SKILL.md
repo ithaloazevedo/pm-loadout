@@ -45,6 +45,7 @@ Classify the request into one primary mission:
 Load `references/routing-map.md` when the mission is not obvious or spans multiple rows.
 Load `references/pm-flow.md` when the user wants an end-to-end product workflow.
 Load `references/loadouts.md` when recommending or documenting reusable skill bundles.
+Load `references/drive-docs.md` whenever a mission produces or edits a document in Google Drive (PRD, spec, brief). It is mandatory before creating any Drive file — it prevents malformed docs (raw markdown sent as `text/plain` imports literally; the MCP cannot edit Docs in place or convert HTML to a native Doc).
 
 ## Standalone Mode
 
