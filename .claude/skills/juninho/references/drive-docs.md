@@ -9,10 +9,18 @@ Load this whenever a mission produces or edits a document in Google Drive (PRD, 
   - When replacing a doc, create the new one and **tell the user exactly which old file(s) to trash manually** (give titles + IDs).
 - **Conversion to a native Google Doc is limited.** `create_file` only auto-converts `text/plain → Google Doc` and `text/csv → Sheet`. **It does NOT convert `text/html` to a native Doc** — HTML is stored as a `.html` file (even if you set `mimeType` to the Doc type). Confirmed empirically.
 
-## The formatting decision (pick before creating)
+## The formatting decision (pick before creating), best → worst
 
-1. **Default: upload HTML (`contentMimeType: "text/html"`).** Gives real `<h1>/<h2>/<h3>` headings, `<table>`, `<strong>`, `<ul>/<ol>`, `<pre>`. The Drive preview renders it cleanly and the user converts to an editable native Doc in one click via **"Abrir com → Documentos Google"** (the open-time conversion preserves the formatting). This is the best fidelity available through this MCP.
-2. **Only if a native Doc is mandatory with zero clicks:** upload `text/plain`. It converts to a Doc immediately **but has no heading/table styles**. In that case write **clean prose** — NO markdown symbols, numbered/UPPERCASE section titles, plain `-` bullets at most.
+0. **Preferred — a native Google Docs MCP.** If a Google Docs server is connected (tools like `create_doc`, `insert_doc_elements`, `update_paragraph_style`, `batch_update_doc`), use it. It creates a true native Doc with heading styles, tables, and an outline, editable, **zero manual conversion**. This is the canonical method (chosen 2026-06). See `## Connecting a Google Docs MCP` below if the tools aren't present.
+1. **Fallback (no Docs MCP) — upload HTML (`contentMimeType: "text/html"`).** Gives real `<h1>/<h2>/<h3>`, `<table>`, `<strong>`, `<ul>/<ol>`, `<pre>`. BUT this MCP stores it as an `.html` file (it does NOT convert HTML to a native Doc); the user must open it via **"Abrir com → Documentos Google"** to get an editable Doc. Best fidelity with zero setup, but one manual click.
+2. **Last resort — `text/plain` → native Doc.** Converts immediately **but has no heading/table styles**. Write clean prose: NO markdown symbols, numbered/UPPERCASE titles, plain `-` bullets at most.
+
+## Connecting a Google Docs MCP
+
+The bundled `claude_ai_Google_Drive` connector has **no Docs API** (no `batchUpdate`), so it cannot create formatted native Docs. To get the preferred method, connect a server that wraps the Google Docs API — e.g. the open-source `workspace-mcp` (`github.com/taylorwilsdon/google_workspace_mcp`):
+- Needs `uv`/`uvx`, a Google Cloud project with the **Docs + Drive APIs** enabled, and OAuth credentials (`GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET`).
+- Register (stdio): `claude mcp add --scope user --env GOOGLE_OAUTH_CLIENT_ID=... --env GOOGLE_OAUTH_CLIENT_SECRET=... --transport stdio google-docs -- uvx workspace-mcp --tool-tier core`
+- **Do not name the server `workspace`** — that name is reserved by Claude Code and skipped at load.
 
 ## Never do this
 

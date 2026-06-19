@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novo Processo de Produto &amp; Tecnologia</title>
+<style>
+  :root{
+    --bg:#0c1424;
+    --bg-2:#101c33;
+    --panel:#152442;
+    --panel-2:#1b2f55;
+    --ink:#eef3fb;
+    --muted:#9fb1cd;
+    --faint:#6c80a3;
+    --accent:#2dd4bf;
+    --accent-2:#38bdf8;
+    --warn:#f6b352;
+    --danger:#f87171;
+    --line:rgba(255,255,255,.10);
+    --radius:18px;
+    --shadow:0 30px 70px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 80% -10%,#16294a 0,var(--bg) 55%);
+    color:var(--ink);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .deck{position:relative;width:100vw;height:100vh}
+  .slide{
+    position:absolute;inset:0;
+    display:none;
+    padding:6vh 8vw;
+    flex-direction:column;
+    justify-content:center;
+    animation:fade .45s ease;
+  }
+  .slide.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  .kicker{
+    font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:1.1rem;
+    display:flex;align-items:center;gap:.7rem;
+  }
+  .kicker::before{content:"";width:34px;height:2px;background:var(--accent);display:inline-block;border-radius:2px}
+  h1{font-size:clamp(2.2rem,5vw,4rem);line-height:1.05;font-weight:800;letter-spacing:-.02em}
+  h2{font-size:clamp(1.7rem,3.4vw,2.7rem);line-height:1.1;font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
+  .sub{color:var(--muted);font-size:clamp(1rem,1.6vw,1.35rem);font-weight:500;margin-top:1rem;max-width:40ch}
+  p{color:var(--muted);line-height:1.55}
+
+  /* layout helpers */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:1.8rem}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:1.8rem}
+  .card{
+    background:linear-gradient(180deg,var(--panel),var(--bg-2));
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:1.4rem 1.5rem;
+  }
+  .card h3{font-size:1.05rem;margin-bottom:.55rem;letter-spacing:-.01em}
+  .card p{font-size:.96rem}
+  .card .ico{font-size:1.5rem;margin-bottom:.6rem;display:block}
+  .tag{display:inline-block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;
+    padding:.25rem .6rem;border-radius:999px;border:1px solid var(--line)}
+  .tag.green{color:var(--accent);border-color:rgba(45,212,191,.4);background:rgba(45,212,191,.08)}
+  .tag.blue{color:var(--accent-2);border-color:rgba(56,189,248,.4);background:rgba(56,189,248,.08)}
+  .tag.warn{color:var(--warn);border-color:rgba(246,179,82,.4);background:rgba(246,179,82,.08)}
+
+  ul.clean{list-style:none;margin-top:1.2rem;display:flex;flex-direction:column;gap:.85rem}
+  ul.clean li{display:flex;gap:.8rem;align-items:flex-start;color:var(--ink);font-size:1.05rem;line-height:1.45}
+  ul.clean li .dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-top:.55rem}
+  ul.clean li b{font-weight:700}
+  ul.clean li span.m{color:var(--muted);font-weight:400}
+
+  .callout{margin-top:1.6rem;border-left:3px solid var(--accent);background:rgba(45,212,191,.07);
+    padding:1rem 1.3rem;border-radius:0 12px 12px 0;color:var(--ink);font-size:1.02rem}
+  .callout b{color:var(--accent)}
+
+  /* progress / chrome */
+  .footer{position:absolute;bottom:2.6vh;left:8vw;right:8vw;display:flex;justify-content:space-between;
+    align-items:center;color:var(--faint);font-size:.78rem;letter-spacing:.04em}
+  .brand{font-weight:700;color:var(--muted);letter-spacing:.02em}
+  .progress{position:absolute;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .4s ease;z-index:10}
+  .nav-hint{position:absolute;bottom:2.6vh;left:50%;transform:translateX(-50%);color:var(--faint);font-size:.74rem}
+
+  /* ---------- Slide 1 cover ---------- */
+  #s1{justify-content:center}
+  #s1 .team{margin-top:2.4rem;display:flex;gap:.6rem;flex-wrap:wrap}
+  #s1 .chip{padding:.4rem .9rem;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:.9rem;background:rgba(255,255,255,.03)}
+
+  /* ---------- Slide 2 chaos -> order ---------- */
+  .chaos-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:1.5rem;align-items:center;margin-top:2rem}
+  .chaos{position:relative;height:300px;border:1px dashed rgba(248,113,113,.35);border-radius:var(--radius);
+    background:rgba(248,113,113,.05)}
+  .chaos .core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:var(--danger);color:#1a0a0a;font-weight:800;padding:.7rem 1rem;border-radius:12px;font-size:.95rem;z-index:2;
+    box-shadow:0 0 0 6px rgba(248,113,113,.15)}
+  .chaos .src{position:absolute;background:var(--panel);border:1px solid var(--line);font-size:.8rem;
+    padding:.4rem .65rem;border-radius:8px;color:var(--ink);font-weight:600}
+  .chaos .s1{top:8%;left:6%}.chaos .s2{top:6%;right:8%}.chaos .s3{top:44%;left:2%}
+  .chaos .s4{top:46%;right:2%}.chaos .s5{bottom:8%;left:10%}.chaos .s6{bottom:6%;right:12%}
+  .arrowbig{font-size:2.6rem;color:var(--accent);text-align:center}
+  .order{height:300px;border:1px solid rgba(45,212,191,.4);border-radius:var(--radius);background:rgba(45,212,191,.06);
+    display:flex;flex-direction:column;justify-content:center;gap:.7rem;padding:1.4rem}
+  .order .row{display:flex;align-items:center;gap:.7rem;font-weight:600}
+  .order .pill{background:var(--accent);color:#06231f;font-weight:800;padding:.45rem .8rem;border-radius:8px;font-size:.85rem}
+  .order .flowline{display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.9rem;flex-wrap:wrap}
+  .order .step{background:var(--panel-2);border:1px solid var(--line);padding:.35rem .65rem;border-radius:7px;color:var(--ink);font-size:.82rem}
+  .pains{margin-top:1.4rem;display:flex;gap:.7rem;flex-wrap:wrap}
+  .pains .p{font-size:.85rem;color:var(--danger);border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.06);
+    padding:.35rem .7rem;border-radius:999px}
+
+  /* ---------- Slide 3 flow ---------- */
+  .flow{margin-top:1.6rem;display:grid;grid-template-columns:1fr;gap:1rem}
+  .track{border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem 1.2rem;background:linear-gradient(180deg,var(--panel),var(--bg-2))}
+  .track .label{display:flex;align-items:center;gap:.6rem;font-weight:800;margin-bottom:.9rem;font-size:1.05rem}
+  .track.disc .label{color:var(--accent-2)}
+  .track.del .label{color:var(--accent)}
+  .steps{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+  .steps .st{background:var(--panel-2);border:1px solid var(--line);padding:.55rem .8rem;border-radius:10px;font-size:.9rem;font-weight:600}
+  .steps .sep{color:var(--faint);font-weight:700}
+  .gate{align-self:center;background:var(--warn);color:#2a1a00;font-weight:800;padding:.5rem .9rem;border-radius:10px;font-size:.85rem;margin:.2rem 0}
+  .filterband{margin-top:1.2rem;display:flex;align-items:center;justify-content:center;gap:.8rem;flex-wrap:wrap;
+    background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.3);border-radius:14px;padding:.9rem 1.1rem}
+  .filterband b{color:var(--accent-2)}
+
+  /* ---------- Slide 4 clickup ---------- */
+  .ws{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:1.8rem}
+  .tree{font-size:1rem;line-height:1.9}
+  .tree .root{font-weight:800;font-size:1.1rem;display:flex;align-items:center;gap:.5rem}
+  .tree .branch{padding-left:1.4rem;color:var(--muted)}
+  .tree .branch b{color:var(--ink)}
+  .tree .branch::before{content:"└─ ";color:var(--faint)}
+
+  /* slide 5 refinement flow */
+  .refflow{margin-top:1.5rem;display:flex;align-items:stretch;gap:.45rem;flex-wrap:wrap}
+  .refflow .fn{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:.6rem .85rem;font-size:.88rem;font-weight:600;color:var(--muted);display:flex;align-items:center}
+  .refflow .fn.muted{opacity:.6}
+  .refflow .here{background:rgba(45,212,191,.12);border:1.5px solid var(--accent);color:var(--ink);font-weight:800;
+    box-shadow:0 0 0 4px rgba(45,212,191,.10)}
+  .refflow .here .badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);
+    color:#06231f;font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .5rem;border-radius:999px;white-space:nowrap}
+  .refflow .arr{align-self:center;color:var(--faint);font-weight:700}
+  .refflow .gate-mini{align-self:center;background:rgba(246,179,82,.12);border:1px solid rgba(246,179,82,.4);
+    color:var(--warn);font-size:.74rem;font-weight:700;padding:.45rem .6rem;border-radius:8px;text-align:center;line-height:1.2}
+
+  /* slide 5 / 7 two moments */
+  .moment{border-radius:var(--radius);padding:1.5rem 1.6rem;border:1px solid var(--line)}
+  .moment.short{background:rgba(246,179,82,.07);border-color:rgba(246,179,82,.35)}
+  .moment.long{background:rgba(45,212,191,.07);border-color:rgba(45,212,191,.35)}
+  .moment h3{font-size:1.15rem;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+  .moment.short h3{color:var(--warn)}
+  .moment.long h3{color:var(--accent)}
+
+  /* slide 9 closing */
+  #s9{justify-content:center;text-align:center;align-items:center}
+  #s9 .quote{font-size:clamp(1.8rem,4vw,3.2rem);font-weight:800;line-height:1.15;letter-spacing:-.02em;max-width:24ch}
+  #s9 .quote em{color:var(--accent);font-style:normal}
+  .trace{margin-top:2.4rem;width:100%;max-width:960px}
+  .trace-title{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-bottom:1rem}
+  .chain{display:flex;align-items:stretch;justify-content:center;gap:.7rem;flex-wrap:wrap}
+  .chain .node{display:flex;flex-direction:column;gap:.25rem;text-align:left;text-decoration:none;
+    background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:12px;
+    padding:.85rem 1rem;min-width:210px;flex:1;transition:transform .15s ease,border-color .15s ease}
+  .chain .node:hover{transform:translateY(-3px)}
+  .chain .node .lvl{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800}
+  .chain .node .code{font-size:1.1rem;font-weight:800;color:var(--ink);letter-spacing:.01em}
+  .chain .node .desc{font-size:.82rem;color:var(--muted);line-height:1.35}
+  .chain .roadmap{border-color:rgba(246,179,82,.4)} .chain .roadmap .lvl{color:var(--warn)}
+  .chain .discovery{border-color:rgba(56,189,248,.4)} .chain .discovery .lvl{color:var(--accent-2)}
+  .chain .delivery{border-color:rgba(45,212,191,.4)} .chain .delivery .lvl{color:var(--accent)}
+  .chain .chev{align-self:center;color:var(--faint);font-size:1.4rem;font-weight:700}
+  .trace-foot{margin-top:1.1rem;font-size:.95rem;color:var(--muted)} .trace-foot b{color:var(--ink)}
+
+  .center-narrow{max-width:60ch}
+  .lead{font-size:1.15rem;color:var(--muted);margin-top:.4rem}
+  .meta-row{display:flex;gap:1rem;margin-top:1.6rem;flex-wrap:wrap}
+  .stat{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:14px;padding:1rem 1.3rem;flex:1;min-width:150px}
+  .stat .n{font-size:1.8rem;font-weight:800;color:var(--accent)}
+  .stat .l{color:var(--muted);font-size:.9rem;margin-top:.2rem}
+
+  /* WhatsApp message slide */
+  #swa{justify-content:flex-start;padding-top:4.5vh}
+  .wa{margin-top:1.2rem;max-width:700px;width:100%;background:#0b1f1a;border:1px solid var(--line);
+    border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+  .wa-head{display:flex;align-items:center;gap:.7rem;background:#152e28;padding:.65rem 1rem;border-bottom:1px solid rgba(255,255,255,.06)}
+  .wa-ava{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#06231f;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:.9rem}
+  .wa-name{font-weight:700;font-size:.92rem;color:var(--ink)}
+  .wa-status{font-size:.72rem;color:var(--accent)}
+  .wa-body{padding:1rem 1.1rem;background:#08120f}
+  .wa .bubble{position:relative;background:#005c4d;border-radius:12px;padding:.85rem 1rem;font-size:.84rem;line-height:1.42;max-width:94%}
+  .wa .bubble p{color:#e9fff7;margin-bottom:.5rem}
+  .wa .bubble p:last-of-type{margin-bottom:.2rem}
+  .wa .bubble b{color:#fff;font-weight:700}
+  .wa .wa-list{padding-left:.15rem}
+  .wa .wa-time{display:block;text-align:right;font-size:.66rem;color:#8fd9c8;margin-top:.25rem}
+
+  /* slide 5 delivery endpoint node */
+  .refflow .fn.del-node{background:rgba(45,212,191,.10);border-color:rgba(45,212,191,.4);color:var(--ink)}
+
+  @media print{
+    body{overflow:visible}
+    .slide{display:flex !important;position:relative;height:100vh;page-break-after:always}
+    .footer,.nav-hint,.progress{position:absolute}
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1 -->
+  <section class="slide active" id="s1">
+    <div class="kicker">Produto &amp; Tecnologia · Vertical Loto</div>
+    <h1>Novo Processo de<br>Produto &amp; Tecnologia</h1>
+    <div class="sub">Transparência, foco e maturidade de entrega.</div>
+    <div class="team">
+      <span class="chip">Time de Produto</span>
+      <span class="chip">Ithalo</span>
+      <span class="chip">Alison</span>
+      <span class="chip">Mateus</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 2 -->
+  <section class="slide" id="s2">
+    <div class="kicker">O problema que estamos resolvendo</div>
+    <h2>Dev acionado por todos os lados</h2>
+    <p class="lead">Sem filtro, sem priorização — e a esteira nunca vazava.</p>
+    <div class="chaos-wrap">
+      <div class="chaos">
+        <span class="src s1">Diretoria</span>
+        <span class="src s2">Clientes externos</span>
+        <span class="src s3">Marketing</span>
+        <span class="src s4">Suporte</span>
+        <span class="src s5">CRM</span>
+        <span class="src s6">Demandas avulsas</span>
+        <span class="core">DEV</span>
+      </div>
+      <div class="arrowbig">→</div>
+      <div class="order">
+        <div class="row"><span class="pill">PRODUTO</span> ponto único de entrada</div>
+        <div class="flowline">
+          <span class="step">Recebe</span><span>→</span>
+          <span class="step">Prioriza</span><span>→</span>
+          <span class="step">Refina</span><span>→</span>
+          <span class="step">Encaminha</span>
+        </div>
+        <p style="font-size:.9rem">Fluxo com filtro, foco e vazão.</p>
+      </div>
+    </div>
+    <div class="pains">
+      <span class="p">Sobrecarga</span>
+      <span class="p">Falta de foco</span>
+      <span class="p">Sem prioridade</span>
+      <span class="p">Fila sem vazão</span>
+    </div>
+  </section>
+
+  <!-- SLIDE 2B — Comunicação WhatsApp -->
+  <section class="slide" id="swa">
+    <div class="kicker">Comunicação aos stakeholders</div>
+    <h2>A mensagem que vai para os grupos</h2>
+    <div class="wa">
+      <div class="wa-head">
+        <span class="wa-ava">P</span>
+        <div><div class="wa-name">Produto · Vertical Loto</div><div class="wa-status">online</div></div>
+      </div>
+      <div class="wa-body">
+        <div class="bubble">
+          <p>Oi, pessoal! 👋</p>
+          <p>Passando aqui para compartilhar uma atualização importante sobre como vamos trabalhar juntos daqui pra frente.</p>
+          <p>Estamos reorganizando nosso processo interno para conseguir atender vocês ainda melhor. A mudança principal é que o <b>time de produto passa a ser o ponto de contato oficial</b> para todas as solicitações. Somos nós: <b>Ithalo, Mateus e Allison.</b></p>
+          <p>O time de desenvolvimento vai continuar trabalhando com total dedicação para vocês, mas agora com mais foco. As demandas vão passar por nós primeiro, assim a gente consegue:</p>
+          <p class="wa-list">•⁠ Entender bem o que vocês precisam<br>•⁠ Refinar e prototipar a solução<br>•⁠ Validar com vocês antes de desenvolver<br>•⁠ Entregar com mais previsibilidade</p>
+          <p>Nada muda no relacionamento de vocês com a gente — a gente continua aqui, disponível e parceiro de sempre. Só estamos organizando melhor o caminho das demandas para que as entregas sejam mais ágeis e assertivas.</p>
+          <p>Qualquer coisa, é só chamar! 🙌</p>
+          <span class="wa-time">✓✓ 09:00</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3 -->
+  <section class="slide" id="s3">
+    <div class="kicker">A solução · Novo fluxo</div>
+    <h2>Duas trilhas, um filtro no meio</h2>
+    <div class="flow">
+      <div class="track disc">
+        <div class="label">◆ Discovery</div>
+        <div class="steps">
+          <span class="st">Demanda chega ao Produto</span><span class="sep">→</span>
+          <span class="st">Entendimento da demanda</span><span class="sep">→</span>
+          <span class="st">Priorização</span><span class="sep">→</span>
+          <span class="st">Especificação</span><span class="sep">→</span>
+          <span class="st">Prototipação</span><span class="sep">→</span>
+          <span class="st">Refinamento</span>
+        </div>
+      </div>
+      <div class="gate">⬇ Validação com stakeholder · só passa para Delivery depois de validado</div>
+      <div class="track del">
+        <div class="label">● Delivery</div>
+        <div class="steps">
+          <span class="st">Desenvolvimento</span><span class="sep">→</span>
+          <span class="st">QA / Homologação</span><span class="sep">→</span>
+          <span class="st">Entrega</span>
+        </div>
+      </div>
+    </div>
+    <div class="filterband">
+      <b>Time de Produto</b> (Ithalo, Alison, Mateus) é o filtro entre os dois mundos — nada cruza sem passar por aqui.
+    </div>
+  </section>
+
+  <!-- SLIDE 4 -->
+  <section class="slide" id="s4">
+    <div class="kicker">Onde vivemos · ClickUp</div>
+    <h2>Tudo documentado, rastreável e visível</h2>
+    <div class="card" style="margin-top:1.8rem">
+      <span class="tag blue">Space · Vertical Loto</span>
+      <div class="tree" style="margin-top:1.1rem">
+        <div class="root">📁 Vertical Loto</div>
+        <div class="branch"><b>Product Roadmap</b> <span style="color:var(--faint)">— as apostas estratégicas</span></div>
+        <div class="branch"><b>Product Discovery</b> <span style="color:var(--faint)">— investigação e validação</span></div>
+        <div class="branch"><b>Product Delivery</b> <span style="color:var(--faint)">— construção e entrega</span></div>
+      </div>
+    </div>
+    <div class="callout">
+      <b>Forms de entrada (novidade):</b> abertura de tickets de novos itens do roadmap será via formulário —
+      <b>exclusivo para novas features e melhorias.</b> Bug e manutenção seguem outro caminho.
+    </div>
+  </section>
+
+  <!-- SLIDE 5 -->
+  <section class="slide" id="s5">
+    <div class="kicker">A jornada de uma demanda</div>
+    <h2>Da solicitação até o Delivery</h2>
+    <div class="refflow">
+      <span class="fn">Demanda chega ao Produto</span><span class="arr">→</span>
+      <span class="fn">Entendimento da demanda</span><span class="arr">→</span>
+      <span class="fn">Priorização</span><span class="arr">→</span>
+      <span class="fn">Especificação</span><span class="arr">→</span>
+      <span class="fn">Prototipação</span><span class="arr">→</span>
+      <span class="fn here"><span class="badge">rito de 30 min</span>Refinamento</span><span class="arr">→</span>
+      <span class="fn del-node">Delivery</span>
+    </div>
+    <div class="card" style="margin-top:1.8rem">
+      <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-bottom:.7rem">
+        <span class="tag green">O rito de Refinamento</span>
+        <span style="color:var(--muted);font-size:.95rem">30 min · recorrente · 1 Produto + 1 referência técnica + 1 de Qualidade <span style="color:var(--faint)">(quando aplicável)</span></span>
+      </div>
+      <ul class="clean" style="margin-top:.3rem">
+        <li><span class="dot"></span><b>Entendimento da demanda</b> e <b>critérios de aceite</b></li>
+        <li><span class="dot"></span><b>Complexidade técnica</b> e <b>impacto em módulos</b></li>
+        <li><span class="dot"></span><b>Pessoas necessárias</b> para a entrega</li>
+      </ul>
+    </div>
+    <div class="callout">Objetivo: <b>planejar melhor para entregar melhor.</b></div>
+  </section>
+
+  <!-- SLIDE 6 -->
+  <section class="slide" id="s6">
+    <div class="kicker">Padrão de documentação</div>
+    <h2>Um template de especificação no ClickUp</h2>
+    <div class="grid2">
+      <div class="card"><span class="ico">📝</span><h3>Descrição da demanda</h3><p>Contexto e objetivo claros para qualquer pessoa entender.</p></div>
+      <div class="card"><span class="ico">✅</span><h3>Critérios de aceite</h3><p>O que precisa ser verdade para considerar entregue.</p></div>
+      <div class="card"><span class="ico">🔗</span><h3>Dependências técnicas</h3><p>Módulos afetados, integrações e pré-requisitos.</p></div>
+      <div class="card"><span class="ico">🎨</span><h3>Protótipo (se houver)</h3><p>Referência visual do que será construído.</p></div>
+    </div>
+    <div class="callout">Serve para os dois lados: <b>desenvolvimento</b> e <b>homologação</b> partem do mesmo documento.</div>
+  </section>
+
+  <!-- SLIDE 7 -->
+  <section class="slide" id="s7">
+    <div class="kicker">Expectativa de transição · com transparência</div>
+    <h2>No começo, pode doer um pouco mais</h2>
+    <div class="grid2" style="margin-top:1.6rem">
+      <div class="moment short">
+        <h3>⏳ Curto prazo</h3>
+        <p style="color:var(--ink);font-size:1.05rem;line-height:1.5">Algumas entregas podem demorar um pouco mais enquanto o processo ganha maturidade. É ajuste, não freio.</p>
+      </div>
+      <div class="moment long">
+        <h3>📈 Médio / longo prazo</h3>
+        <p style="color:var(--ink);font-size:1.05rem;line-height:1.5">Time focado, entregas previsíveis, mais qualidade e um produto mais saudável.</p>
+      </div>
+    </div>
+    <div class="callout">Não é uma barreira — é <b>investimento na saúde do time e do produto.</b></div>
+  </section>
+
+  <!-- SLIDE 8 -->
+  <section class="slide" id="s8">
+    <div class="kicker">Próximos passos</div>
+    <h2>O que já está em movimento</h2>
+    <ul class="clean">
+      <li><span class="dot"></span><b>Remoção dos devs dos grupos de solicitação</b> <span class="m">— já comunicado</span></li>
+      <li><span class="dot"></span><b>Canais de Produto</b> como ponto de entrada <span class="m">— + forms para novas features/melhorias</span></li>
+      <li><span class="dot"></span><b>Canal de incidentes mantido</b> <span class="m">— com 3 referências técnicas</span></li>
+      <li><span class="dot"></span><b>Primeiros refinamentos</b> já acontecendo</li>
+    </ul>
+  </section>
+
+  <!-- SLIDE 9 -->
+  <section class="slide" id="s9">
+    <div class="kicker" style="justify-content:center">Fechamento</div>
+    <div class="quote">Estamos construindo um <em>processo</em>,<br>não uma <em>barreira</em>.</div>
+    <p class="lead" style="margin-top:1.4rem">O time de Produto é parceiro — e está aqui para isso.</p>
+
+    <div class="trace">
+      <div class="trace-title">Exemplo real · rastreabilidade ponta a ponta</div>
+      <div class="chain">
+        <a class="node roadmap" href="https://app.clickup.com/t/868k00qu0" target="_blank">
+          <span class="lvl">Roadmap</span>
+          <span class="code">VL-11852</span>
+          <span class="desc">Onboarding com KYC → conversão Cadastro → FTD</span>
+        </a>
+        <span class="chev">→</span>
+        <a class="node discovery" href="https://app.clickup.com/t/868jxb94g" target="_blank">
+          <span class="lvl">Discovery</span>
+          <span class="code">VL-11235</span>
+          <span class="desc">Investigar o gargalo de KYC</span>
+        </a>
+        <span class="chev">→</span>
+        <a class="node delivery" href="https://app.clickup.com/t/868jymfg7" target="_blank">
+          <span class="lvl">Delivery</span>
+          <span class="code">VL-11369</span>
+          <span class="desc">Reposicionar KYC antes do FTD · 6 subtasks</span>
+        </a>
+      </div>
+      <p class="trace-foot">Cada tarefa de Discovery e Delivery nasce <b>vinculada ao item de Roadmap</b> — a diretoria acompanha a aposta inteira por um único ponto.</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  <span class="brand">Produto &amp; Tecnologia</span>
+  <span id="counter">1 / 9</span>
+</div>
+<div class="nav-hint">← → para navegar · F tela cheia · P imprimir/PDF</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    document.getElementById('counter').textContent=(i+1)+' / '+slides.length;
+    document.getElementById('progress').style.width=((i+1)/slides.length*100)+'%';
+  }
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){show(i+1);e.preventDefault();}
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){show(i-1);}
+    else if(e.key==='Home'){show(0);}
+    else if(e.key==='End'){show(slides.length-1);}
+    else if(e.key.toLowerCase()==='f'){
+      if(!document.fullscreenElement)document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+    else if(e.key.toLowerCase()==='p'){window.print();}
+  });
+  document.addEventListener('click',e=>{
+    if(e.target.closest('a'))return;
+    const x=e.clientX/window.innerWidth;
+    show(x>0.35?i+1:i-1);
+  });
+  show(0);
+</script>
+</body>
+</html>
