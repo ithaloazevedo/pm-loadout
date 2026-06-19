@@ -79,6 +79,23 @@ Esta verificação ocorre uma única vez por sessão.
 Não há parent nativo entre folders: **o vínculo é feito por linked task** (`clickup_add_task_link`) e por
 referência no corpo. Os campos de priorização (RICE, MoSCoW, Horizonte, Squad) **só existem no folder Roadmap**.
 
+## Definição dos Folders (fluxo canônico — a skill SEMPRE segue)
+
+Cada folder tem um propósito fixo. Use-os para decidir onde um item nasce:
+
+| Folder | Propósito | O que vive aqui |
+|--------|-----------|-----------------|
+| **Product Roadmap** | Visão geral de iniciativas estratégicas de ponta a ponta | Apostas estratégicas (Roadmap Items): Visão, Métricas, Portfólio, Dependências e priorização |
+| **Product Discovery** | **Design Ops, Pesquisa, Definição de Escopo e Prototipação** | Projetos cujo escopo está sendo **orientado, não 100% fechado** — pesquisa, JTBD/personas, definição de escopo e protótipos navegáveis |
+| **Product Delivery** | Escopo **fechado**, alinhado com a engenharia apenas para **execução** | Specs de build prontas: capacidades + critérios de aceite testáveis, sem decisões de produto/UX em aberto |
+
+**Regras que decorrem disso:**
+
+- **Prototipação é sempre Discovery.** Um projeto de protótipo nasce no folder Product Discovery, nunca em Delivery — mesmo que o escopo já esteja bem orientado.
+- **Todo protótipo é no Figma.** Discovery de prototipação produz um **protótipo navegável no Figma**, jamais protótipo HTML/código. O protótipo existe para resolver as **decisões de UX em aberto** e fechar o escopo antes do Delivery.
+- **Discovery tem escopo orientado, não fechado.** É esperado que carregue decisões de UX em aberto. Só vai para Delivery quando o escopo fecha **e** está alinhado com dev para executar.
+- **Delivery é só execução.** Se ainda há decisão de produto ou de UX a tomar, o item não é Delivery — é Discovery.
+
 ## Filosofia e Princípios
 
 > **"Estratégia centralizada no Roadmap, detalhe na base."**
@@ -127,12 +144,14 @@ Identifique o tipo de item e o que falta. **Bloqueantes por tipo** (resolva todo
 | Projeto de Discovery | tipo confirmado, Roadmap Item associado, problema central |
 | Projeto de Delivery | tipo confirmado, Roadmap Item associado, escopo fechado (capacidades) |
 
-**Se o usuário não souber distinguir Discovery de Delivery:**
-> "O escopo já está fechado e validado com stakeholders?" — sim → Delivery / não → Discovery
+**Se o usuário não souber distinguir Discovery de Delivery** (ver "Definição dos Folders"):
+> "Ainda há pesquisa, prototipação ou decisão de produto/UX a fazer?" — sim → **Discovery** / não, escopo fechado e alinhado com dev para executar → **Delivery**
+
+> ⚠️ **Prototipação é sempre Discovery, e todo protótipo é no Figma.** Se a demanda é "fazer o protótipo", o item nasce em Product Discovery com escopo orientado (não fechado) e entregável no Figma — nunca em Delivery, nunca HTML/código.
 
 **Para Delivery**, pergunte se existe um Discovery prévio no ClickUp para vincular. Se sim → busque e vincule; se não → siga sem o campo.
 
-**Enriquecedores** (peça após bloqueantes, só quando relevantes): Link do Figma/FigJam (Discovery, Delivery), OKRs/KPIs e RICE (Roadmap), dependências externas (Roadmap, Delivery), questões em aberto (Discovery).
+**Enriquecedores** (peça após bloqueantes, só quando relevantes): Link do Figma — protótipo (Discovery de prototipação) ou referência de design (Delivery); OKRs/KPIs e RICE (Roadmap); dependências externas (Roadmap, Delivery); questões e decisões de UX em aberto (Discovery). **Não force seções sem informação** — o template de Discovery é adaptativo (ver [references/template-discovery.md](references/template-discovery.md)).
 
 ### Passo 2: Busca no ClickUp
 
@@ -169,7 +188,7 @@ Se não: apresente o Markdown final pronto para colar.
 
 Só grave após o "sim". Use os IDs de [references/clickup-config.md](references/clickup-config.md).
 
-**3. Vínculo** — vincule o item ao nível acima/abaixo via `clickup_add_task_link` (pertencimento) e, **sempre que vincular Discovery/Delivery a um Roadmap Item, atualize também a seção 🗂️ Portfólio de Projetos do Roadmap Item** (nome + link `VL-XXXXX`). Use `clickup_add_task_dependency` apenas quando houver ordem real (alimenta Gantt). Detalhe e guardrail em [references/clickup-method.md](references/clickup-method.md) → "Vínculos entre níveis".
+**3. Vínculo** — vincule o item ao nível acima/abaixo via `clickup_add_task_link` (pertencimento) e, **sempre que vincular Discovery/Delivery a um Roadmap Item, atualize também a seção 🗂️ Portfólio de Projetos do Roadmap Item** no formato `Nome (https://app.clickup.com/t/9006076935/VL-XXXXX)` — uma linha por projeto, com a URL completa, que o ClickUp renderiza como task-link interativo (status + responsável). Use `clickup_add_task_dependency` apenas quando houver ordem real (alimenta Gantt). Detalhe e guardrail em [references/clickup-method.md](references/clickup-method.md) → "Vínculos entre níveis".
 
 **4. Update (comentário)** — pergunte se deve postar um comentário-update narrativo (contexto → decisão → próximo passo). Modelos em [references/clickup-method.md](references/clickup-method.md). Confirme o rascunho antes de postar.
 
@@ -196,7 +215,7 @@ Compare o Discovery com o que o template de Delivery exige. Peça só o que falt
 Pré-preencha com os dados do Discovery. Campo **Discovery:** aponta para a task de origem. Apresente para aprovação, depois:
 > "Posso criar este Projeto de Delivery no ClickUp agora?"
 
-Se sim → resolva/crie a lista do folder Delivery, `clickup_create_task`, e **vincule os três níveis** com `clickup_add_task_link`: Delivery ↔ Discovery (origem) e Delivery ↔ Roadmap Item (pai). **Atualize a seção 🗂️ Portfólio de Projetos do Roadmap Item** com o novo Delivery (nome + link). Retorne o link.
+Se sim → resolva/crie a lista do folder Delivery, `clickup_create_task`, e **vincule os três níveis** com `clickup_add_task_link`: Delivery ↔ Discovery (origem) e Delivery ↔ Roadmap Item (pai). **Atualize a seção 🗂️ Portfólio de Projetos do Roadmap Item** com o novo Delivery no formato `Nome (https://app.clickup.com/t/9006076935/VL-XXXXX)` (task-link interativo — ver clickup-method). Retorne o link.
 
 ### Passo 4: Updates duplos (comentários)
 Sugira dois comentários e pergunte se deseja postar ambos, um, ou nenhum:
@@ -232,9 +251,11 @@ Peça o ID/nome. `clickup_get_task` (com `detail_level: detailed`). Se não enco
 |----------|--------|
 | Título imperativo? | ✅/❌ |
 | Vinculado a um Roadmap Item? | ✅/❌ |
-| Problema descrito com especificidade (dados)? | ✅/❌ |
-| Questões em aberto listadas? | ✅/❌ |
-| Critérios de saída definidos? | ✅/❌ |
+| Sub-tipo declarado (Pesquisa / Definição de Escopo / Prototipação / Design Ops)? | ✅/❌ |
+| Objetivo claro + Critérios de saída definidos? | ✅/❌ |
+| Seções presentes são as relevantes ao contexto (sem seções vazias/genéricas)? | ✅/❌ |
+| Se Prototipação: protótipo é no **Figma** e há **decisões de UX em aberto** listadas? | ✅/❌/NA |
+| JTBD / Personas / Evidências presentes **quando há informação** (não inventados)? | ✅/❌/NA |
 | Dono nomeado? | ✅/❌ |
 
 **Projeto de Delivery**
@@ -295,9 +316,10 @@ Exiba:
 1. A **hierarquia** Roadmap Item → Discovery → Delivery → subtask, com a pergunta de cada nível.
 2. A **regra de ouro de títulos** com exemplos bons/ruins.
 3. Os **anti-patterns** mais comuns ([references/anti-pattern.md](references/anti-pattern.md)).
-4. **Relação Discovery → Delivery**: Discovery não é pré-requisito obrigatório. Use Discovery quando o escopo não está fechado; vá direto a Delivery quando já está claro e validado. Com Discovery prévio, use `promote`.
-5. **Quando NÃO criar um Projeto de Delivery**: se cabe em 1-2 dias, não tem fases/paralelismo e não envolve Designer nem múltiplos times → é uma **subtask** (ou item simples), não um projeto.
-6. **Diferença vs. Linear**: o Roadmap Item é o contêiner estratégico; vínculos são por linked task; priorização (RICE/MoSCoW/Horizonte) vive no folder Roadmap.
+4. A **Definição dos Folders** (Roadmap = iniciativas estratégicas ponta a ponta · Discovery = Design Ops, Pesquisa, Definição de Escopo e Prototipação · Delivery = escopo fechado, só execução) e as regras que decorrem dela — em especial: **prototipação é sempre Discovery e todo protótipo é no Figma**.
+5. **Relação Discovery → Delivery**: Discovery não é pré-requisito obrigatório. Use Discovery quando há pesquisa, prototipação ou decisões de produto/UX em aberto; vá direto a Delivery quando o escopo está fechado e alinhado com dev. Com Discovery prévio, use `promote`.
+6. **Quando NÃO criar um Projeto de Delivery**: se cabe em 1-2 dias, não tem fases/paralelismo e não envolve Designer nem múltiplos times → é uma **subtask** (ou item simples), não um projeto.
+7. **Diferença vs. Linear**: o Roadmap Item é o contêiner estratégico; vínculos são por linked task; priorização (RICE/MoSCoW/Horizonte) vive no folder Roadmap.
 
 ---
 

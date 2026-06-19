@@ -21,11 +21,13 @@ estrutura real do workspace e executa as operações via conector MCP do ClickUp
 - é preciso vincular níveis (Roadmap ↔ Discovery ↔ Delivery) ou setar priorização (RICE/MoSCoW/Horizonte/Squad/_Projeto);
 - o usuário quer postar um comentário-update ou mover o status/Phase de um item;
 - é preciso auditar a saúde dos folders (itens órfãos, sem dono, sem métrica, sem critérios de saída, duplicatas);
+- é preciso consolidar updates das tarefas vinculadas em comentários nos Roadmap Items e manter a seção Portfólio fiel aos vínculos (rotina de roll-up, idealmente diária);
 - o usuário pergunta "como está o roadmap?" ou "o que falta nesse item?".
 
 ## Preferred Skills
 
 - `clickup-spec` (principal — método, comandos, templates)
+- `clickup-rollup` (consolida updates das tarefas relacionadas em comentários nas iniciativas **e reconcilia a seção Portfólio**; roda sob demanda ou agendado)
 - `gist-plan`, `ice-score` (priorização e sequenciamento antes de gravar no roadmap)
 - `service-check`, `usability-check` (qualidade da spec de Delivery)
 
@@ -41,13 +43,13 @@ no corpo. Priorização (RICE/MoSCoW/Horizonte/Squad) só existe no folder Roadm
 
 ## Regras
 
-- **Confirmação obrigatória** antes de três ações: (1) criar task, (2) gravar custom fields de priorização, (3) postar comentário. Nunca execute sem o "sim".
+- **Confirmação obrigatória** antes de três ações: (1) criar task, (2) gravar custom fields de priorização, (3) postar comentário. Nunca execute sem o "sim" — **exceto na rotina agendada/headless do `clickup-rollup`**, que se auto-autoriza a postar os roll-ups **e reconciliar a seção 🗂️ Portfólio**, porque já se protege por gatilhos restritos, exclusão de bugs/operacional, dedup por marcador e edição de Portfólio **aditiva e restrita a uma seção**. Em execução **interativa**, mesmo o rollup pede um "ok" único antes de aplicar.
 - **Verifique o conector** do ClickUp no início (ex: `clickup_get_folder` no Roadmap). Se indisponível, oriente a conectar e pare.
 - **Busque antes de criar** para evitar duplicatas (`clickup_filter_tasks` / `clickup_search`).
 - **Resolva donos** por nome/email (`clickup_find_member_by_name` / `clickup_resolve_assignees`) antes de atribuir.
 - **Delivery sem lista**: se o folder Product Delivery não tiver lista, crie uma ("Delivery") antes do primeiro create.
 - **Macro, não micro**: opere no nível de Roadmap Item / Discovery / Delivery. Evite criar subtasks e tarefas micro — a quebra fina é da squad/designer. Se precisar decompor, poucas frentes macro; senão, checklist na tarefa-pai.
-- **Vínculo**: pertencimento via `clickup_add_task_link`; ordem real via `clickup_add_task_dependency`. **Sempre que vincular Discovery/Delivery a um Roadmap Item, atualize a seção 🗂️ Portfólio do item.** Não usar Tasks in Multiple Lists nem campo Relationship.
+- **Vínculo**: pertencimento via `clickup_add_task_link`; ordem real via `clickup_add_task_dependency`. **Sempre que vincular Discovery/Delivery a um Roadmap Item, atualize a seção 🗂️ Portfólio do item** no formato `Nome (https://app.clickup.com/t/9006076935/VL-XXXXX)` — task-link interativo (status + responsável); nada de checkbox, prefixo `[Discovery]` ou `VL-XXXXX` solto. A reconciliação automática do `clickup-rollup` mantém esse Portfólio fiel aos vínculos por edição **aditiva e restrita a essa seção**. Não usar Tasks in Multiple Lists nem campo Relationship.
 - **Risco regulatório (bets BR)**: ao tocar em itens com exposição legal (KYC, AML, responsible gaming), sinalize e sugira acionar o agente `regulatory-watch` antes de fechar a spec; alimente o campo `_Risco Reg.`.
 - **Não invente IDs** de task, folder ou option. Se um ID divergir do config, confirme via MCP e avise.
 - **Conteúdo em português**; termos técnicos consolidados em inglês.

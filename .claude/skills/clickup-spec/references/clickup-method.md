@@ -14,10 +14,25 @@
 | Linear | ClickUp (Vertical Loto) |
 |--------|--------------------------|
 | Iniciativa | **Roadmap Item** (folder Product Roadmap) — Visão, Métricas, Portfólio, Dependências; percorre todo o ciclo de status |
-| Projeto de Discovery | **Projeto de Discovery** (folder Product Discovery, lista Design) |
-| Projeto de Delivery | **Projeto de Delivery** (folder Product Delivery) |
+| Projeto de Discovery | **Projeto de Discovery** (folder Product Discovery, lista Design) — Design Ops, Pesquisa, Definição de Escopo e Prototipação; escopo orientado, não fechado |
+| Projeto de Delivery | **Projeto de Delivery** (folder Product Delivery) — escopo fechado, alinhado com dev só para execução |
 | Issue / Milestone | **Subtask** sob o item pai (UC, edge case, build) |
 | Activity Update | **Comentário** na task (`clickup_create_task_comment`) |
+
+## Definição dos folders (fluxo canônico)
+
+| Folder | Propósito | O que vive aqui |
+|--------|-----------|-----------------|
+| **Product Roadmap** | Visão geral de iniciativas estratégicas de ponta a ponta | Apostas estratégicas: Visão, Métricas, Portfólio, Dependências, priorização |
+| **Product Discovery** | **Design Ops, Pesquisa, Definição de Escopo e Prototipação** | Projetos de escopo **orientado, não fechado**: pesquisa, JTBD/personas, definição de escopo, protótipos navegáveis |
+| **Product Delivery** | Escopo **fechado**, alinhado com a engenharia só para **execução** | Specs de build: capacidades + critérios de aceite testáveis, sem decisões de produto/UX em aberto |
+
+**Regras decorrentes (a `clickup-spec` sempre segue):**
+
+- **Prototipação é sempre Discovery** — nunca Delivery, mesmo com escopo bem orientado.
+- **Todo protótipo é no Figma** — Discovery de prototipação produz protótipo navegável no Figma, jamais HTML/código. O protótipo resolve as **decisões de UX em aberto** e fecha o escopo antes do Delivery.
+- **Delivery é só execução** — se ainda há decisão de produto/UX, é Discovery.
+- **Template de Discovery é adaptativo** — JTBD, Personas, Evidências e demais seções entram só quando há informação/relevância; na dúvida, perguntar (ver [template-discovery.md](template-discovery.md)).
 
 ## Vínculos entre níveis
 
@@ -34,9 +49,22 @@ simples e legível — linked task (sistema) + Portfólio no corpo (humano).
 
 ### Boa prática — espelhar sempre no Portfólio
 Sempre que vincular uma tarefa de **Discovery ou Delivery** a um **Roadmap Item** por linked task, **atualize
-também a seção 🗂️ Portfólio de Projetos do Roadmap Item**, adicionando a linha com nome + link `VL-XXXXX`. O
-linked task dá o vínculo de sistema; o Portfólio é o índice legível e a fonte de verdade humana. **Os dois
-andam juntos — nunca crie o vínculo sem atualizar o corpo** (vale para `create` e `promote`).
+também a seção 🗂️ Portfólio de Projetos do Roadmap Item**. O linked task dá o vínculo de sistema; o Portfólio é
+o índice legível e a fonte de verdade humana. **Os dois andam juntos — nunca crie o vínculo sem atualizar o
+corpo** (vale para `create` e `promote`).
+
+**Formato do Portfólio (task-link interativo):** cada projeto é **uma linha** com o **nome da tarefa seguido da
+URL completa entre parênteses**. O ClickUp detecta a URL e a renderiza como **componente interativo** — mostra
+**status e responsável** ao vivo e permite mudar o status dali. Use a URL completa com o workspace ID:
+
+```
+Nome da Tarefa (https://app.clickup.com/t/9006076935/VL-XXXXX)
+Outro Projeto (https://app.clickup.com/t/9006076935/VL-YYYYY)
+```
+
+> **Não** use checkbox (`- [ ]`), prefixo `[Discovery]/[Delivery]` nem `VL-XXXXX` solto: sem a URL completa o
+> texto fica estático e não vira componente. O card já exibe o status — não escreva status à mão. (Referência
+> viva do padrão: VL-11852.)
 
 ### Guardrail — macro, não micro
 - O escopo da `clickup-spec` é **macro**: Roadmap Item, Discovery e Delivery. Mantenha tarefas no nível de projeto/aposta.

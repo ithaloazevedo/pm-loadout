@@ -40,7 +40,7 @@ Classify the request into one primary mission:
 | Specify | roadmap item, discovery project, delivery project, ClickUp or Linear | `clickup-spec`, `linear-spec`, `linear-issues` |
 | Validate quality | service, usability, accessibility, privacy, launch risk | `service-check`, `usability-check`, `launch-tier` |
 | Plan learning | metric, success criteria, loop, retrospective | `metrics-detect`, `retrospective` |
-| Watch compliance | bets law/regulation update, Portaria, GLI, compliance checklist | `bias-check` (+ `agents/regulatory-watch.md`) |
+| Watch compliance | bets law/regulation update, Portaria, GLI, compliance checklist | `bias-check` (+ `../../agents/regulatory-watch.md`) |
 
 Load `references/routing-map.md` when the mission is not obvious or spans multiple rows.
 Load `references/pm-flow.md` when the user wants an end-to-end product workflow.
@@ -72,13 +72,13 @@ Juninho may consult specialists when a mission benefits from a second lens. Load
 
 | Agent | Use when |
 |---|---|
-| `agents/scout.md` | Discovery, evidence, interviews, needs, assumptions |
-| `agents/strategist.md` | Prioritization, strategy, sequencing, market/game board |
-| `agents/scribe.md` | Specs, ClickUp hierarchy, issue shaping, crisp artifacts |
-| `agents/gerenciador-do-clickup.md` | Operate the ClickUp process: create/structure Roadmap/Discovery/Delivery, promote, link, set fields, post updates, audit folders |
-| `agents/judge.md` | Challenge, product quality, service/usability/privacy checks |
-| `agents/analyst.md` | Metrics, learning loops, launch and retrospective signals |
-| `agents/regulatory-watch.md` | Regulatory/legal updates, compliance checklist, bets BR law/Portaria changes |
+| `../../agents/scout.md` | Discovery, evidence, interviews, needs, assumptions |
+| `../../agents/strategist.md` | Prioritization, strategy, sequencing, market/game board |
+| `../../agents/scribe.md` | Specs, ClickUp hierarchy, issue shaping, crisp artifacts |
+| `../../agents/gerenciador-do-clickup.md` | Operate the ClickUp process: create/structure Roadmap/Discovery/Delivery, promote, link, set fields, post updates, audit folders, roll-up + Portfólio reconciliation (fonte única — canônico em `.claude/agents/`) |
+| `../../agents/judge.md` | Challenge, product quality, service/usability/privacy checks |
+| `../../agents/analyst.md` | Metrics, learning loops, launch and retrospective signals |
+| `../../agents/regulatory-watch.md` | Regulatory/legal updates, compliance checklist, bets BR law/Portaria changes |
 
 When using a specialist, require this handoff:
 

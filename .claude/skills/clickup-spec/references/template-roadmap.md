@@ -19,8 +19,8 @@ métricas, portfólio de projetos e dependências, e percorre todo o ciclo de st
 | Secundária | [métrica de apoio] | [meta] | [—] |
 
 ### 🗂️ Portfólio de Projetos
-- [ ] [Discovery — link VL-XXXXX]
-- [ ] [Delivery / épico — link VL-XXXXX]
+Nome do Discovery (https://app.clickup.com/t/9006076935/VL-XXXXX)
+Nome do Delivery (https://app.clickup.com/t/9006076935/VL-YYYYY)
 
 ### 🔗 Dependências Externas
 - **[Área/Time/Decisão]:** [o que está pendente]
@@ -28,6 +28,10 @@ métricas, portfólio de projetos e dependências, e percorre todo o ciclo de st
 
 **Campos a sugerir** (com confirmação): _Projeto (marca), Squad, Impacto (eixo), RICE (Reach/Impact/Confidence/Effort),
 MoSCoW, Horizonte, Phase. Ver [clickup-method.md](clickup-method.md). **Status inicial:** `considering` ou `prioritized`.
+
+> **Portfólio = task-link interativo.** Cada projeto é uma linha `Nome (URL completa da tarefa)` — o ClickUp
+> renderiza a URL como componente com status e responsável ao vivo. Nada de checkbox, prefixo `[Discovery]` ou
+> `VL-XXXXX` solto. Detalhe em [clickup-method.md](clickup-method.md) → "Boa prática — espelhar sempre no Portfólio".
 
 ---
 
@@ -49,9 +53,9 @@ pendente é recuperado por re-engajamento. Mantém a operação fora do risco de
 | Secundária | Reativação de usuários com KYC reprovado/pendente | A definir | — |
 
 ### 🗂️ Portfólio de Projetos
-- [Discovery] Investigar o gargalo de KYC no onboarding e definir direção de solução — VL-11235
-- [ ] Reposicionar KYC facial antes do FTD com processamento em background — épico VL-11369 (6 subtasks)
-- [ ] Banner de reativação para KYC reprovado/pendente — VL-11394
+Investigar o gargalo de KYC no onboarding e definir direção de solução (https://app.clickup.com/t/9006076935/VL-11235)
+Reposicionar KYC facial antes do FTD com processamento em background (https://app.clickup.com/t/9006076935/VL-11369)
+Banner de reativação para KYC reprovado/pendente (https://app.clickup.com/t/9006076935/VL-11394)
 
 ### 🔗 Dependências Externas
 - **API de KYC (Legitimuz / Serasa):** decisão de provedor e SLA de resposta — _em aberto_

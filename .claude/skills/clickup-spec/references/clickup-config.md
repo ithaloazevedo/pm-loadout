@@ -4,7 +4,7 @@ Mapa de IDs reais do workspace para a skill `clickup-spec` e o agente `gerenciad
 sem precisar re-descobrir a estrutura. **Confirme via MCP no início de cada sessão** (IDs podem mudar
 se o workspace for reconfigurado). Se um ID divergir, atualize este arquivo.
 
-> Última verificação: 2026-06-12.
+> Última verificação: 2026-06-19.
 
 ## Hierarquia
 
@@ -22,7 +22,7 @@ se o workspace for reconfigurado). Se um ID divergir, atualize este arquivo.
 |--------|-------|----|-----|
 | Product Roadmap | Product Roadmap | `901113906048` | Itens de Roadmap (apostas estratégicas) |
 | Product Discovery | Design | `901113898193` | Projetos de Discovery + subtasks (UCs, edge cases) |
-| Product Delivery | *(resolver em runtime)* | — | Specs de Delivery. Se o folder não tiver lista, criar uma (ex: "Delivery") via `clickup_create_list_in_folder` antes do primeiro create. |
+| Product Delivery | Execução | `901113940182` | Specs de Delivery (escopo fechado, execução). Use esta lista; só crie outra se ela for removida. |
 
 ## Status por lista
 
@@ -32,7 +32,7 @@ se o workspace for reconfigurado). Se um ID divergir, atualize este arquivo.
 **Product Discovery / Design** (`901113898193`):
 `to do` → `in progress` → `em aprovação` → `fechado`
 
-**Product Delivery**: confirmar em runtime após resolver a lista (herda o conjunto da lista criada).
+**Product Delivery / Execução** (`901113940182`): `to-do` → `stand-by` → `dev` → `qa` → `done` (confirme variações em runtime).
 
 ## Custom Fields — Folder Product Roadmap (conjunto rico)
 
