@@ -1,8 +1,10 @@
 # Template: Projeto de Delivery
 
 Vive no folder **Product Delivery**. Use quando o Discovery foi concluído — direção validada, escopo
-fechado, engenharia pode iniciar o planejamento. Se o folder não tiver lista, crie uma ("Delivery") antes do
-primeiro create (`clickup_create_list_in_folder`).
+fechado, engenharia pode iniciar o planejamento. **Nasce na lista `Backlog de Delivery`** (refinado e
+priorizado, pronto para sprint); migra para `Execução` ao entrar na sprint, ou é criado direto em `Execução`
+se for tarefa prioritária. **Nunca** crie listas novas no folder (a lista legada "Delivery" está vazia e não
+deve ser usada). IDs e status em [clickup-config.md](clickup-config.md).
 
 ---
 

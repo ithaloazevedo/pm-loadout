@@ -96,6 +96,11 @@ Cada folder tem um propósito fixo. Use-os para decidir onde um item nasce:
 - **Discovery tem escopo orientado, não fechado.** É esperado que carregue decisões de UX em aberto. Só vai para Delivery quando o escopo fecha **e** está alinhado com dev para executar.
 - **Delivery é só execução.** Se ainda há decisão de produto ou de UX a tomar, o item não é Delivery — é Discovery.
 
+> **🚦 Onde criar um Projeto de Delivery (regra firme — evita criação errada):**
+> - **Default:** todo Delivery **nasce na lista `Backlog de Delivery`** (`901113940183`), status inicial `backlog`. É o estágio "refinado e priorizado, pronto para entrar em sprint". Só depois de refinado/priorizado é que **migra para `Execução`** (puxado para a sprint).
+> - **Exceção:** uma **tarefa prioritária** pode ser criada **direto na `Execução`** (`901113940182`), status `to-do`. Use só quando o item já entra na sprint corrente por urgência — confirme com o usuário.
+> - **Nunca** crie na lista legada **"Delivery"** (`901113980144`, vazia) nem crie listas novas no folder. As duas listas acima cobrem todo o fluxo. IDs e status em [references/clickup-config.md](references/clickup-config.md).
+
 ## Filosofia e Princípios
 
 > **"Estratégia centralizada no Roadmap, detalhe na base."**
@@ -122,13 +127,13 @@ Método e automação de campos: [references/clickup-method.md](references/click
 
 Carregue os schemas via ToolSearch quando precisar. Tools-chave:
 - `clickup_create_task` — cria a task na lista certa. Custom fields: `custom_fields: [{ id, value }]` (IDs em [references/clickup-config.md](references/clickup-config.md)).
-- `clickup_create_list_in_folder` — se o folder Product Delivery não tiver lista, crie uma ("Delivery") antes do primeiro create.
+- `clickup_create_list_in_folder` — **não usar** para Delivery: as listas já existem (`Backlog de Delivery` default, `Execução` para sprint). Nunca crie listas novas no folder Product Delivery.
 - `clickup_add_task_link` — vincula Roadmap ↔ Discovery ↔ Delivery (linked tasks).
 - `clickup_create_task_comment` — posta updates narrativos.
 - `clickup_update_task` — muda status/campos de itens existentes.
 - `clickup_find_member_by_name` / `clickup_resolve_assignees` — resolve donos por nome/email antes de atribuir.
 
-Resolva a lista de destino pelo folder (config). Para descrição, use `markdown_description`.
+Resolva a lista de destino pelo folder (config). **Delivery nasce em `Backlog de Delivery` (default); só vai para `Execução` quando entra na sprint, ou direto em `Execução` se for tarefa prioritária** — ver a regra 🚦 em "Definição dos Folders". Para descrição, use `markdown_description`.
 
 ---
 
@@ -175,13 +180,13 @@ seguindo [references/clickup-method.md](references/clickup-method.md). Apresente
 > "Posso criar este item no ClickUp agora?"
 
 Se sim:
-- resolva a lista de destino pelo folder (config). Para **Delivery**, se o folder não tiver lista, crie uma ("Delivery") antes;
+- resolva a lista de destino pelo folder (config). Para **Delivery**, use **`Backlog de Delivery`** (default); só use **`Execução`** se for tarefa prioritária que já entra na sprint (confirme). Nunca crie listas novas no folder;
 - `clickup_create_task` com nome (título imperativo), `markdown_description` (corpo do template), status inicial adequado (ver abaixo) e assignee do dono;
 - retorne o link (`https://app.clickup.com/t/9006076935/VL-XXXXX`).
 
 Se não: apresente o Markdown final pronto para colar.
 
-**Status inicial sugerido:** Roadmap Item → `considering` ou `prioritized` (pergunte se já está priorizado); Discovery → `to do`; Delivery → primeiro status da lista (confirme em runtime).
+**Status inicial sugerido:** Roadmap Item → `considering` ou `prioritized` (pergunte se já está priorizado); Discovery → `to do`; Delivery → `backlog` na lista `Backlog de Delivery` (default) ou `to-do` na `Execução` se for exceção prioritária.
 
 **2. Custom fields (Roadmap Item)** — após criar, confirme antes de gravar:
 > "Quer que eu grave os campos de priorização? RICE ≈ [valor] (R [x] · I [y] · C [z]% · E [w]), Horizonte [Now/Next/Later], MoSCoW [..], Squad [..], _Projeto [..]."
@@ -215,7 +220,7 @@ Compare o Discovery com o que o template de Delivery exige. Peça só o que falt
 Pré-preencha com os dados do Discovery. Campo **Discovery:** aponta para a task de origem. Apresente para aprovação, depois:
 > "Posso criar este Projeto de Delivery no ClickUp agora?"
 
-Se sim → resolva/crie a lista do folder Delivery, `clickup_create_task`, e **vincule os três níveis** com `clickup_add_task_link`: Delivery ↔ Discovery (origem) e Delivery ↔ Roadmap Item (pai). **Atualize a seção 🗂️ Portfólio de Projetos do Roadmap Item** com o novo Delivery no formato `Nome (https://app.clickup.com/t/9006076935/VL-XXXXX)` (task-link interativo — ver clickup-method). Retorne o link.
+Se sim → crie na lista **`Backlog de Delivery`** (status `backlog`; é o destino padrão de todo Delivery promovido — não nasce em Execução nem em lista nova), `clickup_create_task`, e **vincule os três níveis** com `clickup_add_task_link`: Delivery ↔ Discovery (origem) e Delivery ↔ Roadmap Item (pai). **Atualize a seção 🗂️ Portfólio de Projetos do Roadmap Item** com o novo Delivery no formato `Nome (https://app.clickup.com/t/9006076935/VL-XXXXX)` (task-link interativo — ver clickup-method). Retorne o link.
 
 ### Passo 4: Updates duplos (comentários)
 Sugira dois comentários e pergunte se deseja postar ambos, um, ou nenhum:

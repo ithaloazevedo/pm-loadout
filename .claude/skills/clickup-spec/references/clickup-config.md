@@ -22,7 +22,10 @@ se o workspace for reconfigurado). Se um ID divergir, atualize este arquivo.
 |--------|-------|----|-----|
 | Product Roadmap | Product Roadmap | `901113906048` | Itens de Roadmap (apostas estratégicas) |
 | Product Discovery | Design | `901113898193` | Projetos de Discovery + subtasks (UCs, edge cases) |
-| Product Delivery | Execução | `901113940182` | Specs de Delivery (escopo fechado, execução). Use esta lista; só crie outra se ela for removida. |
+| Product Delivery | **Backlog de Delivery** | `901113940183` | **Onde NASCE todo Projeto de Delivery (default)**: itens refinados e priorizados, prontos para entrar em sprint. |
+| Product Delivery | Execução | `901113940182` | Sprint ativa / WIP da engenharia. Um Delivery chega aqui ao ser puxado para a sprint (refinado + priorizado). **Exceção:** tarefa prioritária pode ser criada direto aqui. |
+
+> ⚠️ O folder Product Delivery tem uma terceira lista, **"Delivery"** (`901113980144`), **vazia, sem descrição e sem uso — NÃO considerar** (legada, criada por default). Nunca criar tasks nela; nunca criar listas novas no folder (as duas acima já cobrem o fluxo).
 
 ## Status por lista
 
@@ -32,7 +35,9 @@ se o workspace for reconfigurado). Se um ID divergir, atualize este arquivo.
 **Product Discovery / Design** (`901113898193`):
 `to do` → `in progress` → `em aprovação` → `fechado`
 
-**Product Delivery / Execução** (`901113940182`): `to-do` → `stand-by` → `dev` → `qa` → `done` (confirme variações em runtime).
+**Product Delivery / Backlog de Delivery** (`901113940183`): `backlog` → `priorizado` → `em refinamento` → `in progress` → `complete`.
+
+**Product Delivery / Execução** (`901113940182`): `to-do` → `stand-by` → `dev` → `qa` → `aprovado` → `em correção` → `alpha` → `pendente` → `deploy` → `prd` → `concluído`.
 
 ## Custom Fields — Folder Product Roadmap (conjunto rico)
 

@@ -32,6 +32,7 @@
 - **Prototipação é sempre Discovery** — nunca Delivery, mesmo com escopo bem orientado.
 - **Todo protótipo é no Figma** — Discovery de prototipação produz protótipo navegável no Figma, jamais HTML/código. O protótipo resolve as **decisões de UX em aberto** e fecha o escopo antes do Delivery.
 - **Delivery é só execução** — se ainda há decisão de produto/UX, é Discovery.
+- **Delivery nasce no `Backlog de Delivery`** (`901113940183`, status `backlog`): refinado e priorizado, pronto para sprint. Migra para **`Execução`** (`901113940182`) ao entrar na sprint; exceção = tarefa prioritária criada direto em `Execução`. **Nunca** usar a lista legada "Delivery" (`901113980144`, vazia) nem criar listas novas no folder.
 - **Template de Discovery é adaptativo** — JTBD, Personas, Evidências e demais seções entram só quando há informação/relevância; na dúvida, perguntar (ver [template-discovery.md](template-discovery.md)).
 
 ## Vínculos entre níveis
