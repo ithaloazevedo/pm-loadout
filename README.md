@@ -35,21 +35,26 @@ git clone https://github.com/ithaloazevedo/pm-loadout.git
 cd pm-loadout
 ```
 
+Para usar fora do repo, copie as skills e agentes para a pasta global do Claude Code (`~/.claude`).
+
 No macOS/Linux:
 
 ```bash
-bash scripts/install.sh           # instala no Claude Code (~/.claude)
-bash scripts/install.sh --codex   # tambem no Codex (~/.codex)
+mkdir -p ~/.claude/skills ~/.claude/agents
+cp -R .claude/skills/* ~/.claude/skills/
+cp -R .claude/agents/* ~/.claude/agents/
 ```
 
-No Windows:
+No Windows (PowerShell):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1            # Claude Code
-powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -Codex     # tambem no Codex
+New-Item -ItemType Directory -Force $HOME\.claude\skills, $HOME\.claude\agents | Out-Null
+Copy-Item -Recurse -Force .\.claude\skills\* $HOME\.claude\skills\
+Copy-Item -Recurse -Force .\.claude\agents\* $HOME\.claude\agents\
 ```
 
-Os instaladores copiam `.claude/skills/*` para `~/.claude/skills` (e os agentes para `~/.claude/agents`).
+> Para propagar exclusoes (skill ou agente removido), apague o item de destino antes de copiar.
+
 Alternativamente, ao trabalhar dentro do proprio repo, as skills e agentes em `.claude/` ja sao reconhecidos pelo Claude Code sem instalar nada.
 
 ## Como usar
