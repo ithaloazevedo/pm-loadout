@@ -89,7 +89,7 @@ Para avançar para Delivery:
 - Pesquisa / board: [link]
 ```
 
-**Status inicial:** `to do`. **Vínculo:** linked task com o Roadmap Item pai — e **espelhe no 🗂️ Portfólio do Roadmap Item**.
+**Status inicial:** `to do`. **Vínculo:** linked task com o Objetivo vinculado (quando houver) — e referencie no corpo do Objetivo.
 
 > **Próximo passo:** cumpridos os critérios de saída, use `/clickup-spec promote VL-XXXXX` para gerar o Delivery.
 

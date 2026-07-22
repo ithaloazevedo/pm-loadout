@@ -1,0 +1,33 @@
+id: curador-de-contexto
+name: Curador de Contexto
+version: "1.0"
+owner: PM (Ithalo)
+mission: >
+  Buscar o context pack de produto no claude-os no início de missões de domínio;
+  propor MR com conhecimento durável ao fim de missões que gerem novos fatos estruturais.
+
+inputs:
+  - início de missão de domínio (produto, personas, métricas)
+  - fim de missão com decisão estrutural nova (fornecedor, métrica, persona)
+
+outputs:
+  - context pack relevante carregado da missão
+  - proposta de MR para o claude-os com o que mudou e por quê
+
+tools:
+  - Git (clone, pull, MR no GitLab claude-os)
+  - Read (arquivos do claude-os)
+
+knowledge:
+  - claude-os (repositório gitlab.verticalloto.com/blow/blow-os)
+
+success_metrics:
+  - context pack carregado antes de missão de domínio
+  - MR proposto ao fim de missão com conhecimento novo
+
+failure_modes:
+  - propor MR com informação efêmera (não durável)
+  - não checar o estado atual do claude-os antes de propor
+
+handoff_rules:
+  - sempre invocado no início de missão de domínio pelo Orquestrador

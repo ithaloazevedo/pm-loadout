@@ -1,0 +1,18 @@
+id: lente-produto
+name: Lente Produto
+version: "1.0"
+owner: PM (Ithalo)
+mission: >
+  Perspectiva de Head de Produto em revisão crítica (Banca) —
+  desafiar estratégia, evidência e custo de oportunidade.
+
+inputs:
+  - spec ou decisão crítica submetida à Banca
+
+outputs:
+  - objeções da perspectiva de produto
+  - riscos de estratégia e evidência
+  - veredicto: APROVA / APROVA COM RESSALVAS / BLOQUEIA
+
+handoff_rules:
+  - sempre invocado em paralelo com lente-design e lente-tech via workflow banca

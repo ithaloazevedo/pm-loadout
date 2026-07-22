@@ -1,37 +1,38 @@
 ---
 name: clickup-rollup
 description: |
-  Consolida os updates das tarefas relacionadas (Discovery/Delivery) em comentários narrativos nos Roadmap Items do ClickUp (workspace Vertical Loto), para que cada iniciativa deixe de ficar isolada.
-  Detecta updates relevantes nas tarefas vinculadas a cada Roadmap Item — pesquisa concluída (com resultado), protótipo finalizado (com link do Figma), mudança de status, novo Delivery promovido — e posta um roll-up na iniciativa.
-  Na mesma varredura, mantém a seção Portfólio de Projetos de cada Roadmap Item fiel aos vínculos reais (reconciliação aditiva dos linked tasks).
-  Ignora tarefas operacionais, bugs e qualquer tarefa não vinculada ao Roadmap. Executado pelo agente gerenciador-do-clickup. Feito para rodar sob demanda ou agendado diariamente.
+  Consolida os updates das tarefas relacionadas (Discovery/Delivery) em comentários narrativos nos Objetivos do ClickUp (workspace Vertical Tech), para que cada Objetivo deixe de ficar isolado.
+  Detecta updates relevantes nas tarefas vinculadas a cada Objetivo — pesquisa concluída (com resultado), protótipo finalizado (com link do Figma), mudança de status, novo Delivery promovido — e posta um roll-up no Objetivo.
+  Na mesma varredura, mantém a seção Portfólio de Projetos de cada Objetivo fiel aos vínculos reais (reconciliação aditiva dos linked tasks) e consolida o Plano de Medição (eventos declarados na área de Instrumentação dos épicos vinculados).
+  Ignora tarefas operacionais, bugs e qualquer tarefa não vinculada a um Objetivo. Executado pelo agente agente-delivery. Feito para rodar sob demanda ou agendado diariamente.
   Comandos: /clickup-rollup run [ID ou nome opcional], /clickup-rollup dry-run, /clickup-rollup help
 ---
 
 **Autor:** Ithalo Mendes <ithalo.mendes@verticalloto.com>
 
-# ClickUp Roll-up — Updates de Iniciativa
+# ClickUp Roll-up — Updates de Objetivo
 
-Mantém cada **Roadmap Item** (iniciativa) vivo: quando uma tarefa **relacionada** (Discovery/Delivery vinculada
-por linked task) tem um update relevante, esta skill **sintetiza e posta um comentário narrativo no Roadmap
-Item** — "pesquisa realizada com o resultado", "protótipo finalizado com link do Figma", "Delivery entrou em
-QA", etc. Assim a iniciativa concentra a história dos seus projetos, sem ninguém precisar caçar tarefa por tarefa.
+Mantém cada **Objetivo** vivo: quando uma tarefa **relacionada** (Discovery/Delivery vinculada
+por linked task) tem um update relevante, esta skill **sintetiza e posta um comentário narrativo no Objetivo**
+— "pesquisa realizada com o resultado", "protótipo finalizado com link do Figma", "Delivery entrou em QA", etc.
+Assim o Objetivo concentra a história dos seus projetos, sem ninguém precisar caçar tarefa por tarefa.
 
-Na mesma passada, a rotina também **mantém a seção 🗂️ Portfólio de Projetos da iniciativa espelhando os vínculos
+Na mesma passada, a rotina também **mantém a seção 🗂️ Portfólio de Projetos do Objetivo espelhando os vínculos
 reais** — fechando, de forma automática, o guardrail manual da `clickup-spec` ("nunca crie um linked task sem
-atualizar o Portfólio"). Duas responsabilidades, uma varredura: **comentar** o que avançou e **reconciliar** o
-Portfólio.
+atualizar o Portfólio") — **e consolida o 📏 Plano de Medição** a partir dos eventos declarados na área de
+Instrumentação dos épicos. Três responsabilidades, uma varredura: **comentar** o que avançou, **reconciliar** o
+Portfólio e **consolidar** a medição.
 
-> **Quem executa:** o agente [gerenciador-do-clickup](../../agents/gerenciador-do-clickup.md). Esta skill é a
+> **Quem executa:** o agente [agente-delivery](../../agents/agente-delivery.md). Esta skill é a
 > rotina; o agente é o braço que lê o ClickUp e posta os comentários.
-> **Relação com `clickup-spec`:** a `clickup-spec` *cria/estrutura* itens; a `clickup-rollup` *mantém a iniciativa
-> atualizada* com o que acontece nos projetos vinculados. As duas compartilham config e método.
+> **Relação com `clickup-spec`:** a `clickup-spec` *cria/estrutura* itens; a `clickup-rollup` *mantém o Objetivo
+> atualizado* com o que acontece nos projetos vinculados. As duas compartilham config e método.
 
 ## Comandos
 
 | Comando | Uso | Descrição |
 |---------|-----|-----------|
-| `run` | `/clickup-rollup run [ID/nome]` | Varre os Roadmap Items ativos e posta os roll-ups necessários (modo automático — só ClickUp). Aceita ID/nome para rodar em uma única iniciativa. |
+| `run` | `/clickup-rollup run [ID/nome]` | Varre os Objetivo vinculados ativos e posta os roll-ups necessários (modo automático — só ClickUp). Aceita ID/nome para rodar em uma única iniciativa. |
 | `run` **+ notas** | `/clickup-rollup run` + notas da reunião | Igual ao `run`, mas você fornece as **notas da reunião** (pontos coletados + próximos passos). A skill cruza o progresso do ClickUp com as suas decisões e escreve o update na sua voz. **Modo recomendado** — ver "Modo com notas". |
 | `dry-run` | `/clickup-rollup dry-run` | Faz a varredura e **apresenta** os roll-ups que seriam postados, **sem postar** (aceita notas também). Use para revisar antes. |
 | `help` | `/clickup-rollup help` | Explica escopo, gatilhos e formato. |
@@ -45,13 +46,13 @@ Se não estiver disponível, interrompa e oriente a conectar o ClickUp (Configur
 
 ## Escopo — o que entra e o que NÃO entra
 
-**Entra:** tarefas de **Discovery** e **Delivery** vinculadas por *linked task* a um **Roadmap Item** (folder
+**Entra:** tarefas de **Discovery** e **Delivery** vinculadas por *linked task* a um **Objetivo vinculado** (folder
 Product Roadmap). Só essas alimentam o roll-up da iniciativa.
 
 **NÃO entra (nunca gerar roll-up a partir destas):**
 - Bugs / incidentes (`_Classe` = Incidente, `Tipo de Chamado` = Incidente).
 - Tarefas operacionais e de suporte (ex: folders/listas de Tickets, CRM, sustentação).
-- Qualquer tarefa **sem vínculo** com um Roadmap Item.
+- Qualquer tarefa **sem vínculo** com um Objetivo vinculado — inclusive tarefas no folder Product Discovery vinculadas apenas a tickets operacionais (e não a uma iniciativa do Roadmap). O critério de inclusão é o **vínculo com o Objetivo vinculado**, não o folder onde a tarefa vive.
 - Subtasks puramente técnicas (passos de implementação) — o sinal relevante é o **status/entregável do projeto**, não cada micro-passo.
 
 > Regra de ouro: se a tarefa não está no Portfólio de uma iniciativa, ela não existe para esta skill.
@@ -75,7 +76,7 @@ Edição cosmética (typo na descrição, troca de assignee, mudança de data) *
 
 Segunda responsabilidade da mesma varredura. Como o passo 2 **já lê os linked tasks** de cada iniciativa, a
 reconciliação roda no mesmo job, sem leitura extra. Objetivo: manter a seção **🗂️ Portfólio de Projetos** do
-Roadmap Item fiel aos vínculos reais, fechando o guardrail manual da `clickup-spec`.
+Objetivo vinculado fiel aos vínculos reais, fechando o guardrail manual da `clickup-spec`.
 
 **O que faz:**
 - **Adiciona** ao Portfólio todo Discovery/Delivery vinculado (linked task) que ainda não está listado, no formato `Nome (https://app.clickup.com/t/9006076935/VL-XXXXX)` — uma linha por projeto, com a URL completa, que o ClickUp renderiza como task-link interativo (status + responsável). Ver clickup-method → "Boa prática — espelhar sempre no Portfólio".
@@ -89,6 +90,47 @@ operacional e tarefa solta nunca entram.
 **Como:** `clickup_update_task` com `markdown_description`, reescrevendo **apenas** o bloco da seção 🗂️ Portfólio
 e preservando o resto do corpo na íntegra. Edição puramente **aditiva** — nunca apaga linhas existentes. Em
 `dry-run`, só apresentar o diff (o que seria adicionado / o que está órfão), sem gravar.
+
+## Consolidação do Plano de Medição (handoff PM → Dados)
+
+Terceira responsabilidade da mesma varredura. Como o passo 2 **já lê a descrição de cada épico** vinculado, a
+consolidação roda no mesmo job. Objetivo: manter a seção **📏 Plano de Medição** do Objetivo vinculado como o índice
+consolidado da **intenção de medição** — os eventos que os épicos declaram — para servir de handoff a Dados/Eng.
+
+**Fronteira de responsabilidade (guardrail):** o PM é dono da **intenção de medição** — qual evento existe, de
+qual épico vem e qual métrica ele alimenta. O **schema técnico** (nome final do evento, propriedades, tipos,
+arquivo versionado, testes) é de **Dados/Eng**. Esta seção consolida só a intenção; **não** inventa propriedades
+nem schema.
+
+**De onde extrai:** a subseção **Instrumentação** dentro dos **✅ Critérios de Aceite** de cada épico (ver
+[template-delivery.md](../clickup-spec/references/template-delivery.md)). Os eventos aparecem como código
+(`hub_checkin_completed`) seguidos do que medem. A métrica que o evento alimenta vem, quando declarada, do
+próprio critério; do contrário, cruze com a seção 📈 Métricas da iniciativa. Não conseguiu mapear com segurança
+→ marque **"a mapear"**, nunca chute.
+
+**Formato da seção** (tabela, reconstruída a cada passada a partir dos épicos):
+
+```markdown
+### 📏 Plano de Medição
+
+_Consolidado automaticamente da Instrumentação dos épicos. Intenção de medição (PM); schema técnico é de Dados/Eng._
+
+| Evento | Alimenta | Épico |
+| --- | --- | --- |
+| `hub_checkin_completed` | Métrica-norte (streak, check-in 1d/7d) | Missões + Daily Streak |
+| `hub_entry_click` | Descoberta (origem: bottom bar/banner/menu) | Estrutura base e pontos de entrada |
+
+⚠️ Épicos sem evento de instrumentação declarado: [lista, se houver] — buraco de cobertura de medição.
+```
+
+**O que faz:**
+- **Consolida** todos os eventos declarados nos épicos vinculados numa única tabela, um evento por linha, com o épico de origem e a métrica que alimenta.
+- **Expõe o buraco de cobertura** (o valor que sobrou do antigo `spec-sync`): épico vinculado voltado ao usuário **sem** nenhum evento declarado é sinalizado — a métrica-norte pode estar sem instrumentação. Épico de ferramenta interna (backoffice, cujo "evento" é log de auditoria) não conta como buraco.
+- **Não toca** em nada fora da seção 📏 Plano de Medição: Visão, Métricas, Portfólio, Dependências e anotações manuais ficam intactas.
+
+**Quando edita:** só quando a tabela consolidada difere da seção atual (evento novo, evento removido de um épico, mudança de mapeamento). Já fiel → não escreve. Diferente da reconciliação do Portfólio (aditiva), esta seção é **derivada e reconstruída**: como espelha 100% os épicos, um evento que sumiu de um épico sai da tabela. Em `dry-run`, só apresentar o diff.
+
+**Como:** `clickup_update_task` com `markdown_description`, reescrevendo **apenas** o bloco da seção 📏 Plano de Medição e preservando o resto do corpo na íntegra. Se a seção ainda não existe no card, inseri-la logo após a 📈 Métricas associadas.
 
 ## Modo com notas (briefing da reunião) — recomendado
 
@@ -122,8 +164,9 @@ Sem notas, a skill roda no **modo automático** (só ClickUp) — útil para a r
 4. **Aplicar os gatilhos.** Se nenhuma tarefa vinculada teve update relevante na janela **e** não há nota da reunião para a iniciativa → **não postar nada** (silêncio é resultado válido). Uma nota relevante, sozinha, já justifica o roll-up.
 5. **Sintetizar** um único comentário de roll-up por iniciativa (formato abaixo), **fundindo o progresso detectado no ClickUp com as notas da reunião** (se fornecidas — ver "Modo com notas"). O **próximo passo vem das notas**; sem nota, marque "a definir" — nunca invente.
 6. **Postar** com `clickup_create_comment` (entity_type `task`, entity_id da iniciativa). Em `dry-run`, só apresentar.
-7. **Reconciliar o Portfólio** (ver "Reconciliação do Portfólio"): compare os linked tasks de Discovery/Delivery com a seção 🗂️ Portfólio do Roadmap Item; se faltar algum, reescreva **só** esse bloco via `clickup_update_task` (edição aditiva) e sinalize entradas órfãs no relatório. Portfólio já fiel → não escreve. Em `dry-run`, só apresentar o diff.
-8. **Reportar** ao final: quantas iniciativas varridas, quantos roll-ups postados, quantos Portfólios reconciliados (e o que foi adicionado/órfão), quais ficaram em silêncio e por quê.
+7. **Reconciliar o Portfólio** (ver "Reconciliação do Portfólio"): compare os linked tasks de Discovery/Delivery com a seção 🗂️ Portfólio do Objetivo vinculado; se faltar algum, reescreva **só** esse bloco via `clickup_update_task` (edição aditiva) e sinalize entradas órfãs no relatório. Portfólio já fiel → não escreve. Em `dry-run`, só apresentar o diff.
+8. **Consolidar o Plano de Medição** (ver "Consolidação do Plano de Medição"): a partir das descrições já lidas no passo 2, extraia os eventos da subseção Instrumentação de cada épico, monte a tabela consolidada e, se diferir da seção 📏 Plano de Medição atual, reescreva **só** esse bloco. Sinalize épicos voltados ao usuário sem evento declarado. Em `dry-run`, só apresentar o diff.
+9. **Reportar** ao final: quantas iniciativas varridas, quantos roll-ups postados, quantos Portfólios reconciliados (e o que foi adicionado/órfão), quantos Planos de Medição consolidados (eventos consolidados / buracos de cobertura), quais ficaram em silêncio e por quê.
 
 ## Idempotência (sem estado persistente)
 
@@ -135,7 +178,7 @@ ClickUp não guarda "última execução"; o estado vive nos **próprios comentá
 
 ## Tom e formato do comentário (Activity Update humanizado)
 
-O comentário **não é um relatório de status** — é o **update que o PM escreveria de próprio punho para os stakeholders**, em primeira pessoa, com lente de valor. Inspirado no Activity Update do `linear-spec`: narrativo, contextual, conecta o trabalho ao resultado.
+O comentário **não é um relatório de status** — é o **update que o PM escreveria de próprio punho para os stakeholders**, em primeira pessoa, com lente de valor. Narrativo, contextual, conecta o trabalho ao resultado.
 
 **Tom (voz do Ithalo):**
 - Fale como gente, para gente: "a gente", "seguimos" — direto e caloroso, sem jargão de processo.
@@ -187,13 +230,14 @@ Claude Code) — a forma de pedir e os cuidados estão na seção "Como agendar"
 
 ## Guardrails
 
-- **Só iniciativas e seus vínculos.** Nunca gere roll-up a partir de bug, operacional ou tarefa solta.
+- **Só Objetivos e seus vínculos.** Nunca gere roll-up a partir de bug, operacional ou tarefa solta.
 - **Silêncio é válido.** Sem update relevante na janela → não poste. Nada de comentário "sem novidades".
-- **Um roll-up por iniciativa por execução.** Agrupe; não pingue um comentário por tarefa.
+- **Um roll-up por Objetivo por execução.** Agrupe; não pingue um comentário por tarefa.
 - **Sem duplicar.** Respeite o marcador e a janela; na dúvida, não poste.
 - **Português, primeira pessoa, voz do PM** — humanizado, valor antes de status, como se o próprio PM tivesse comentado (ver "Tom e formato"). Nunca soe como robô ou relatório.
-- **Não muda status nem campos** das tarefas — esta skill só **lê** e **comenta**. Mudanças de status são da `clickup-spec`/`gerenciador-do-clickup` sob confirmação.
-- **Exceção única de escrita no corpo:** a reconciliação pode editar **apenas** a seção 🗂️ Portfólio do Roadmap Item, de forma **aditiva** (nunca apaga, nunca toca outras seções nem outras tarefas). Qualquer remoção é só sinalizada no relatório, jamais executada.
+- **Não muda status nem campos** das tarefas — esta skill só **lê** e **comenta**. Mudanças de status são da `clickup-spec`/`agente-delivery` sob confirmação.
+- **Exceção de escrita no corpo, restrita a duas seções:** a rotina pode editar **apenas** a 🗂️ Portfólio (de forma **aditiva** — nunca apaga; remoção só sinalizada) e a 📏 Plano de Medição (**derivada** — reconstruída a partir dos épicos, portanto pode remover evento que sumiu de um épico). Nunca toca em Visão, Métricas, Dependências, anotações manuais ou outras tarefas.
+- **Fronteira PM ↔ Dados na medição:** consolide só a **intenção** (evento → métrica → épico). Nunca invente propriedades, tipos ou schema técnico — isso é de Dados/Eng. Sem mapeamento seguro para a métrica → "a mapear".
 
 ## Referências
 
@@ -201,4 +245,4 @@ Claude Code) — a forma de pedir e os cuidados estão na seção "Como agendar"
 |---------|----------|
 | [../clickup-spec/references/clickup-config.md](../clickup-spec/references/clickup-config.md) | IDs de space, folders, listas, custom fields, status |
 | [../clickup-spec/references/clickup-method.md](../clickup-spec/references/clickup-method.md) | Método e modelos de comentário narrativo |
-| [../../agents/gerenciador-do-clickup.md](../../agents/gerenciador-do-clickup.md) | Agente executor |
+| [../../agents/agente-delivery.md](../../agents/agente-delivery.md) | Agente executor |

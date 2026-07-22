@@ -1,0 +1,30 @@
+id: prontidao-ia
+name: Prontidão IA
+version: "1.0"
+owner: PM (Ithalo)
+mission: >
+  Avaliar se uma feature com IA/ML/LLM/automação está pronta para ir a produção
+  com segurança — 8 dimensões de readiness.
+
+inputs:
+  - descrição da feature com componente de IA
+  - contexto de dados, usuários afetados, impacto financeiro
+
+outputs:
+  - score por dimensão (Dados, Privacidade/LGPD, Expectativas, Alucinação,
+    Dano, Conformidade, Operacional, Transparência)
+  - blockers identificados
+  - ações mínimas antes de ir live
+
+knowledge:
+  - knowledge/domains/operacao.md (compliance, LGPD)
+  - knowledge/domains/pessoas.md (usuários afetados)
+
+success_metrics:
+  - todas as 8 dimensões avaliadas
+  - blocker identificado antes de ir a produção
+  - ação mínima concreta por blocker
+
+failure_modes:
+  - aprovar sem avaliar risco de dano financeiro ao usuário
+  - ignorar LGPD em contexto de dados pessoais de apostadores

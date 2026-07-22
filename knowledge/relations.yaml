@@ -1,0 +1,201 @@
+# Knowledge Graph — Relações Estruturadas
+#
+# Formato de cada relação:
+#   from:       entidade de origem
+#   relation:   tipo da relação (verbo)
+#   to:         entidade de destino
+#   domain:     domínio(s) envolvidos
+#   valid_from: data em que a relação foi estabelecida (YYYY-MM-DD)
+#   valid_until: data de expiração, se conhecida (omitir se indefinida)
+#
+# Para legibilidade humana e narrativas, ver relations.md.
+# Para decisões que alteram relações, registrar em knowledge/decisions/.
+
+relations:
+
+  # --- Produto ---
+
+  - from: Produto
+    relation: composto_por
+    to: Módulo
+    domain: [produto]
+    valid_from: "2026-01-01"
+
+  - from: Produto
+    relation: medido_por
+    to: Métrica
+    domain: [produto, negocio]
+    valid_from: "2026-01-01"
+
+  - from: Módulo
+    relation: pertence_a
+    to: Produto
+    domain: [produto]
+    valid_from: "2026-01-01"
+
+  - from: Módulo
+    relation: composto_por
+    to: Feature
+    domain: [produto]
+    valid_from: "2026-01-01"
+
+  - from: Feature
+    relation: pertence_a
+    to: Módulo
+    domain: [produto]
+    valid_from: "2026-01-01"
+
+  - from: Feature
+    relation: gera
+    to: Evento
+    domain: [produto]
+    valid_from: "2026-01-01"
+
+  - from: Feature
+    relation: consome
+    to: API
+    domain: [produto, engenharia]
+    valid_from: "2026-01-01"
+
+  - from: Feature
+    relation: depende_de
+    to: Integração
+    domain: [produto, engenharia]
+    valid_from: "2026-01-01"
+
+  - from: Feature
+    relation: impacta
+    to: Métrica
+    domain: [produto, negocio]
+    valid_from: "2026-01-01"
+
+  - from: Evento
+    relation: alimenta
+    to: Métrica
+    domain: [produto, negocio]
+    valid_from: "2026-01-01"
+
+  # --- Negócio ---
+
+  - from: Métrica
+    relation: mede_progresso_em
+    to: KR
+    domain: [negocio]
+    valid_from: "2026-01-01"
+
+  - from: KR
+    relation: pertence_a
+    to: Objetivo
+    domain: [negocio]
+    valid_from: "2026-01-01"
+
+  - from: Stakeholder
+    relation: influencia
+    to: Objetivo
+    domain: [pessoas, negocio]
+    valid_from: "2026-01-01"
+
+  # --- Engenharia / Operação ---
+
+  - from: Integração
+    relation: provida_por
+    to: Fornecedor
+    domain: [engenharia, operacao]
+    valid_from: "2026-01-01"
+
+  - from: Integração
+    relation: consumida_por
+    to: Sistema
+    domain: [engenharia]
+    valid_from: "2026-01-01"
+
+  - from: KYC
+    relation: executado_por
+    to: Serasa
+    domain: [operacao]
+    valid_from: "2026-01-01"
+
+  - from: KYC
+    relation: impacta
+    to: "Feature: Onboarding"
+    domain: [operacao, produto]
+    valid_from: "2026-01-01"
+
+  # --- Regulação ---
+
+  - from: "Lei 14.790/2023"
+    relation: exige
+    to: KYC
+    domain: [operacao]
+    valid_from: "2023-12-22"
+
+  - from: Regulação
+    relation: governa
+    to: Feature
+    domain: [operacao]
+    valid_from: "2023-12-22"
+
+  - from: Regulação
+    relation: governa
+    to: Integração
+    domain: [operacao]
+    valid_from: "2023-12-22"
+
+  - from: "Agente de Vigilância Regulatória"
+    relation: monitora
+    to: Regulação
+    domain: [operacao]
+    valid_from: "2026-01-01"
+
+  - from: "Agente de Vigilância Regulatória"
+    relation: reporta_para
+    to: "Agente de Governança"
+    domain: [processo]
+    valid_from: "2026-01-01"
+
+  # --- Processo / Entrega ---
+
+  - from: "Épico / Tarefa"
+    relation: pertence_a
+    to: Squad
+    domain: [processo, pessoas]
+    valid_from: "2026-01-01"
+
+  - from: Correção
+    relation: subtarefa_de
+    to: "Épico / Tarefa"
+    domain: [processo]
+    valid_from: "2026-01-01"
+
+  - from: Bug
+    relation: afeta
+    to: "Feature em produção"
+    domain: [processo, produto]
+    valid_from: "2026-01-01"
+
+  - from: Squad
+    relation: responsavel_por
+    to: Módulo
+    domain: [pessoas, produto]
+    valid_from: "2026-01-01"
+
+  # --- Fornecedores com risco temporal ---
+
+  - from: Smartico
+    relation: integrado_via
+    to: "Deep links + API de missões"
+    domain: [engenharia]
+    valid_from: "2026-01-01"
+
+  - from: "Gateway PIX"
+    relation: sujeito_a
+    to: "Regulação AML"
+    domain: [operacao]
+    valid_from: "2026-01-01"
+
+  - from: SIGAP
+    relation: consome_dados_de
+    to: Vertical
+    domain: [operacao]
+    valid_from: "2026-01-01"
+    # Varredura quinzenal conforme API v2.0 — ver memory sigap-integracao-vertical.md

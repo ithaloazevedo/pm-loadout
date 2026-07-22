@@ -28,13 +28,13 @@ Ask at most one blocking question at a time. If enough context exists, state ass
 
 | If the output is... | Hand off to |
 |---|---|
-| user/problem hypothesis | `user-interview`, `jtbd-map`, `user-needs-map` |
-| opportunity space | `ost-builder`, `assumption-test` |
-| multiple options | `ice-score`, `devils-advocate`, `gist-plan` |
-| strategic uncertainty | `cynefin-classify`, `wardley-map` |
-| ready product artifact | `clickup-spec`, `linear-spec`, `linear-issues` |
-| quality/readiness question | `service-check`, `usability-check`, `launch-tier` |
-| success measurement | `metrics-detect` |
+| user/problem hypothesis | `entrevista-usuario`, `jtbd`, `mapa-necessidades` |
+| opportunity space | `ost`, `suposicoes` |
+| multiple options | `ice`, `advogado-do-diabo`, `gist` |
+| strategic uncertainty | `cynefin`, `wardley` |
+| ready product artifact | `clickup-spec` |
+| quality/readiness question | `checar-servico`, `checar-usabilidade`, `nivel-lancamento` |
+| success measurement | `metricas` |
 
 ## Output Shape
 

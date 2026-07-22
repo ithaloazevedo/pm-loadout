@@ -1,51 +1,76 @@
-# Template: Projeto de Delivery
+# Template: Projeto de Delivery (Épico)
 
-Vive no folder **Product Delivery**. Use quando o Discovery foi concluído — direção validada, escopo
-fechado, engenharia pode iniciar o planejamento. **Nasce na lista `Backlog de Delivery`** (refinado e
-priorizado, pronto para sprint); migra para `Execução` ao entrar na sprint, ou é criado direto em `Execução`
-se for tarefa prioritária. **Nunca** crie listas novas no folder (a lista legada "Delivery" está vazia e não
-deve ser usada). IDs e status em [clickup-config.md](clickup-config.md).
+Vive no **folder de Delivery da squad que executa** (Experiência do jogador / Operação e afiliados /
+Provedora de conteúdo — em regra, o folder é determinado pelo campo `Time` da Iniciativa; se um épico é
+executado por outra squad, ex. gestão no backoffice, ele vai para o folder dessa squad). Use quando o
+Discovery foi concluído — direção validada, escopo fechado, engenharia pode iniciar o planejamento.
+**Nasce na lista `Backlog`**; migra para `Execução` ao entrar na sprint. **Nunca** crie listas novas nos
+folders. IDs e status em [clickup-config.md](clickup-config.md).
+
+Os **critérios de aceite são propostos pelo PM** a partir do protótipo/discovery e validados no
+refinamento com a squad — o épico não nasce sem eles.
 
 ---
 
 ## Template
 
-> **Sem bloco de cabeçalho.** Não repita Roadmap Item / Discovery / Dono no topo: o **Dono** é o assignee da
+> **Sem bloco de cabeçalho.** Não repita Iniciativa / Discovery / Dono no topo: o **Dono** é o assignee da
 > task e os **vínculos** vão na seção 🔗 Links. **Espaçamento:** linha em branco só **entre** seções `###` —
 > dentro de uma seção, sub-cabeçalhos colam nos bullets (sem linha em branco).
 
 ```markdown
 ### 🎯 Objetivo
-[1-2 frases: o que este projeto entrega e qual KPI move]
+[1-2 frases: o que este épico entrega e qual objetivo e KPI/KR ele move]
 
 ### 🧠 Contexto
-[Problema validado no discovery, dados que justificam, o que já sabemos sobre a direção]
+[Problema validado no discovery + dados que justificam. Decisões já fechadas
+que moldam o escopo (ex.: "estratégia híbrida decidida em DD/MM") entram aqui.]
 
 ### 📋 Escopo
 ✅ **Dentro:**
-- Usuário consegue [capacidade 1]
-- Usuário consegue [capacidade 2]
+- [Ator] [faz / acessa / recebe] [capacidade em linguagem simples — sem detalhe técnico]
+
 🚫 **Fora:**
-- [o que explicitamente não será feito — evita scope creep]
+- [O que não entra neste épico — com destino: v2, outro épico ou nunca]
 
 ### ✅ Critérios de Aceite
 **[Área funcional 1]**
 - [ ] [comportamento específico e testável]
-**[Área funcional 2]**
-- [ ] [comportamento específico e testável]
+**Qualidade (padrão em todo épico voltado ao usuário)**
+- [ ] Telas seguem o Design System — indistinguíveis do restante do portal
+- [ ] Responsivo desktop e mobile conforme protótipo
+**Instrumentação (padrão em todo épico)**
+- [ ] Eventos [X, Y] registrados — o KPI do Objetivo é mensurável no lançamento
+
+### ❓ Aberto para refinamento
+[Dúvidas a bater com a squad — esvazia após o refinamento: cada item
+vira decisão no Contexto ou critério de aceite]
 
 ### 🔗 Links
-- Roadmap Item: [Nome — link VL-XXXXX]
-- Discovery: [Nome — link VL-XXXXX, se houver]
-- Figma: [link]
-- Pré-requisito: [link se houver]
+- Figma: [frame específico da seção, não o arquivo inteiro]
+- Discovery: [Nome — link] · OKR: [Nome — link] (se não houver não inclua)
+- Pré-requisito: [link — espelha a dependência waiting_on do sistema]
 ```
 
-**Vínculo:** linked task com o Roadmap Item **e** com o Discovery de origem.
+**Regras de uso:**
+
+- **Escopo define fronteira, não comportamento** — "usuário acessa X" pertence ao Escopo; "ao clicar em Y, sistema faz Z" pertence aos Critérios de Aceite. Não repita nos CAs o que já está no Escopo como capacidade.
+- **Fora de escopo tem destino** — outro épico, v2 ou nunca; evita o "e onde isso vai ser feito?".
+- **Decisões fechadas vivem no Contexto** — com data; dúvida não é decisão (vai para ❓).
+- **Qualidade e Instrumentação são áreas fixas** dos critérios. Em ferramenta interna (backoffice),
+  adaptar Qualidade para o padrão da ferramenta.
+- **Delivery não entra em sprint com ❓ Aberto para refinamento preenchida.**
+- **Vínculo:** linked task com a Iniciativa **e** com o Discovery de origem; pré-requisito na seção
+  Links espelha uma dependência `waiting_on` real.
+- **Feature nova declara seu kill switch** — se a funcionalidade pode precisar ser desligada sem
+  deploy (integração externa, mecânica de risco), a flag de desativação entra no escopo ou em
+  épico de gestão dedicado.
 
 ---
 
 ## Exemplo Real: Reposicionar o KYC facial antes do FTD com processamento em background
+
+_(anterior às áreas padrão de Qualidade/Instrumentação — nos novos épicos, elas sempre entram)_
 
 ### 🎯 Objetivo
 Entregar o novo fluxo de onboarding em que a captura facial do KYC ocorre **antes do FTD** e a verificação
@@ -64,8 +89,8 @@ processamento assíncrono enquanto o usuário segue para o depósito.
 - Usuário segue para o depósito enquanto a verificação roda em background
 - Usuário reprovado/pendente é direcionado ao fluxo de re-engajamento
 🚫 **Fora:**
-- Eliminar ou flexibilizar a obrigatoriedade do KYC (regulatório)
-- Incentivos promocionais para concluir o KYC
+- Eliminar ou flexibilizar a obrigatoriedade do KYC (regulatório — nunca)
+- Incentivos promocionais para concluir o KYC (avaliar em iniciativa de conversão)
 - Banner de reativação (projeto separado — VL-11394)
 
 ### ✅ Critérios de Aceite
@@ -82,6 +107,6 @@ processamento assíncrono enquanto o usuário segue para o depósito.
 - [ ] Tratamento de dados biométricos conforme LGPD (Art. 11 §1º)
 
 ### 🔗 Links
-- Roadmap Item: Otimizar o onboarding com KYC para elevar a conversão Cadastro → FTD — VL-11852
+- OKR: Otimizar o onboarding com KYC para elevar a conversão Cadastro → FTD — VL-11852
 - Discovery: Investigar o gargalo de KYC no onboarding e definir direção de solução — VL-11235
 - Figma: [Aguardando]
