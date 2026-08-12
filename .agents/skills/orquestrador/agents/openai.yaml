@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orquestrador"
+  short_description: "Orquestrador sênior de produto"
+  default_prompt: "Use $orquestrador para conduzir esta missao de produto e escolher as skills certas."

@@ -5,8 +5,9 @@ Thumbs.db
 
 .env
 .env.*
-.codex/
 
 node_modules/
 .venv/
 __pycache__/
+cache.db
+config/pm-loadout.local.yaml
