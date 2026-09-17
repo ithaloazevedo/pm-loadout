@@ -4,7 +4,8 @@ Mapa de IDs reais do workspace para a skill `clickup-spec` e o agente `agente-de
 sem precisar re-descobrir a estrutura. **Confirme via MCP no início de cada sessão** (IDs podem mudar
 se o workspace for reconfigurado). Se um ID divergir, atualize este arquivo.
 
-> Última verificação: 2026-08-04 (via `clickup_get_workspace_hierarchy`). Os **IDs** abaixo seguem
+> Última verificação: 2026-09-17 (folders reconfirmados um a um via `clickup_get_folder`;
+> mapa de nomes reais inalterado desde 2026-08-04). Os **IDs** abaixo seguem
 > corretos, mas o **nome de exibição** de vários folders mudou no ClickUp desde 2026-07-21 — a coluna
 > "Nome" usa o nome **funcional** (papel no processo, usado neste doc e nos templates); o nome real
 > atual no ClickUp vai entre parênteses. Confirme por ID, não por nome, ao chamar `clickup_get_folder`.

@@ -4,19 +4,22 @@ Mapa de IDs reais do workspace para a skill `clickup-spec` e o agente `agente-de
 sem precisar re-descobrir a estrutura. **Confirme via MCP no início de cada sessão** (IDs podem mudar
 se o workspace for reconfigurado). Se um ID divergir, atualize este arquivo.
 
-> Última verificação: 2026-07-21.
+> Última verificação: 2026-09-17 (folders reconfirmados via `clickup_get_folder`). Os **IDs** seguem
+> corretos, mas o **nome de exibição** de vários folders mudou no ClickUp — a coluna "Nome (funcional)"
+> usa o nome do papel no processo (usado neste doc e nos templates); o nome real atual no ClickUp vai
+> na coluna ao lado. **Confirme por ID, não por nome**, ao chamar `clickup_get_folder`.
 
 ## Hierarquia
 
-| Nível | Nome | ID |
-|-------|------|----|
-| Workspace | Workspace | `9006076935` |
-| Space | **Vertical Tech** | `90114055709` |
-| Folder | **Roadmap** | `90118093876` |
-| Folder | **Discovery & Design** | `90118093877` |
-| Folder | **Delivery: Experiência do jogador** | `90118093878` |
-| Folder | **Delivery: Operação e afiliados** | `90118093917` |
-| Folder | **Delivery: Provedora de conteúdo** | `90118093918` |
+| Nível | Nome (funcional) | Nome real no ClickUp | ID |
+|-------|-------------------|----------------------|----|
+| Workspace | Workspace | Workspace | `9006076935` |
+| Space | **Vertical Tech** | Vertical Tech | `90114055709` |
+| Folder | **Roadmap** | Strategy | `90118093876` |
+| Folder | **Discovery & Design** | Discovery & Design | `90118093877` |
+| Folder | **Delivery: Experiência do jogador** | Delivery: Plataforma | `90118093878` |
+| Folder | **Delivery: Operação e afiliados** | Delivery:Backoffice & Integração | `90118093917` |
+| Folder | **Delivery: Provedora de conteúdo** | Delivery: Produto | `90118093918` |
 
 ### Listas conhecidas
 
