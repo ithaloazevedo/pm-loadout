@@ -6,12 +6,7 @@ Manter histórico de sessões, decisões, preferências do usuário e contexto d
 
 ## Implementação
 
-Memory é o sistema nativo do Claude Code — arquivos markdown em:
-```
-~/.claude/projects/-Users-ithaloazevedo-Projetos-pm-loadout/memory/
-```
-
-Indexado em `MEMORY.md` no mesmo diretório.
+Memory é fornecida pelo runtime. No Claude Code, ela pode ser persistida em arquivos do projeto; no Codex, o histórico da tarefa e as instruções do workspace oferecem o contexto de trabalho. Não dependa de um caminho privado de memória para concluir uma missão.
 
 ## Tipos de Memória
 
@@ -35,7 +30,7 @@ metadata:
 
 **Regra de uso**: antes de recomendar algo com base em uma memory de tipo `project` ou `reference`, verificar se o fato ainda é atual (ler o arquivo correspondente no projeto ou consultar o sistema externo). Se estiver desatualizado, atualizar a memory antes de usar.
 
-**Quem faz a limpeza**: o `agente-evolucao` é responsável por propor remoção ou atualização de memories stale quando identificadas durante observação do sistema.
+**Quem faz a limpeza**: o `agente-evolucao` é responsável por propor remoção ou atualização de memórias desatualizadas quando identificadas durante observação do sistema.
 
 ## O que NÃO salvar
 

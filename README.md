@@ -21,14 +21,14 @@ O ponto de entrada recomendado e o `$juninho`: um orquestrador que identifica a 
 - `Scout`: discovery, necessidades, entrevistas, suposicoes e oportunidades.
 - `Strategist`: priorizacao, estrategia, sequenciamento e trade-offs.
 - `Scribe`: specs e artefatos claros.
-- `Gerenciador do ClickUp`: opera o processo no ClickUp (Roadmap, Discovery, Delivery), executa a `clickup-spec`.
+- `agente-delivery`: opera o processo no ClickUp (Projeto de Delivery — Backlog com faixa de descoberta embutida, e Sprint), executa a `clickup-spec`.
 - `Judge`: critica, qualidade, riscos e vieses.
 - `Analyst`: metricas, lancamento, aprendizado e retrospectiva.
 - `Regulatory Watch`: atualizacoes legais/regulatorias de bets BR e checklist de compliance.
 
 ## Instalar
 
-A fonte canonica das skills e agentes e a pasta `.claude/` na raiz do repo. Clone o repositorio:
+O loadout suporta Claude Code e Codex. As fontes de cada runtime são `.claude/` (Claude) e `.agents/skills` + `.codex/agents` (Codex). Clone o repositório:
 
 ```powershell
 git clone https://github.com/ithaloazevedo/pm-loadout.git
@@ -57,25 +57,37 @@ Copy-Item -Recurse -Force .\.claude\agents\* $HOME\.claude\agents\
 
 Alternativamente, ao trabalhar dentro do proprio repo, as skills e agentes em `.claude/` ja sao reconhecidos pelo Claude Code sem instalar nada.
 
+### Codex
+
+Ao abrir este repositório no Codex, as skills em `.agents/skills/` e os perfis em `.codex/agents/` são carregados pelo workspace. Para instalar globalmente no macOS/Linux:
+
+```bash
+mkdir -p ~/.codex/skills ~/.codex/agents
+cp -R .agents/skills/* ~/.codex/skills/
+cp -R .codex/agents/* ~/.codex/agents/
+```
+
+O suporte é dual: Canvas, Mycelium e as ferramentas `Read`/`Write` continuam válidos no Claude. No Codex, quando essas integrações não existirem, a skill entrega o artefato na conversa e só salva conhecimento durável em `knowledge/` quando solicitado ou confirmado.
+
 ## Como usar
 
 Comece pelo Juninho:
 
 ```text
 /juninho
-Tenho uma ideia de produto e quero transformar isso em um item de roadmap no ClickUp.
+Tenho uma ideia de produto e quero transformar isso em um Projeto de Delivery no ClickUp.
 ```
 
 Ou chame uma skill diretamente quando ja souber o que precisa:
 
 ```text
 /clickup-spec create
-Crie um item de roadmap para...
+Crie um Projeto de Delivery para...
 ```
 
 ## Nota sobre modo standalone
 
-Algumas skills vieram de fluxos Mycelium/Superpowers e podem mencionar canvas, `.claude`, `/mycelium` ou conectores especificos. No `pm-loadout`, trate essas persistencias como opcionais: se o ambiente nao tiver esses recursos, a skill deve entregar o artefato no chat e declarar o que ficaria registrado.
+Algumas skills vieram de fluxos Mycelium/Superpowers e podem mencionar canvas, `.claude`, `/mycelium` ou conectores específicos. Essas integrações continuam suportadas no Claude; no Codex, trate-as como opcionais quando o ambiente não as oferecer. A versão em `.agents/skills/` inclui essa compatibilidade para Codex.
 
 Veja [docs/standalone-mode.md](docs/standalone-mode.md).
 

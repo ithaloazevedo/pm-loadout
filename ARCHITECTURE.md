@@ -36,7 +36,7 @@ Cada agente resolve apenas um domínio. Nunca criar agentes genéricos. Evitar s
 ### 2. Contexto compartilhado
 Nenhum agente possui conhecimento próprio. Todo contexto vem de:
 - Knowledge Graph (`knowledge/`)
-- Memory (Claude built-in)
+- Memory do runtime (Claude ou Codex); decisões duráveis ficam no Knowledge Graph
 - Decision Log (`knowledge/decisions/`)
 
 ### 3. Orquestrador como único ponto de entrada

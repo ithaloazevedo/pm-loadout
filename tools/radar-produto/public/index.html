@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Radar de Produto — Vertical Tech</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --surface-2:      #f4f3f0;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --hairline:       #e1e0d9;
+    --border:         rgba(11,11,11,0.10);
+    --border-strong:  rgba(11,11,11,0.18);
+
+    --cat-1: #2a78d6; /* Plataforma */
+    --cat-2: #eb6834; /* Backoffice & Integração */
+    --cat-3: #1baf7a; /* Produto */
+    --cat-4: #eda100; /* Discovery */
+
+    --status-good:     #0ca30c;
+    --status-warning:  #b8860b;
+    --status-serious:  #ec835a;
+    --status-critical: #d03b3b;
+    --status-neutral:  #898781;
+    --status-info:     #2a78d6;
+
+    --focus-ring: #1c5cab;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --surface-2: #232322; --page-plane: #0d0d0d;
+      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8d86;
+      --hairline: #2c2c2a; --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.20);
+      --cat-1: #3987e5; --cat-2: #d95926; --cat-3: #199e70; --cat-4: #c98500;
+      --status-good: #0ca30c; --status-warning: #fab219; --status-serious: #ec835a;
+      --status-critical: #e66767; --status-neutral: #8f8d86; --status-info: #3987e5;
+      --focus-ring: #86b6ef;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --surface-2: #232322; --page-plane: #0d0d0d;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8d86;
+    --hairline: #2c2c2a; --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.20);
+    --cat-1: #3987e5; --cat-2: #d95926; --cat-3: #199e70; --cat-4: #c98500;
+    --status-good: #0ca30c; --status-warning: #fab219; --status-serious: #ec835a;
+    --status-critical: #e66767; --status-neutral: #8f8d86; --status-info: #3987e5;
+    --focus-ring: #86b6ef;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --surface-1: #fcfcfb; --surface-2: #f4f3f0; --page-plane: #f9f9f7;
+    --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #898781;
+    --hairline: #e1e0d9; --border: rgba(11,11,11,0.10); --border-strong: rgba(11,11,11,0.18);
+    --cat-1: #2a78d6; --cat-2: #eb6834; --cat-3: #1baf7a; --cat-4: #eda100;
+    --status-good: #0ca30c; --status-warning: #b8860b; --status-serious: #ec835a;
+    --status-critical: #d03b3b; --status-neutral: #898781; --status-info: #2a78d6;
+    --focus-ring: #1c5cab;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; border-radius: 4px; }
+  .mono { font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", monospace; font-variant-numeric: tabular-nums; }
+  a { color: inherit; }
+
+  .app { max-width: 1180px; margin: 0 auto; padding: 24px 20px 64px; }
+
+  .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+  .header h1 { font-size: 21px; font-weight: 700; margin: 0 0 2px; letter-spacing: -0.01em; text-wrap: balance; }
+  .header .subtitle { font-size: 13px; color: var(--text-secondary); margin: 0; }
+  .header-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: 12px; color: var(--text-muted); }
+  .refresh-row { display: flex; align-items: center; gap: 8px; }
+  .btn {
+    appearance: none; border: 1px solid var(--border-strong); background: var(--surface-1);
+    color: var(--text-primary); border-radius: 7px; padding: 6px 12px; font-size: 12.5px;
+    font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: var(--surface-2); }
+  .btn:active { transform: translateY(1px); }
+  .btn svg { width: 13px; height: 13px; }
+  .btn.spinning svg { animation: spin 900ms linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .btn.spinning svg { animation: none; } }
+  .btn.small { padding: 4px 9px; font-size: 11.5px; }
+
+  .view-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .scope-switch {
+    display: inline-flex; border: 1px solid var(--border-strong); border-radius: 8px;
+    padding: 2px; background: var(--surface-1); gap: 2px;
+  }
+  .scope-switch button {
+    appearance: none; border: none; background: transparent; color: var(--text-secondary);
+    font-size: 12.5px; font-weight: 600; padding: 6px 14px; border-radius: 6px; cursor: pointer;
+  }
+  .scope-switch button.active { background: var(--surface-2); color: var(--text-primary); }
+
+  .filterbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+  select.active-filter {
+    border-color: var(--focus-ring); font-weight: 700; color: var(--focus-ring);
+    background: color-mix(in srgb, var(--focus-ring) 10%, var(--surface-1));
+  }
+  .filter-count { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tab {
+    appearance: none; border: 1px solid var(--border); background: var(--surface-1);
+    color: var(--text-secondary); border-radius: 999px; padding: 5px 12px 5px 9px;
+    font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex;
+    align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .tab .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .tab.active { background: var(--surface-2); color: var(--text-primary); border-color: var(--border-strong); }
+  select {
+    appearance: none; border: 1px solid var(--border-strong); background: var(--surface-1);
+    color: var(--text-primary); border-radius: 7px; padding: 5px 10px; font-size: 12.5px;
+    font-weight: 500; min-width: 132px;
+  }
+  .spacer { flex: 1 1 auto; }
+  .checkbox-label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; font-size: 12.5px; color: var(--text-secondary); }
+  .checkbox-label input { accent-color: var(--focus-ring); }
+
+  .avatar {
+    display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px;
+    border-radius: 50%; background: var(--surface-2); color: var(--text-secondary);
+    font-size: 8.5px; font-weight: 700; flex: none; border: 1px solid var(--border);
+  }
+  .tile-head .avatar { width: 20px; height: 20px; font-size: 9.5px; }
+
+  .kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .kpi { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; }
+  .kpi .value { font-size: 23px; font-weight: 700; letter-spacing: -0.01em; }
+  .kpi .value.alert { color: var(--status-critical); }
+  .kpi .value.warn { color: var(--status-serious); }
+  .kpi .label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 22px; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 13px 14px; }
+  .tile-head { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+  .tile-head .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .tile-head .name { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); }
+  .tile-count { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .tile-count .unit { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-left: 4px; }
+  .tile-bar { display: flex; height: 6px; border-radius: 4px; overflow: hidden; background: var(--hairline); gap: 1px; }
+  .tile-bar span { display: block; height: 100%; }
+  .tile-skel { height: 26px; width: 60%; margin-bottom: 8px; }
+  .tile-error-title { font-size: 12.5px; font-weight: 700; color: var(--status-critical); margin-bottom: 3px; }
+  .tile-error-body { font-size: 11.5px; color: var(--text-secondary); }
+
+  .empty-state { padding: 28px 16px; text-align: center; color: var(--text-muted); font-size: 13px; border: 1px dashed var(--border-strong); border-radius: 10px; }
+  .banner { display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border-radius: 10px; font-size: 13px; border: 1px solid var(--border-strong); background: var(--surface-1); }
+  .banner strong { color: var(--status-critical); }
+  .banner span { color: var(--text-secondary); }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); }
+  table { width: 100%; border-collapse: collapse; min-width: 780px; }
+  thead th {
+    text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--text-muted); padding: 9px 12px; border-bottom: 1px solid var(--hairline);
+    white-space: nowrap;
+  }
+  tbody td { padding: 9px 12px; border-bottom: 1px solid var(--hairline); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  .task-name-btn {
+    appearance: none; background: none; border: none; padding: 0; text-align: left;
+    font-size: 13px; font-weight: 600; color: var(--text-primary); cursor: pointer;
+    border-bottom: 1px dashed var(--border-strong);
+  }
+  .task-name-btn:hover { border-bottom-color: var(--text-primary); }
+  .frente-group { margin-bottom: 18px; }
+  .frente-group:last-child { margin-bottom: 0; }
+  .frente-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13.5px; font-weight: 700;
+  }
+  .frente-head a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dashed var(--border-strong); }
+  .frente-head a:hover { border-bottom-color: var(--text-primary); }
+  .frente-name-semfrente { color: var(--status-critical); }
+  .frente-count { font-size: 11.5px; font-weight: 600; color: var(--text-muted); }
+  .frente-select {
+    font-size: 12px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface-1); color: var(--text-primary); max-width: 220px;
+  }
+  .frente-reassign { display: flex; align-items: center; gap: 6px; }
+  .squad-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
+  .squad-chip .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .status-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; padding: 3px 9px 3px 7px; border-radius: 999px; white-space: nowrap; background: var(--surface-2); }
+  .status-chip .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .assignees { font-size: 12.5px; color: var(--text-secondary); }
+  .duedate { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+  .duedate.overdue { color: var(--status-critical); font-weight: 700; }
+  .priority-flag { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px; white-space: nowrap; color: #fff; }
+
+  .skeleton { height: 12px; border-radius: 5px; background: linear-gradient(90deg, var(--hairline) 25%, var(--surface-2) 37%, var(--hairline) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; }
+  @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+  @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+
+  footer.note { margin-top: 30px; padding-top: 16px; border-top: 1px solid var(--hairline); font-size: 12px; color: var(--text-muted); max-width: 660px; }
+
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; z-index: 40; }
+  .overlay.open { display: block; }
+  .drawer {
+    position: fixed; top: 0; right: 0; height: 100%; width: min(420px, 92vw);
+    background: var(--surface-1); border-left: 1px solid var(--border-strong);
+    transform: translateX(100%); transition: transform 200ms ease; z-index: 41;
+    display: flex; flex-direction: column;
+  }
+  @media (prefers-reduced-motion: reduce) { .drawer { transition: none; } }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 18px 18px 14px; border-bottom: 1px solid var(--hairline); }
+  .drawer-head h2 { font-size: 15px; font-weight: 700; margin: 0; text-wrap: balance; }
+  .drawer-close { appearance: none; border: none; background: none; color: var(--text-muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px; }
+  .drawer-body { padding: 16px 18px; overflow-y: auto; flex: 1; }
+  .kv { display: grid; grid-template-columns: 100px 1fr; gap: 9px 12px; font-size: 13px; margin-bottom: 4px; }
+  .kv dt { color: var(--text-muted); margin: 0; }
+  .kv dd { margin: 0; color: var(--text-primary); }
+  .drawer-foot { padding: 14px 18px; border-top: 1px solid var(--hairline); }
+  .link-out { font-size: 12.5px; font-weight: 700; color: var(--focus-ring); text-decoration: none; }
+
+  .edit-section { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--hairline); }
+  .edit-field { margin-bottom: 12px; }
+  .edit-field label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 4px; }
+  .edit-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .save-indicator { font-size: 11px; font-weight: 600; }
+  .save-indicator.saving { color: var(--text-muted); }
+  .save-indicator.ok { color: var(--status-good); }
+  .save-indicator.err { color: var(--status-critical); }
+  .chip-person {
+    display: inline-flex; align-items: center; gap: 5px; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 999px; padding: 3px 8px 3px 10px;
+    font-size: 12px; margin: 0 5px 5px 0;
+  }
+  .chip-person button { appearance: none; border: none; background: none; cursor: pointer; color: var(--text-muted); font-size: 13px; padding: 0; line-height: 1; }
+  .chip-person button:hover { color: var(--status-critical); }
+  .readonly-note { font-size: 11.5px; color: var(--text-muted); background: var(--surface-2); border-radius: 8px; padding: 8px 10px; margin-bottom: 14px; }
+
+  /* ---------- status report ---------- */
+  .report-view { display: none; }
+  .report-view.open { display: block; }
+  .report-toolbar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; max-width: 780px; margin: 0 auto 18px;
+    padding: 12px 0 0;
+  }
+  .report-toolbar .spacer { flex: 1 1 auto; }
+  .report-doc {
+    max-width: 780px; margin: 0 auto 60px; background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 12px; padding: 40px 48px; color: var(--text-primary);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .report-doc h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .report-doc .report-meta { font-size: 12.5px; color: var(--text-muted); margin-bottom: 28px; }
+  .report-doc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 26px 0 10px; border-bottom: 1px solid var(--hairline); padding-bottom: 6px; }
+  .report-doc h2:first-of-type { margin-top: 0; }
+  .report-doc p, .report-doc li { font-size: 13.5px; line-height: 1.6; }
+  .report-doc ul { margin: 0; padding-left: 20px; }
+  .report-doc li { margin-bottom: 4px; }
+  .report-doc [contenteditable="true"] { border-radius: 6px; padding: 4px 6px; margin: -4px -6px; }
+  .report-doc [contenteditable="true"]:hover { background: var(--surface-2); }
+  .report-doc [contenteditable="true"]:focus { background: var(--surface-2); outline: 1px dashed var(--border-strong); }
+  .report-squad-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12.5px; }
+  .report-squad-table th, .report-squad-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--hairline); }
+  .report-squad-table th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.03em; }
+  .report-empty-hint { font-size: 12px; color: var(--text-muted); font-style: italic; }
+
+  @media print {
+    body * { visibility: hidden; }
+    .report-view.open, .report-view.open * { visibility: visible; }
+    .report-view.open { position: absolute; top: 0; left: 0; width: 100%; }
+    .no-print { display: none !important; }
+    .report-doc { border: none; box-shadow: none; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>Radar de Produto</h1>
+      <p class="subtitle">Vertical Tech — Delivery, direto do ClickUp (aplicação local)</p>
+    </div>
+    <div class="header-meta">
+      <div class="refresh-row">
+        <span id="last-updated" class="mono">—</span>
+        <button class="btn" id="refresh-btn" type="button">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3.2h-3.2"/></svg>
+          Atualizar
+        </button>
+        <button class="btn" id="open-report-btn" type="button">Gerar report</button>
+        <button class="btn" id="publish-doc-btn" type="button">Publicar report do dia no Doc</button>
+        <span id="publish-doc-status" class="mono" style="font-size:12px;color:var(--text-muted)"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="view-row">
+    <div class="scope-switch" id="scope-switch">
+      <button data-scope="mine" class="active" type="button">Meus times</button>
+      <button data-scope="all" type="button">Todos os times</button>
+    </div>
+    <div class="scope-switch" id="groupby-switch">
+      <button data-groupby="squad" class="active" type="button">Ver por squad</button>
+      <button data-groupby="pessoa" type="button">Ver por pessoa</button>
+      <button data-groupby="frente" type="button">Ver por frente</button>
+    </div>
+  </div>
+
+  <div class="filterbar">
+    <div class="tabs" id="primary-tabs"></div>
+  </div>
+  <div class="filterbar">
+    <select id="filter-etapa" aria-label="Filtrar por etapa">
+      <option value="all">Todas as etapas</option>
+      <option value="Backlog">Backlog</option>
+      <option value="Execução">Execução</option>
+    </select>
+    <select id="filter-prioridade" aria-label="Filtrar por prioridade">
+      <option value="all">Todas as prioridades</option>
+      <option value="urgent">Urgente</option>
+      <option value="high">Alta</option>
+      <option value="normal">Normal</option>
+      <option value="low">Baixa</option>
+    </select>
+    <select id="filter-solicitante" aria-label="Filtrar por solicitante">
+      <option value="all">Todos os solicitantes</option>
+    </select>
+    <select id="filter-secondary" aria-label="Filtro secundário"></select>
+    <span class="filter-count" id="filter-count" hidden></span>
+    <button class="btn small" id="clear-filters-btn" type="button" hidden>Limpar filtros</button>
+    <div class="spacer"></div>
+    <label class="checkbox-label"><input type="checkbox" id="filter-closed"> Mostrar concluídas</label>
+  </div>
+
+  <div class="kpi-strip" id="kpi-strip"></div>
+  <div class="tiles" id="tiles"></div>
+
+  <div id="content"></div>
+
+  <footer class="note">
+    Solicitante, empresa e outros metadados aparecem ao abrir o detalhe de uma tarefa — buscar isso
+    para todas as tarefas de uma vez seria custoso na API do ClickUp, então é buscado sob demanda.
+    Desde a mudança estrutural de 2026-09-10, Discovery deixou de ser uma lista/esteira própria no
+    ClickUp — descoberta agora é uma faixa de status dentro do Backlog de cada squad (ver
+    knowledge/domains/processo.md). Este painel ainda não foi revisado para refletir essa faixa.
+    Editar status, prioridade, prazo e responsáveis só fica disponível para tarefas dos seus times
+    (Plataforma e Backoffice &amp; Integração) — grava direto no ClickUp assim que você muda o campo.
+    Esta é uma aplicação local: os dados vêm da API do ClickUp através do seu próprio servidor em
+    <code>localhost</code>; o token nunca chega ao navegador.
+  </footer>
+</div>
+
+<div class="report-view" id="report-view">
+  <div class="report-toolbar no-print">
+    <button class="btn" id="report-back-btn" type="button">← Voltar ao painel</button>
+    <select id="report-period" aria-label="Período do report">
+      <option value="7">Últimos 7 dias</option>
+      <option value="14">Últimos 14 dias</option>
+      <option value="30">Últimos 30 dias</option>
+    </select>
+    <div class="spacer"></div>
+    <span id="report-status" class="mono" style="font-size:12px;color:var(--text-muted)"></span>
+    <button class="btn" id="report-export-btn" type="button">Exportar PDF</button>
+  </div>
+  <div class="report-doc" id="report-doc"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+  <div class="drawer-head">
+    <h2 id="drawer-title">Tarefa</h2>
+    <button class="drawer-close" id="drawer-close" type="button" aria-label="Fechar">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-foot" id="drawer-foot"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Mudança estrutural de 2026-09-10: o folder Discovery & Design (e a lista
+  // "Discovery" que aparecia aqui como squad própria) foi removido do ClickUp —
+  // descoberta virou uma faixa de status dentro do Backlog de cada squad, não
+  // mais uma esteira própria. Ver knowledge/domains/processo.md.
+  var ALL_SQUADS = [
+    { key: "plataforma", label: "Plataforma", varName: "--cat-1" },
+    { key: "backoffice", label: "Backoffice & Integração", varName: "--cat-2" },
+    { key: "produto", label: "Produto", varName: "--cat-3" }
+  ];
+  var MINE = ["plataforma", "backoffice"];
+
+  function squadByKey(key) {
+    for (var i = 0; i < ALL_SQUADS.length; i++) if (ALL_SQUADS[i].key === key) return ALL_SQUADS[i];
+    return null;
+  }
+  function squadsForScope(scope) {
+    return ALL_SQUADS.filter(function (s) { return scope === "all" || MINE.indexOf(s.key) !== -1; });
+  }
+
+  var state = {
+    scope: "mine",
+    groupBy: "squad",       // "squad" | "pessoa" | "frente"
+    tabFilter: "all",       // squad key, or person id when groupBy === "pessoa"
+    secondaryFilter: "all", // person id, or squad key when groupBy === "pessoa"
+    etapaFilter: "all",
+    prioridadeFilter: "all",
+    solicitanteFilter: "all",
+    showClosed: false,
+    data: {},
+    activeSquads: {},
+    refreshing: false
+  };
+
+  // ---------- status classification ----------
+  function classifyStatus(raw) {
+    var s = (raw || "").toLowerCase();
+    if (s.indexOf("bloque") !== -1) return { bucket: "bloqueada", color: "var(--status-critical)" };
+    if (s.indexOf("cancelad") !== -1) return { bucket: "cancelado", color: "var(--status-neutral)" };
+    if (s.indexOf("pronto") !== -1 || s.indexOf("finaliz") !== -1 || s.indexOf("complete") !== -1 || s.indexOf("conclu") !== -1) {
+      return { bucket: "concluido", color: "var(--status-good)" };
+    }
+    if (s.indexOf("revis") !== -1 || s.indexOf("homolog") !== -1 || s.indexOf("teste") !== -1 || s.indexOf("deploy") !== -1 || s.indexOf("valida") !== -1) {
+      return { bucket: "validacao", color: "var(--status-warning)" };
+    }
+    if (s.indexOf("desenvolv") !== -1 || s === "to do" || s.indexOf("progresso") !== -1) {
+      return { bucket: "andamento", color: "var(--status-info)" };
+    }
+    if (s.indexOf("backlog") !== -1 || s.indexOf("refinamento") !== -1 || s.indexOf("prioriz") !== -1 || s.indexOf("pendente") !== -1) {
+      return { bucket: "a_fazer", color: "var(--status-neutral)" };
+    }
+    return { bucket: "outro", color: "var(--status-neutral)" };
+  }
+
+  var PRIORITY_INFO = {
+    urgent: { label: "Urgente", color: "var(--status-critical)" },
+    high: { label: "Alta", color: "var(--status-serious)" }
+  };
+
+  function esc(str) {
+    return String(str == null ? "" : str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function initials(name) {
+    var parts = String(name || "").trim().split(/\s+/);
+    if (!parts[0]) return "?";
+    var a = parts[0][0] || "";
+    var b = parts.length > 1 ? (parts[1][0] || "") : "";
+    return (a + b).toUpperCase();
+  }
+  function timeAgoPtBr(ms) {
+    if (!ms) return "—";
+    var diff = Math.max(0, Date.now() - ms);
+    var min = Math.round(diff / 60000);
+    if (min < 1) return "atualizado agora";
+    if (min < 60) return "atualizado há " + min + " min";
+    var h = Math.round(min / 60);
+    if (h < 24) return "atualizado há " + h + "h";
+    var d = Math.round(h / 24);
+    return "atualizado há " + d + "d";
+  }
+  function formatDateBr(d) { return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }); }
+
+  // ---------- local API client ----------
+  function apiGet(path) {
+    return fetch(path).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        if (!res.ok) return Promise.reject({ message: body.error || ("Erro " + res.status) });
+        return body;
+      });
+    });
+  }
+  function apiPut(path, body) {
+    return fetch(path, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (b) {
+        if (!res.ok) return Promise.reject({ message: b.error || ("Erro " + res.status) });
+        return b;
+      });
+    });
+  }
+  function errorInfo(err) {
+    var msg = (err && err.message) || "Tente atualizar em alguns instantes.";
+    if (/CLICKUP_API_TOKEN/.test(msg)) return { title: "Token do ClickUp não configurado", body: msg };
+    return { title: "Não foi possível carregar agora", body: msg };
+  }
+
+  function subscribeSquad(key) {
+    state.data[key] = { status: "loading", tasks: [] };
+    fetchSquadData(key);
+  }
+  function fetchSquadData(key) {
+    return apiGet("/api/tasks/" + key + "?include_closed=" + state.showClosed)
+      .then(function (body) { state.data[key] = { status: "ready", tasks: body.tasks || [], storedAt: Date.now() }; render(); })
+      .catch(function (err) {
+        var prev = (state.data[key] && state.data[key].tasks) || [];
+        state.data[key] = { status: "error", tasks: prev, error: err }; render();
+      });
+  }
+  function ensureSubscriptions() {
+    var wanted = squadsForScope(state.scope).map(function (s) { return s.key; });
+    Object.keys(state.activeSquads).forEach(function (key) {
+      if (wanted.indexOf(key) === -1) { delete state.activeSquads[key]; delete state.data[key]; }
+    });
+    wanted.forEach(function (key) { if (!state.activeSquads[key]) { state.activeSquads[key] = true; subscribeSquad(key); } });
+    render();
+  }
+  function resubscribeAll() {
+    Object.keys(state.activeSquads).forEach(subscribeSquad);
+    render();
+  }
+  function manualRefresh() {
+    state.refreshing = true; render();
+    Promise.all(Object.keys(state.activeSquads).map(fetchSquadData)).then(function () {
+      setTimeout(function () { state.refreshing = false; render(); }, 400);
+    });
+  }
+
+  // ---------- derived data ----------
+  function activeRows() {
+    var out = [];
+    squadsForScope(state.scope).forEach(function (s) {
+      var d = state.data[s.key];
+      if (!d || d.status !== "ready") return;
+      d.tasks.forEach(function (t) { out.push({ task: t, squad: s }); });
+    });
+    return out;
+  }
+
+  function filteredRows() {
+    var rows = activeRows();
+    if (state.tabFilter !== "all") {
+      if (state.groupBy === "squad" || state.groupBy === "frente") rows = rows.filter(function (r) { return r.squad.key === state.tabFilter; });
+      else rows = rows.filter(function (r) { return (r.task.assignees || []).some(function (a) { return String(a.id) === state.tabFilter; }); });
+    }
+    if (state.groupBy !== "frente" && state.secondaryFilter !== "all") {
+      if (state.groupBy === "squad") rows = rows.filter(function (r) { return (r.task.assignees || []).some(function (a) { return String(a.id) === state.secondaryFilter; }); });
+      else rows = rows.filter(function (r) { return r.squad.key === state.secondaryFilter; });
+    }
+    if (state.etapaFilter !== "all") rows = rows.filter(function (r) { return etapaOf(r) === state.etapaFilter; });
+    if (state.prioridadeFilter !== "all") rows = rows.filter(function (r) { return (r.task.priority || "") === state.prioridadeFilter; });
+    if (state.solicitanteFilter !== "all") rows = rows.filter(function (r) { return r.task.solicitante && String(r.task.solicitante.id) === state.solicitanteFilter; });
+    return rows;
+  }
+
+  function etapaOf(row) { return (row.task.list && row.task.list.name) || "—"; }
+
+  var PRIORITY_WEIGHT = { urgent: 0, high: 1, normal: 2, low: 3 };
+  function sortRows(rows) {
+    return rows.slice().sort(function (a, b) {
+      var primaryDiff;
+      if (state.groupBy === "squad") {
+        primaryDiff = ALL_SQUADS.indexOf(a.squad) - ALL_SQUADS.indexOf(b.squad);
+      } else {
+        var an = (a.task.assignees[0] && a.task.assignees[0].username) || "";
+        var bn = (b.task.assignees[0] && b.task.assignees[0].username) || "";
+        primaryDiff = an.localeCompare(bn, "pt-BR");
+      }
+      if (primaryDiff !== 0) return primaryDiff;
+      var pw = function (r) { return PRIORITY_WEIGHT[r.task.priority] != null ? PRIORITY_WEIGHT[r.task.priority] : 4; };
+      var pDiff = pw(a) - pw(b);
+      if (pDiff !== 0) return pDiff;
+      var ad = a.task.due_date ? parseInt(a.task.due_date, 10) : Infinity;
+      var bd = b.task.due_date ? parseInt(b.task.due_date, 10) : Infinity;
+      return ad - bd;
+    });
+  }
+
+  function allPeople() {
+    var map = {};
+    activeRows().forEach(function (r) {
+      (r.task.assignees || []).forEach(function (a) { map[a.id] = a.username; });
+    });
+    return Object.keys(map).map(function (id) { return { id: id, username: map[id] }; })
+      .sort(function (x, y) { return x.username.localeCompare(y.username, "pt-BR"); });
+  }
+
+  function allSolicitantes() {
+    var map = {};
+    activeRows().forEach(function (r) {
+      var s = r.task.solicitante;
+      if (s) map[s.id] = s.username;
+    });
+    return Object.keys(map).map(function (id) { return { id: id, username: map[id] }; })
+      .sort(function (x, y) { return x.username.localeCompare(y.username, "pt-BR"); });
+  }
+
+  function computeKpis() {
+    var rows = activeRows();
+    var atrasadas = 0, bloqueadas = 0, urgentes = 0;
+    rows.forEach(function (r) {
+      var t = r.task, c = classifyStatus(t.status);
+      if (t.due_date) {
+        var ms = parseInt(t.due_date, 10);
+        if (ms < Date.now() && c.bucket !== "concluido" && c.bucket !== "cancelado") atrasadas++;
+      }
+      if (c.bucket === "bloqueada") bloqueadas++;
+      if (t.priority === "urgent" || t.priority === "high") urgentes++;
+    });
+    return { total: rows.length, atrasadas: atrasadas, bloqueadas: bloqueadas, urgentes: urgentes };
+  }
+
+  // ---------- rendering ----------
+  var elTabs = document.getElementById("primary-tabs");
+  var elKpis = document.getElementById("kpi-strip");
+  var elTiles = document.getElementById("tiles");
+  var elContent = document.getElementById("content");
+  var elLastUpdated = document.getElementById("last-updated");
+  var elSecondary = document.getElementById("filter-secondary");
+  var elSolicitante = document.getElementById("filter-solicitante");
+  var elEtapa = document.getElementById("filter-etapa");
+  var elPrioridade = document.getElementById("filter-prioridade");
+  var elFilterCount = document.getElementById("filter-count");
+  var elClearFiltersBtn = document.getElementById("clear-filters-btn");
+  var elRefreshBtn = document.getElementById("refresh-btn");
+
+  function render() {
+    renderScopeSwitch();
+    renderGroupBySwitch();
+    renderTabs();
+    renderKpis();
+    renderTiles();
+    renderSecondaryOptions();
+    renderSolicitanteOptions();
+    renderFilterActiveState();
+    renderContent();
+    renderLastUpdated();
+    elRefreshBtn.classList.toggle("spinning", state.refreshing);
+  }
+
+  function renderSolicitanteOptions() {
+    var current = state.solicitanteFilter;
+    var people = allSolicitantes();
+    elSolicitante.innerHTML = '<option value="all">Todos os solicitantes</option>' +
+      people.map(function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.username) + "</option>"; }).join("");
+    var stillExists = current === "all" || people.some(function (p) { return String(p.id) === current; });
+    elSolicitante.value = stillExists ? current : "all";
+    if (!stillExists) state.solicitanteFilter = "all";
+  }
+
+  function renderFilterActiveState() {
+    var active = 0;
+    [[elEtapa, state.etapaFilter], [elPrioridade, state.prioridadeFilter], [elSolicitante, state.solicitanteFilter], [elSecondary, state.secondaryFilter]].forEach(function (pair) {
+      var isActive = pair[1] !== "all";
+      pair[0].classList.toggle("active-filter", isActive);
+      if (isActive) active++;
+    });
+    if (active > 0) {
+      elFilterCount.hidden = false;
+      elFilterCount.textContent = active + (active === 1 ? " filtro ativo" : " filtros ativos");
+      elClearFiltersBtn.hidden = false;
+    } else {
+      elFilterCount.hidden = true;
+      elClearFiltersBtn.hidden = true;
+    }
+  }
+
+  function renderScopeSwitch() {
+    document.querySelectorAll("#scope-switch button").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-scope") === state.scope);
+    });
+  }
+  function renderGroupBySwitch() {
+    document.querySelectorAll("#groupby-switch button").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-groupby") === state.groupBy);
+    });
+  }
+
+  function renderTabs() {
+    var html = '<button type="button" class="tab' + (state.tabFilter === "all" ? " active" : "") + '" data-tab="all">Todos</button>';
+    if (state.groupBy === "squad" || state.groupBy === "frente") {
+      squadsForScope(state.scope).forEach(function (s) {
+        html += '<button type="button" class="tab' + (state.tabFilter === s.key ? " active" : "") + '" data-tab="' + s.key + '">' +
+          '<span class="dot" style="background:var(' + s.varName + ')"></span>' + esc(s.label) + "</button>";
+      });
+    } else {
+      allPeople().forEach(function (p) {
+        html += '<button type="button" class="tab' + (state.tabFilter === p.id ? " active" : "") + '" data-tab="' + esc(p.id) + '">' +
+          '<span class="avatar">' + esc(initials(p.username)) + '</span>' + esc(p.username) + "</button>";
+      });
+    }
+    elTabs.innerHTML = html;
+    var stillValid = state.tabFilter === "all" ||
+      ((state.groupBy === "squad" || state.groupBy === "frente") ? squadsForScope(state.scope).some(function (s) { return s.key === state.tabFilter; })
+        : allPeople().some(function (p) { return p.id === state.tabFilter; }));
+    if (!stillValid) state.tabFilter = "all";
+  }
+
+  function renderKpis() {
+    var k = computeKpis();
+    var items = [
+      { label: "Ativos no recorte", value: k.total, cls: "" },
+      { label: "Atrasadas", value: k.atrasadas, cls: k.atrasadas > 0 ? "alert" : "" },
+      { label: "Bloqueadas", value: k.bloqueadas, cls: k.bloqueadas > 0 ? "alert" : "" },
+      { label: "Urgentes + altas", value: k.urgentes, cls: k.urgentes > 0 ? "warn" : "" }
+    ];
+    elKpis.innerHTML = items.map(function (it) {
+      return '<div class="kpi"><div class="value ' + it.cls + '">' + it.value + '</div><div class="label">' + esc(it.label) + "</div></div>";
+    }).join("");
+  }
+
+  function bucketBarHtml(tasks) {
+    var buckets = {}, order = [];
+    tasks.forEach(function (t) {
+      var c = classifyStatus(t.status);
+      if (!buckets[c.bucket]) { buckets[c.bucket] = { n: 0, color: c.color }; order.push(c.bucket); }
+      buckets[c.bucket].n++;
+    });
+    var total = tasks.length;
+    var html = '<div class="tile-count">' + total + '<span class="unit">' + (total === 1 ? "item" : "itens") + "</span></div>";
+    if (total > 0) {
+      html += '<div class="tile-bar">';
+      order.forEach(function (b) {
+        var pct = (buckets[b].n / total) * 100;
+        html += '<span style="width:' + pct.toFixed(2) + "%;background:" + buckets[b].color + '" title="' + esc(b) + ": " + buckets[b].n + '"></span>';
+      });
+      html += "</div>";
+    }
+    return html;
+  }
+
+  function renderTiles() {
+    if (state.groupBy === "squad" || state.groupBy === "frente") renderSquadTiles(); else renderPersonTiles();
+  }
+
+  function renderSquadTiles() {
+    var squads = squadsForScope(state.scope);
+    var html = "";
+    squads.forEach(function (s) {
+      var d = state.data[s.key];
+      html += '<div class="tile"><div class="tile-head"><span class="dot" style="background:var(' + s.varName + ')"></span><span class="name">' + esc(s.label) + "</span></div>";
+      if (!d || d.status === "loading") {
+        html += '<div class="skeleton tile-skel"></div><div class="skeleton" style="height:6px;width:100%"></div>';
+      } else if (d.status === "error" && d.tasks.length === 0) {
+        var ei = errorInfo(d.error);
+        html += '<div class="tile-error-title">' + esc(ei.title) + '</div><div class="tile-error-body">' + esc(ei.body) + "</div>";
+      } else {
+        html += bucketBarHtml(d.tasks);
+        if (d.status === "error") {
+          var ei2 = errorInfo(d.error);
+          html += '<div class="tile-error-title" style="margin-top:6px">' + esc(ei2.title) + "</div>";
+        }
+      }
+      html += "</div>";
+    });
+    elTiles.innerHTML = html;
+  }
+
+  function renderPersonTiles() {
+    var squads = squadsForScope(state.scope);
+    var anyReady = squads.some(function (s) { return state.data[s.key] && state.data[s.key].status === "ready"; });
+    if (!anyReady) {
+      elTiles.innerHTML = '<div class="tile"><div class="skeleton tile-skel"></div><div class="skeleton" style="height:6px;width:100%"></div></div>';
+      return;
+    }
+    var rows = activeRows();
+    var withTasks = allPeople().map(function (p) {
+      var tasks = rows.filter(function (r) { return (r.task.assignees || []).some(function (a) { return String(a.id) === String(p.id); }); }).map(function (r) { return r.task; });
+      return { person: p, tasks: tasks };
+    }).sort(function (a, b) { return b.tasks.length - a.tasks.length; });
+
+    if (withTasks.length === 0) {
+      elTiles.innerHTML = '<div class="empty-state">Nenhuma pessoa com tarefas ativas neste recorte.</div>';
+      return;
+    }
+    elTiles.innerHTML = withTasks.map(function (pt) {
+      var html = '<div class="tile"><div class="tile-head"><span class="avatar">' + esc(initials(pt.person.username)) + '</span><span class="name">' + esc(pt.person.username) + "</span></div>";
+      html += bucketBarHtml(pt.tasks);
+      html += "</div>";
+      return html;
+    }).join("");
+  }
+
+  function renderSecondaryOptions() {
+    var current = state.secondaryFilter;
+    var html, items, keyOf;
+    if (state.groupBy === "frente") {
+      elSecondary.innerHTML = '<option value="all">Sem filtro secundário nesta visão</option>';
+      elSecondary.value = "all";
+      elSecondary.disabled = true;
+      state.secondaryFilter = "all";
+      return;
+    }
+    elSecondary.disabled = false;
+    if (state.groupBy === "squad") {
+      items = allPeople();
+      keyOf = function (it) { return it.id; };
+      html = '<option value="all">Todas as pessoas</option>' + items.map(function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.username) + "</option>"; }).join("");
+    } else {
+      items = squadsForScope(state.scope);
+      keyOf = function (it) { return it.key; };
+      html = '<option value="all">Todos os squads</option>' + items.map(function (s) { return '<option value="' + esc(s.key) + '">' + esc(s.label) + "</option>"; }).join("");
+    }
+    elSecondary.innerHTML = html;
+    var stillExists = current === "all" || items.some(function (it) { return String(keyOf(it)) === current; });
+    elSecondary.value = stillExists ? current : "all";
+    if (!stillExists) state.secondaryFilter = "all";
+  }
+
+  function renderLastUpdated() {
+    var squads = squadsForScope(state.scope);
+    var max = 0;
+    squads.forEach(function (s) {
+      var d = state.data[s.key];
+      if (d && d.storedAt && d.storedAt > max) max = d.storedAt;
+    });
+    elLastUpdated.textContent = max ? timeAgoPtBr(max) : "—";
+  }
+
+  function renderContent() {
+    var squads = squadsForScope(state.scope);
+    var anyLoading = squads.some(function (s) { return !state.data[s.key] || state.data[s.key].status === "loading"; });
+    var anyReady = squads.some(function (s) { return state.data[s.key] && state.data[s.key].status === "ready"; });
+    var allErrored = squads.length > 0 && squads.every(function (s) { return state.data[s.key] && state.data[s.key].status === "error"; });
+
+    if (allErrored) {
+      var ei = errorInfo(state.data[squads[0].key].error);
+      elContent.innerHTML = '<div class="banner"><strong>' + esc(ei.title) + "</strong><span>" + esc(ei.body) + "</span></div>";
+      return;
+    }
+    if (anyLoading && !anyReady) {
+      elContent.innerHTML = skeletonTable();
+      return;
+    }
+    var rows = sortRows(filteredRows());
+    if (rows.length === 0) {
+      elContent.innerHTML = '<div class="empty-state">Nenhuma tarefa encontrada com esses filtros.</div>';
+      return;
+    }
+    if (state.groupBy === "frente") { elContent.innerHTML = renderContentByFrente(rows); return; }
+    elContent.innerHTML = renderTable(rows);
+  }
+
+  function skeletonTable() {
+    var rows = "";
+    for (var i = 0; i < 6; i++) {
+      rows += '<tr><td colspan="6"><div class="skeleton" style="width:' + (60 + (i % 3) * 10) + '%"></div></td></tr>';
+    }
+    return '<div class="table-wrap"><table><tbody>' + rows + "</tbody></table></div>";
+  }
+
+  function renderTable(rows) {
+    var showSquadCol = state.groupBy === "pessoa" || state.tabFilter === "all";
+    var html = '<div class="table-wrap"><table><thead><tr>' +
+      "<th>Status</th><th>Tarefa</th>" + (showSquadCol ? "<th>Squad</th>" : "") +
+      "<th>Etapa</th><th>Responsáveis</th><th>Prazo</th>" +
+      "</tr></thead><tbody>";
+    rows.forEach(function (r) {
+      var t = r.task;
+      var c = classifyStatus(t.status);
+      var due = null, overdue = false;
+      if (t.due_date) {
+        var ms = parseInt(t.due_date, 10);
+        due = new Date(ms).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+        overdue = ms < Date.now() && c.bucket !== "concluido" && c.bucket !== "cancelado";
+      }
+      var prio = PRIORITY_INFO[t.priority];
+      html += "<tr>";
+      html += '<td><span class="status-chip"><span class="dot" style="background:' + c.color + '"></span>' + esc(t.status || "—") + "</span></td>";
+      html += '<td><button type="button" class="task-name-btn" data-task-id="' + esc(t.id) + '">' + esc(t.name) + "</button>" +
+        (prio ? ' <span class="priority-flag" style="background:' + prio.color + '">' + esc(prio.label) + "</span>" : "") + "</td>";
+      if (showSquadCol) {
+        html += '<td><span class="squad-chip"><span class="dot" style="background:var(' + r.squad.varName + ')"></span>' + esc(r.squad.label) + "</span></td>";
+      }
+      html += "<td>" + esc(etapaOf(r)) + "</td>";
+      html += '<td class="assignees">' + esc((t.assignees || []).map(function (a) { return a.username; }).join(", ") || "—") + "</td>";
+      html += '<td class="duedate mono' + (overdue ? " overdue" : "") + '">' + (due || "—") + "</td>";
+      html += "</tr>";
+    });
+    html += "</tbody></table></div>";
+    return html;
+  }
+
+  // ---------- agrupamento por Frente (Épico pai) ----------
+  // "Frente" = tarefa-pai (parent) de uma subtarefa, no sentido usado pelo report
+  // semanal do time. Uma tarefa sem parent que NINGUÉM referencia como pai é
+  // "Sem frente"; uma tarefa sem parent que É referenciada por outras é o
+  // próprio Épico (vira cabeçalho do grupo, não uma linha).
+  function computeFrentes(rows) {
+    var byId = {};
+    rows.forEach(function (r) { byId[r.task.id] = r.task; });
+    var hasChildren = {};
+    rows.forEach(function (r) {
+      if (r.task.parent && byId[r.task.parent]) hasChildren[r.task.parent] = true;
+    });
+    var groups = {}, order = [];
+    rows.forEach(function (r) {
+      var t = r.task;
+      if (!t.parent && hasChildren[t.id]) return; // é o próprio Épico — não lista como linha
+      var parentId = (t.parent && byId[t.parent]) ? t.parent : null;
+      var key = r.squad.key + "::" + (parentId || "sem-frente");
+      if (!groups[key]) {
+        groups[key] = {
+          squad: r.squad,
+          frenteId: parentId,
+          frenteName: parentId ? byId[parentId].name : "Sem frente",
+          frenteUrl: parentId ? byId[parentId].url : null,
+          rows: []
+        };
+        order.push(key);
+      }
+      groups[key].rows.push(r);
+    });
+    return order.map(function (k) { return groups[k]; }).sort(function (a, b) {
+      if ((a.frenteId === null) !== (b.frenteId === null)) return a.frenteId === null ? 1 : -1;
+      return b.rows.length - a.rows.length;
+    });
+  }
+
+  // Épicos candidatos para reatribuir: precisam estar na MESMA lista (Backlog/
+  // Execução) da tarefa — o ClickUp não permite parent fora da lista da subtarefa.
+  function epicCandidatesByList(rows) {
+    var byId = {}, hasChildren = {};
+    rows.forEach(function (r) { byId[r.task.id] = r.task; });
+    rows.forEach(function (r) {
+      if (r.task.parent && byId[r.task.parent]) hasChildren[r.task.parent] = true;
+    });
+    var byList = {};
+    rows.forEach(function (r) {
+      if (!hasChildren[r.task.id]) return;
+      var listId = r.task.list && r.task.list.id;
+      if (!listId) return;
+      if (!byList[listId]) byList[listId] = [];
+      byList[listId].push(r.task);
+    });
+    return byList;
+  }
+
+  function frenteReparentControl(task, candidates) {
+    if (!candidates || !candidates.length) return "";
+    var options = '<option value="">Associar a um Épico…</option>' + candidates
+      .filter(function (c) { return c.id !== task.id; })
+      .map(function (c) { return '<option value="' + esc(c.id) + '"' + (c.id === task.parent ? " selected" : "") + ">" + esc(c.name) + "</option>"; })
+      .join("");
+    return '<div class="frente-reassign">' +
+      '<select class="frente-select" data-reparent-task-id="' + esc(task.id) + '">' + options + "</select>" +
+      '<span class="save-indicator" data-field="parent-' + esc(task.id) + '"></span></div>';
+  }
+
+  function renderContentByFrente(rows) {
+    var groups = computeFrentes(rows);
+    var candidatesByList = epicCandidatesByList(rows);
+    if (groups.length === 0) return '<div class="empty-state">Nenhuma tarefa encontrada com esses filtros.</div>';
+    var showSquadCol = state.tabFilter === "all";
+    var html = "";
+    groups.forEach(function (g) {
+      html += '<div class="frente-group">';
+      html += '<div class="frente-head">';
+      if (g.frenteId) {
+        html += '<a href="' + esc(g.frenteUrl) + '" target="_blank" rel="noopener">' + esc(g.frenteName) + "</a>";
+      } else {
+        html += '<span class="frente-name-semfrente">' + esc(g.frenteName) + "</span>";
+      }
+      html += ' <span class="frente-count">' + g.rows.length + (g.rows.length === 1 ? " item" : " itens") + "</span>";
+      if (showSquadCol) html += ' <span class="squad-chip"><span class="dot" style="background:var(' + g.squad.varName + ')"></span>' + esc(g.squad.label) + "</span>";
+      html += "</div>";
+      html += '<div class="table-wrap"><table><thead><tr><th>Status</th><th>Tarefa</th><th>Etapa</th><th>Responsáveis</th><th>Prazo</th>' +
+        (isEditableSquadKey(g.squad.key) ? "<th>Frente</th>" : "") + "</tr></thead><tbody>";
+      g.rows.forEach(function (r) {
+        var t = r.task;
+        var c = classifyStatus(t.status);
+        var due = null, overdue = false;
+        if (t.due_date) {
+          var ms = parseInt(t.due_date, 10);
+          due = new Date(ms).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+          overdue = ms < Date.now() && c.bucket !== "concluido" && c.bucket !== "cancelado";
+        }
+        var prio = PRIORITY_INFO[t.priority];
+        html += "<tr>";
+        html += '<td><span class="status-chip"><span class="dot" style="background:' + c.color + '"></span>' + esc(t.status || "—") + "</span></td>";
+        html += '<td><button type="button" class="task-name-btn" data-task-id="' + esc(t.id) + '">' + esc(t.name) + "</button>" +
+          (prio ? ' <span class="priority-flag" style="background:' + prio.color + '">' + esc(prio.label) + "</span>" : "") + "</td>";
+        html += "<td>" + esc(etapaOf(r)) + "</td>";
+        html += '<td class="assignees">' + esc((t.assignees || []).map(function (a) { return a.username; }).join(", ") || "—") + "</td>";
+        html += '<td class="duedate mono' + (overdue ? " overdue" : "") + '">' + (due || "—") + "</td>";
+        if (isEditableSquadKey(g.squad.key)) {
+          var listId = t.list && t.list.id;
+          html += "<td>" + frenteReparentControl(t, listId ? candidatesByList[listId] : null) + "</td>";
+        }
+        html += "</tr>";
+      });
+      html += "</tbody></table></div></div>";
+    });
+    return html;
+  }
+
+  // ---------- editing ----------
+  function resolveSquadKeyFromTask(task) {
+    // Desatualizado desde a mudança estrutural de 2026-09-10: a lista "Discovery"
+    // foi removida do ClickUp (não existe mais categoria "discovery" em
+    // ALL_SQUADS), então este branch nunca mais deve casar — mantido inofensivo
+    // porque só retorna cedo quando o nome bate. Ver knowledge/domains/processo.md.
+    if (task.list && task.list.name === "Discovery") return "discovery";
+    var folderId = task.folder && task.folder.id;
+    var byFolder = { "90118093878": "plataforma", "90118093917": "backoffice", "90118093918": "produto" };
+    return (folderId && byFolder[folderId]) || null;
+  }
+  function isEditableSquadKey(key) { return squadsForScope("mine").some(function (s) { return s.key === key; }); }
+  function msToDateInputValue(ms) {
+    var d = new Date(ms);
+    var mm = String(d.getMonth() + 1).padStart(2, "0");
+    var dd = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + mm + "-" + dd;
+  }
+
+  var workspaceMembers = null;
+  function loadWorkspaceMembers() {
+    apiGet("/api/members").then(function (body) {
+      workspaceMembers = (body.members || []).map(function (m) { return { id: String(m.id), username: m.username }; })
+        .sort(function (a, b) { return a.username.localeCompare(b.username, "pt-BR"); });
+      if (currentTask) renderDetail(currentTask);
+    }).catch(function () { workspaceMembers = []; });
+  }
+
+  // ---------- detail drawer ----------
+  var elOverlay = document.getElementById("overlay");
+  var elDrawer = document.getElementById("drawer");
+  var elDrawerTitle = document.getElementById("drawer-title");
+  var elDrawerBody = document.getElementById("drawer-body");
+  var elDrawerFoot = document.getElementById("drawer-foot");
+  var currentTask = null;
+
+  function openDrawer() { elOverlay.classList.add("open"); elDrawer.classList.add("open"); }
+  function closeDrawer() { elOverlay.classList.remove("open"); elDrawer.classList.remove("open"); currentTask = null; }
+
+  function findCF(customFields, name) {
+    var arr = customFields || [];
+    for (var i = 0; i < arr.length; i++) if (arr[i].name === name) return arr[i];
+    return null;
+  }
+  function cfValueText(f) {
+    if (!f || f.value === undefined || f.value === null) return null;
+    var v = f.value;
+    try {
+      if (f.type === "users") {
+        var arr = Array.isArray(v) ? v : [v];
+        var names = arr.map(function (u) { return u && (u.username || u.email); }).filter(Boolean);
+        return names.length ? names.join(", ") : null;
+      }
+      if (f.type === "drop_down") {
+        var opts = (f.type_config && f.type_config.options) || [];
+        var match = null;
+        opts.forEach(function (o, idx) { if (o.id === v || idx === v || o.orderindex === v) match = o; });
+        return match ? match.name : String(v);
+      }
+      if (typeof v === "string" || typeof v === "number") return String(v);
+      return JSON.stringify(v);
+    } catch (e) { return null; }
+  }
+
+  function openDetail(taskId) {
+    elDrawerTitle.textContent = "Carregando…";
+    elDrawerBody.innerHTML = '<div class="skeleton" style="width:80%;margin-bottom:10px"></div><div class="skeleton" style="width:60%;margin-bottom:10px"></div><div class="skeleton" style="width:70%"></div>';
+    elDrawerFoot.innerHTML = "";
+    openDrawer();
+    apiGet("/api/task/" + taskId)
+      .then(function (task) { currentTask = task; renderDetail(task); })
+      .catch(function (err) {
+        var ei = errorInfo(err);
+        elDrawerTitle.textContent = "Tarefa";
+        elDrawerBody.innerHTML = '<div class="banner"><strong>' + esc(ei.title) + "</strong><span>" + esc(ei.body) + "</span></div>";
+      });
+  }
+
+  function setIndicator(field, cls, text) {
+    // Busca no drawer e no conteúdo principal — a visão por Frente tem seu
+    // próprio indicador inline (fora do drawer) para o seletor de Épico.
+    var el = elDrawerBody.querySelector('.save-indicator[data-field="' + field + '"]') ||
+      elContent.querySelector('.save-indicator[data-field="' + field + '"]');
+    if (el) { el.className = "save-indicator " + cls; el.textContent = text; }
+  }
+
+  function updateTaskField(taskId, patch, field) {
+    setIndicator(field, "saving", "Salvando…");
+    apiPut("/api/task/" + taskId, patch)
+      .then(function () { afterWrite(taskId, field, null); })
+      .catch(function (err) { afterWrite(taskId, field, err); });
+  }
+
+  function afterWrite(taskId, field, err) {
+    apiGet("/api/task/" + taskId)
+      .then(function (task) {
+        // Só reescreve o drawer se ele estiver aberto mostrando esta mesma
+        // tarefa — evita que uma edição inline (fora do drawer, ex.: o
+        // seletor de Frente na visão por Frente) sobrescreva o drawer de
+        // outra tarefa que o usuário esteja olhando ao mesmo tempo.
+        if (currentTask && currentTask.id === taskId) { currentTask = task; renderDetail(task); }
+        var squadKey = resolveSquadKeyFromTask(task);
+        if (squadKey && state.activeSquads[squadKey]) fetchSquadData(squadKey);
+        if (err) setIndicator(field, "err", errorInfo(err).title + " — estado atual acima.");
+        else { setIndicator(field, "ok", "Salvo"); setTimeout(function () { setIndicator(field, "", ""); }, 2500); }
+      })
+      .catch(function () { setIndicator(field, "err", "Não foi possível confirmar o estado atual."); });
+  }
+
+  function renderDetail(task) {
+    if (!task) { elDrawerBody.innerHTML = '<div class="banner"><strong>Resposta inesperada</strong><span>Não foi possível ler os dados desta tarefa.</span></div>'; return; }
+    elDrawerTitle.textContent = task.name || "Tarefa";
+    var cfs = task.custom_fields || [];
+    var solicitante = cfValueText(findCF(cfs, "Solicitante"));
+    var empresa = cfValueText(findCF(cfs, "Empresa"));
+    var squadKey = resolveSquadKeyFromTask(task);
+    var squadLabel = (task.folder && task.folder.name) || "—";
+    var etapaLabel = (task.list && task.list.name) || "—";
+    var editable = isEditableSquadKey(squadKey);
+
+    var html = "";
+    if (!editable) {
+      html += '<p class="readonly-note">Fora dos seus times — edição desativada aqui. Use o link "Abrir no ClickUp" para alterar.</p>';
+    } else {
+      var statuses = Array.isArray(task.available_statuses) && task.available_statuses.length ? task.available_statuses : null;
+      html += '<div class="edit-section">';
+      html += '<div class="edit-field"><label>Status</label><div class="edit-row">';
+      if (statuses) {
+        html += '<select id="edit-status">' + statuses.map(function (s) {
+          return '<option value="' + esc(s) + '"' + (s === task.status ? " selected" : "") + ">" + esc(s) + "</option>";
+        }).join("") + "</select>";
+      } else {
+        html += '<input type="text" id="edit-status" value="' + esc(task.status || "") + '" style="min-width:160px">';
+      }
+      html += '<span class="save-indicator" data-field="status"></span></div></div>';
+
+      html += '<div class="edit-field"><label>Prioridade</label><div class="edit-row"><select id="edit-priority">';
+      [["none", "Sem prioridade"], ["urgent", "Urgente"], ["high", "Alta"], ["normal", "Normal"], ["low", "Baixa"]].forEach(function (opt) {
+        var val = task.priority || "none";
+        html += '<option value="' + opt[0] + '"' + (opt[0] === val ? " selected" : "") + ">" + esc(opt[1]) + "</option>";
+      });
+      html += '</select><span class="save-indicator" data-field="priority"></span></div></div>';
+
+      html += '<div class="edit-field"><label>Prazo</label><div class="edit-row">';
+      html += '<input type="date" id="edit-duedate" value="' + (task.due_date ? msToDateInputValue(parseInt(task.due_date, 10)) : "") + '">';
+      html += '<button type="button" class="btn small" id="edit-duedate-clear">Remover prazo</button>';
+      html += '<span class="save-indicator" data-field="due_date"></span></div></div>';
+
+      html += '<div class="edit-field"><label>Responsáveis</label>';
+      html += '<div>' + (task.assignees || []).map(function (a) {
+        return '<span class="chip-person">' + esc(a.username) + ' <button type="button" data-remove-assignee="' + esc(a.id) + '" aria-label="Remover">×</button></span>';
+      }).join("") + "</div>";
+      var currentIds = (task.assignees || []).map(function (a) { return String(a.id); });
+      var candidates = (workspaceMembers || allPeople()).filter(function (p) { return currentIds.indexOf(String(p.id)) === -1; });
+      html += '<div class="edit-row"><select id="edit-assignees-add"><option value="">+ adicionar responsável…</option>' +
+        candidates.map(function (p) { return '<option value="' + esc(p.id) + '">' + esc(p.username) + "</option>"; }).join("") +
+        '</select><span class="save-indicator" data-field="assignees"></span></div>';
+      html += "</div></div>";
+    }
+
+    var kv = function (label, value) { return "<dt>" + esc(label) + "</dt><dd>" + esc(value || "—") + "</dd>"; };
+    html += '<dl class="kv">';
+    html += kv("Squad", squadLabel);
+    html += kv("Etapa", etapaLabel);
+    html += kv("Tipo", task.task_type);
+    html += kv("Solicitante", solicitante);
+    html += kv("Empresa", empresa);
+    html += "</dl>";
+    if (!solicitante) html += '<p style="color:var(--text-muted);font-size:12px;margin-top:10px">Sem solicitante registrado nesta tarefa.</p>';
+    elDrawerBody.innerHTML = html;
+    elDrawerFoot.innerHTML = task.url ? '<a class="link-out" href="' + esc(task.url) + '" target="_blank" rel="noopener">Abrir no ClickUp →</a>' : "";
+  }
+
+  elDrawerBody.addEventListener("change", function (e) {
+    if (!currentTask) return;
+    var taskId = currentTask.id;
+    if (e.target.id === "edit-status") {
+      updateTaskField(taskId, { status: e.target.value }, "status");
+    } else if (e.target.id === "edit-priority") {
+      updateTaskField(taskId, { priority: e.target.value }, "priority");
+    } else if (e.target.id === "edit-duedate") {
+      updateTaskField(taskId, { due_date: e.target.value || "none" }, "due_date");
+    } else if (e.target.id === "edit-assignees-add") {
+      var addId = e.target.value;
+      if (!addId) return;
+      updateTaskField(taskId, { assignees: { add: [addId] } }, "assignees");
+    }
+  });
+  elDrawerBody.addEventListener("click", function (e) {
+    if (!currentTask) return;
+    var removeBtn = e.target.closest("button[data-remove-assignee]");
+    if (removeBtn) {
+      updateTaskField(currentTask.id, { assignees: { rem: [removeBtn.getAttribute("data-remove-assignee")] } }, "assignees");
+      return;
+    }
+    if (e.target.closest("#edit-duedate-clear")) {
+      updateTaskField(currentTask.id, { due_date: "none" }, "due_date");
+    }
+  });
+
+  // ---------- status report ----------
+  var elReportView = document.getElementById("report-view");
+  var elReportDoc = document.getElementById("report-doc");
+  var elReportStatus = document.getElementById("report-status");
+  var elReportPeriod = document.getElementById("report-period");
+
+  function scopeLabel() {
+    return state.scope === "mine" ? "Meus times (Plataforma, Backoffice & Integração)" : "Todos os times";
+  }
+
+  function fetchSquadTasksOnce(squad) {
+    return apiGet("/api/tasks/" + squad.key + "?include_closed=true").then(function (body) {
+      return (body.tasks || []).map(function (t) { return { task: t, squad: squad }; });
+    });
+  }
+  function fetchReportRows() {
+    return Promise.all(squadsForScope(state.scope).map(fetchSquadTasksOnce)).then(function (lists) {
+      return lists.reduce(function (acc, l) { return acc.concat(l); }, []);
+    });
+  }
+
+  function computeReportData(rows, periodDays) {
+    var cutoff = Date.now() - periodDays * 86400000;
+    var concluded = rows.filter(function (r) { return r.task.date_closed && parseInt(r.task.date_closed, 10) >= cutoff; });
+    var active = rows.filter(function (r) { return !r.task.date_closed; });
+    var blocked = active.filter(function (r) { return classifyStatus(r.task.status).bucket === "bloqueada"; });
+    var overdue = active.filter(function (r) {
+      if (!r.task.due_date) return false;
+      var ms = parseInt(r.task.due_date, 10);
+      var b = classifyStatus(r.task.status).bucket;
+      return ms < Date.now() && b !== "concluido" && b !== "cancelado";
+    });
+
+    var bySquad = {};
+    squadsForScope(state.scope).forEach(function (s) { bySquad[s.key] = { label: s.label, concluded: 0, active: 0, blocked: 0, overdue: 0 }; });
+    concluded.forEach(function (r) { if (bySquad[r.squad.key]) bySquad[r.squad.key].concluded++; });
+    active.forEach(function (r) { if (bySquad[r.squad.key]) bySquad[r.squad.key].active++; });
+    blocked.forEach(function (r) { if (bySquad[r.squad.key]) bySquad[r.squad.key].blocked++; });
+    overdue.forEach(function (r) { if (bySquad[r.squad.key]) bySquad[r.squad.key].overdue++; });
+
+    return { concluded: concluded, active: active, blocked: blocked, overdue: overdue, bySquad: bySquad };
+  }
+
+  function uniqueTaskNames(rows) {
+    var seen = {}, out = [];
+    rows.forEach(function (r) { if (!seen[r.task.id]) { seen[r.task.id] = true; out.push(r.task.name); } });
+    return out;
+  }
+  function buildEditableList(names, emptyText) {
+    if (names.length === 0) return '<p class="report-empty-hint" contenteditable="true">' + esc(emptyText) + "</p>";
+    return '<ul contenteditable="true">' + names.map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("") + "</ul>";
+  }
+  function buildSummaryText(data, periodDays) {
+    var parts = [];
+    parts.push("Nos últimos " + periodDays + " dias, " + data.concluded.length + " " +
+      (data.concluded.length === 1 ? "item foi concluído" : "itens foram concluídos") +
+      ", com " + data.active.length + " ativos em andamento.");
+    if (data.blocked.length > 0) parts.push(data.blocked.length + " " + (data.blocked.length === 1 ? "item está bloqueado" : "itens estão bloqueados") + ".");
+    if (data.overdue.length > 0) parts.push(data.overdue.length + " " + (data.overdue.length === 1 ? "item está atrasado" : "itens estão atrasados") + ".");
+    return parts.join(" ");
+  }
+
+  function renderReportDoc(data, periodDays) {
+    var today = new Date();
+    var from = new Date(Date.now() - periodDays * 86400000);
+    var html = "";
+    html += "<h1>Status Report — " + esc(scopeLabel()) + "</h1>";
+    html += '<div class="report-meta">Período: ' + formatDateBr(from) + " a " + formatDateBr(today) + " · Gerado em " + formatDateBr(today) + " via Radar de Produto</div>";
+    html += "<h2>Resumo executivo</h2>";
+    html += '<p contenteditable="true">' + esc(buildSummaryText(data, periodDays)) + "</p>";
+    html += "<h2>Números por squad</h2>";
+    html += '<table class="report-squad-table"><thead><tr><th>Squad</th><th>Concluídos no período</th><th>Ativos</th><th>Bloqueados</th><th>Atrasados</th></tr></thead><tbody>';
+    Object.keys(data.bySquad).forEach(function (key) {
+      var s = data.bySquad[key];
+      html += "<tr><td>" + esc(s.label) + "</td><td>" + s.concluded + "</td><td>" + s.active + "</td><td>" + s.blocked + "</td><td>" + s.overdue + "</td></tr>";
+    });
+    html += "</tbody></table>";
+    html += "<h2>Destaques do período</h2>";
+    html += buildEditableList(uniqueTaskNames(data.concluded), "Nenhum item concluído neste período.");
+    html += "<h2>Riscos e bloqueios</h2>";
+    html += buildEditableList(uniqueTaskNames(data.blocked.concat(data.overdue)), "Nenhum risco identificado neste período.");
+    html += "<h2>Próximos passos</h2>";
+    html += '<p contenteditable="true"></p>';
+    return html;
+  }
+
+  function generateReport() {
+    elReportStatus.textContent = "Buscando dados…";
+    elReportDoc.innerHTML = '<div class="skeleton" style="width:60%;margin-bottom:10px"></div><div class="skeleton" style="width:80%;margin-bottom:10px"></div><div class="skeleton" style="width:40%"></div>';
+    var periodDays = parseInt(elReportPeriod.value, 10);
+    fetchReportRows()
+      .then(function (rows) {
+        var data = computeReportData(rows, periodDays);
+        elReportDoc.innerHTML = renderReportDoc(data, periodDays);
+        elReportStatus.textContent = "Dados de " + rows.length + " tarefas · " + timeAgoPtBr(Date.now());
+      })
+      .catch(function (err) {
+        var ei = errorInfo(err);
+        elReportDoc.innerHTML = '<div class="banner"><strong>' + esc(ei.title) + "</strong><span>" + esc(ei.body) + "</span></div>";
+        elReportStatus.textContent = "";
+      });
+  }
+  function openReportView() { elReportView.classList.add("open"); generateReport(); }
+  function closeReportView() { elReportView.classList.remove("open"); }
+  function exportReportPdf() {
+    var prevTitle = document.title;
+    document.title = "Status Report - " + scopeLabel() + " - " + formatDateBr(new Date());
+    window.print();
+    setTimeout(function () { document.title = prevTitle; }, 1000);
+  }
+
+  document.getElementById("open-report-btn").addEventListener("click", openReportView);
+  document.getElementById("report-back-btn").addEventListener("click", closeReportView);
+  document.getElementById("report-export-btn").addEventListener("click", exportReportPdf);
+  elReportPeriod.addEventListener("change", generateReport);
+
+  // ---------- publicar report diário no Doc do ClickUp (escopo PAM) ----------
+  // Um único report, Plataforma + Backoffice fundidos (decisão do Ithalo, 10/08/2026 —
+  // antes havia 3 páginas: uma por squad + um resumo consolidado; agora é só esta).
+  // Nome exato da página de topo já existente no Doc
+  // app.clickup.com/9006076935/docs/8ccvn07-68891 — se o nome mudar lá, mudar aqui também.
+  var TOP_PAGE_NAME = "Report Status — PAM";
+  var PAM_SQUAD_KEYS = ["plataforma", "backoffice"];
+
+  // Os 5 status do report diário (decisão do Ithalo, 10/08/2026) — cada tarefa cai em
+  // EXATAMENTE um destes baldes. Só Execução conta (Backlog fica de fora, mesma regra
+  // do report semanal do claude-os) e subtarefas são ignoradas (`parent` preenchido).
+  var EXEC_LIST_ID = { plataforma: "901114029785", backoffice: "901114029783" };
+  var ST_EM_TESTE = ["teste dev", "teste em dev", "teste homolog", "teste em alpha", "teste alpha"];
+  var ST_EM_DESENVOLVIMENTO = ["desenvolvimento", "revisão técnica", "deploy p/ alpha", "deploy p/ prd"];
+  var ST_PENDENTE = ["pendente"];
+  var ST_FINALIZADO = ["pronto", "finalizado", "concluído", "complete"];
+  var ST_CANCEL = ["cancelado", "despriorizado", "fechado"];
+  function statusIn(status, list) { return list.indexOf((status || "").toLowerCase()) !== -1; }
+
+  // null = status fora dos 5 esperados (não deveria sobrar nenhum depois do filtro de
+  // Execução — se aparecer, é sinal de status novo no board ou lista errada).
+  function classifyStatus5(rawStatus) {
+    var s = (rawStatus || "").toLowerCase();
+    if (s.indexOf("bloque") !== -1) return "bloqueado";
+    if (statusIn(s, ST_EM_TESTE)) return "em teste";
+    if (statusIn(s, ST_EM_DESENVOLVIMENTO)) return "em desenvolvimento";
+    if (statusIn(s, ST_PENDENTE)) return "pendente";
+    if (statusIn(s, ST_FINALIZADO)) return "finalizado";
+    return null;
+  }
+
+  function mdEsc(str) { return String(str == null ? "" : str).replace(/\|/g, "\\|"); }
+
+  var PRIORITY_RANK = { urgent: 1, high: 2, normal: 3, low: 4 };
+  function priorityRank(p) { return PRIORITY_RANK[p] || 5; }
+
+  // Uma tarefa cai em exatamente um dos 5 status, e carrega o squad de origem
+  // (`squadLabel`) pra continuar rastreável mesmo com os dois times fundidos num
+  // report só. "Novas prioridades" e "Próxima prioridade por dev" são recortes
+  // adicionais sobre o MESMO conjunto — não são um 6º status, são outra lente sobre
+  // o mesmo dado (pedido do Ithalo, 10/08/2026).
+  function computeDailyPamData() {
+    var startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    var cutoff = startOfDay.getTime();
+
+    var tasks = [];
+    PAM_SQUAD_KEYS.forEach(function (key) {
+      var d = state.data[key];
+      var squadLabel = squadByKey(key).label;
+      ((d && d.tasks) || []).forEach(function (t) {
+        if (t.list && t.list.id === EXEC_LIST_ID[key] && !t.parent && !statusIn(t.status, ST_CANCEL)) {
+          tasks.push(Object.assign({ squadKey: key, squadLabel: squadLabel }, t));
+        }
+      });
+    });
+
+    var buckets = { finalizado: [], "em teste": [], "em desenvolvimento": [], pendente: [], bloqueado: [] };
+    var naoMapeados = [];
+    tasks.forEach(function (t) {
+      if (t.date_closed) {
+        // "Finalizado" é o único balde com recorte de dia — os outros 4 são foto do
+        // status atual. Fechada hoje conta; fechada em outro dia não conta em nada.
+        if (parseInt(t.date_closed, 10) >= cutoff) buckets.finalizado.push(t);
+        return;
+      }
+      var bucket = classifyStatus5(t.status);
+      if (bucket && bucket !== "finalizado") buckets[bucket].push(t);
+      else if (!bucket) naoMapeados.push(t);
+    });
+    if (naoMapeados.length && typeof console !== "undefined") {
+      console.warn("[report diário] " + naoMapeados.length + " tarefa(s) com status fora dos 5 esperados — " +
+        naoMapeados.map(function (t) { return t.squadLabel + ": " + t.name + " (" + t.status + ")"; }).join("; "));
+    }
+
+    // "Entrou na esteira hoje" = criada hoje e já em Execução. Não captura tarefa
+    // antiga que só HOJE foi movida de Backlog pra Execução — a API de listagem do
+    // ClickUp não expõe histórico de mudança de lista sem uma chamada por tarefa.
+    var novasPrioridades = tasks.filter(function (t) {
+      return t.date_created && parseInt(t.date_created, 10) >= cutoff;
+    });
+
+    // "Próxima prioridade" separa dev de designer (pedido do Ithalo, 10/08/2026) e,
+    // dentro de cada um, agrupa por squad com subtítulo (pedido dele de novo,
+    // 11/08/2026, ao reeditar a versão achatada/alfabética que eu tinha publicado).
+    // Roster de designers vem de knowledge/domains/pessoas.md — atualizar aqui se a
+    // tabela de Times mudar.
+    var DESIGNERS = ["Allison Macedo", "Mateus Sperandio"];
+    var porPessoa = {};
+    buckets.pendente.forEach(function (t) {
+      (t.assignees || []).forEach(function (a) {
+        if (!porPessoa[a.username]) porPessoa[a.username] = [];
+        porPessoa[a.username].push(t);
+      });
+    });
+    function proximaPrioridadeDe(nomes) {
+      return nomes.sort().map(function (username) {
+        var lista = porPessoa[username].slice().sort(function (a, b) { return priorityRank(a.priority) - priorityRank(b.priority); });
+        return { username: username, task: lista[0] };
+      });
+    }
+    var nomesComPendente = Object.keys(porPessoa);
+    var proximaPrioridadeDev = proximaPrioridadeDe(nomesComPendente.filter(function (n) { return DESIGNERS.indexOf(n) === -1; }));
+    var proximaPrioridadeDesigner = proximaPrioridadeDe(nomesComPendente.filter(function (n) { return DESIGNERS.indexOf(n) !== -1; }));
+
+    return { buckets: buckets, novasPrioridades: novasPrioridades, proximaPrioridadeDev: proximaPrioridadeDev, proximaPrioridadeDesigner: proximaPrioridadeDesigner };
+  }
+
+  // "Mencionar tarefa" (o chip nativo com status ao vivo e avatar) NÃO é suportado
+  // pela API de Docs do ClickUp — confirmado em 10/08/2026 na documentação oficial
+  // (developer.clickup.com/docs/docsimportexportlimitations): "Embed a task" está
+  // explicitamente na lista do que a API NÃO suporta, é recurso só do editor nativo.
+  // Uma tentativa anterior (URL solta, sem colchetes) não virou chip nem link — ficou
+  // texto morto, porque URL solta não aciona a formatação "Website link" da API.
+  // O que a API suporta de verdade é o hyperlink markdown de sempre.
+  //
+  // SEM responsável/squad no fim da linha — o Ithalo removeu esse sufixo manualmente
+  // em 11/08/2026 em todas as seções de lista simples (só "Próxima prioridade por
+  // dev/designer" mostra nome de pessoa, porque ali o nome É o rótulo da linha).
+  //
+  // Correção de 18/08/2026: URL SOLTA, sem colchetes — reverte a escolha de
+  // 10-11/08/2026 (`[Nome](url)`). O motivo não é renderização pela API (isso
+  // continua impossível — "Embed a task" não é suportado, ver decisão de
+  // 10/08/2026): é que o Ithalo converte cada referência num chip nativo à mão,
+  // selecionando a URL e colando de novo no editor do ClickUp (esse paste, feito
+  // por uma pessoa dentro do editor, é o que dispara a conversão — não tem nada a
+  // ver com o conteúdo que a API grava). Uma URL dentro de colchetes markdown fica
+  // escondida atrás do texto do link (precisa "copiar link" em vez de selecionar o
+  // texto); URL solta é direto selecionável. Ver decisão de 18/08/2026.
+  function taskRef(t) { return t.url; }
+
+  // `comentariosPorId` é opcional. O Ithalo cortou quase todos os comentários que eu
+  // tinha incluído por padrão (manteve só 1 de ~9, e mesmo esse inline, não como
+  // citação) — por isso este mecanismo deve ser usado com parcimônia: só quando o
+  // comentário é a única forma de explicar por que aquele item específico pede
+  // atenção, não como anexo automático em toda tarefa. Ver memória
+  // feedback-report-diario-pam-formato para o histórico completo.
+  function buildTaskList(tasks, emptyText, comentariosPorId) {
+    if (tasks.length === 0) return [emptyText];
+    var linhas = [];
+    tasks.forEach(function (t) {
+      linhas.push("- " + mdEsc(taskRef(t)));
+      var comentario = comentariosPorId && comentariosPorId[t.id];
+      if (comentario) linhas.push("  > " + mdEsc(comentario));
+    });
+    return linhas;
+  }
+
+  var PLACEHOLDER_EXECUTIVO = "_(resumo executivo não informado)_";
+
+  function buildProximaPrioridadeBySquad(lista, comentariosPorId) {
+    var linhas = [];
+    if (!lista.length) return ["Ninguém com item pendente priorizado."];
+    PAM_SQUAD_KEYS.forEach(function (key) {
+      var doSquad = lista.filter(function (p) { return p.task.squadKey === key; });
+      if (!doSquad.length) return;
+      linhas.push("**" + mdEsc(squadByKey(key).label) + ":**");
+      doSquad.forEach(function (p) {
+        var t = p.task;
+        linhas.push(mdEsc(p.username) + ": " + t.url);
+        var comentario = comentariosPorId && comentariosPorId[t.id];
+        if (comentario) linhas.push("  > " + mdEsc(comentario));
+      });
+    });
+    return linhas;
+  }
+
+  // Template alinhado com o que o Ithalo pediu e depois refinou em 10-11/08/2026 —
+  // ver memória feedback-report-diario-pam-formato para o raciocínio por trás de
+  // cada escolha de formato.
+  function buildPamDailyMarkdown(data, textoExecutivo, comentariosPorId) {
+    var b = data.buckets;
+    var lines = [];
+    lines.push("# Resumo do dia dos times PAM");
+    lines.push(textoExecutivo && textoExecutivo.trim() ? textoExecutivo.trim() : PLACEHOLDER_EXECUTIVO);
+    lines.push("- " + b.finalizado.length + " itens finalizados");
+    lines.push("- " + b["em teste"].length + " itens em teste");
+    lines.push("- " + b["em desenvolvimento"].length + " itens em desenvolvimento");
+    lines.push("- " + b.pendente.length + " itens pendentes");
+    lines.push("- " + b.bloqueado.length + " itens bloqueados");
+
+    lines.push("", "## Novas prioridades (entraram na esteira hoje)");
+    lines.push.apply(lines, buildTaskList(data.novasPrioridades, "Nenhuma tarefa nova entrou na esteira hoje.", comentariosPorId));
+
+    lines.push("", "## Finalizado hoje");
+    lines.push.apply(lines, buildTaskList(b.finalizado, "Nenhum item finalizado hoje."));
+
+    lines.push("", "## Em teste");
+    lines.push.apply(lines, buildTaskList(b["em teste"], "Nenhum item em teste."));
+
+    lines.push("", "## Bloqueado");
+    lines.push.apply(lines, buildTaskList(b.bloqueado, "Nenhum item bloqueado.", comentariosPorId));
+
+    lines.push("", "## Próxima prioridade por dev");
+    lines.push.apply(lines, buildProximaPrioridadeBySquad(data.proximaPrioridadeDev, comentariosPorId));
+
+    lines.push("", "## Próxima prioridade por designer");
+    lines.push.apply(lines, buildProximaPrioridadeBySquad(data.proximaPrioridadeDesigner, comentariosPorId));
+
+    return lines.join("\n");
+  }
+
+  function apiGetJson(path) {
+    return fetch(path).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (b) {
+        if (!res.ok) return Promise.reject({ message: b.error || ("Erro " + res.status) });
+        return b;
+      });
+    });
+  }
+  function apiPostJson(path, body) {
+    return fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      .then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (b) {
+          if (!res.ok) return Promise.reject({ message: b.error || ("Erro " + res.status) });
+          return b;
+        });
+      });
+  }
+
+  // Sem LLM embutido neste app (de propósito — ver README) — "trazer contexto quando
+  // fizer sentido" vira, aqui, um filtro mecânico: mostra o último comentário só se
+  // ele tiver conteúdo substantivo (mais que um "ok"/emoji de reação). Quando o
+  // Claude Code gera o report (como em 10/08/2026), ele lê os comentários de verdade
+  // e decide o que entra com mais critério do que esse filtro consegue.
+  function fetchLatestComment(taskId) {
+    return apiGetJson("/api/task/" + taskId + "/comments").then(function (body) {
+      var comments = body.comments || [];
+      if (!comments.length) return null;
+      var texto = (comments[0].text || "").trim();
+      if (texto.length < 15) return null;
+      return texto.length > 220 ? texto.slice(0, 220) + "…" : texto;
+    }).catch(function () { return null; });
+  }
+  function fetchComentariosPorId(tasks) {
+    var porId = {};
+    return Promise.all(tasks.map(function (t) {
+      return fetchLatestComment(t.id).then(function (texto) { if (texto) porId[t.id] = texto; });
+    })).then(function () { return porId; });
+  }
+
+  function publishDailyReport() {
+    var elStatus = document.getElementById("publish-doc-status");
+    var notReady = PAM_SQUAD_KEYS.filter(function (key) { return !state.data[key] || state.data[key].status !== "ready"; });
+    if (notReady.length) {
+      elStatus.textContent = "Aguarde os dados de " + notReady.map(function (k) { return squadByKey(k).label; }).join(" e ") + " carregarem e tente de novo.";
+      return;
+    }
+    elStatus.textContent = "Publicando…";
+    var dayLabel = formatDateBr(new Date());
+    var data = computeDailyPamData();
+    var relevantes = data.novasPrioridades
+      .concat(data.buckets.bloqueado)
+      .concat(data.proximaPrioridadeDev.map(function (p) { return p.task; }))
+      .concat(data.proximaPrioridadeDesigner.map(function (p) { return p.task; }));
+
+    var textoExecutivo = window.prompt("Resumo executivo do dia — PAM (opcional, cole aqui ou deixe em branco):", "") || "";
+
+    elStatus.textContent = "Buscando comentários…";
+    fetchComentariosPorId(relevantes)
+      .then(function (comentariosPorId) {
+        elStatus.textContent = "Publicando…";
+        return apiPostJson("/api/report-doc/page", {
+          topPageName: TOP_PAGE_NAME, dayLabel: dayLabel, content: buildPamDailyMarkdown(data, textoExecutivo, comentariosPorId)
+        });
+      })
+      .then(function (result) {
+        elStatus.innerHTML = 'Publicado — <a href="' + esc(result.url) + '" target="_blank" rel="noopener">abrir</a>';
+      })
+      .catch(function (err) {
+        elStatus.textContent = "Erro ao publicar: " + ((err && err.message) || "tente de novo");
+      });
+  }
+
+  document.getElementById("publish-doc-btn").addEventListener("click", publishDailyReport);
+
+  // ---------- events ----------
+  document.getElementById("scope-switch").addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-scope]");
+    if (!btn) return;
+    var scope = btn.getAttribute("data-scope");
+    if (scope === state.scope) return;
+    state.scope = scope;
+    ensureSubscriptions();
+  });
+
+  document.getElementById("groupby-switch").addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-groupby]");
+    if (!btn) return;
+    var groupBy = btn.getAttribute("data-groupby");
+    if (groupBy === state.groupBy) return;
+    state.groupBy = groupBy;
+    state.tabFilter = "all";
+    state.secondaryFilter = "all";
+    render();
+  });
+
+  elTabs.addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-tab]");
+    if (!btn) return;
+    state.tabFilter = btn.getAttribute("data-tab");
+    render();
+  });
+
+  elEtapa.addEventListener("change", function (e) { state.etapaFilter = e.target.value; render(); });
+  elPrioridade.addEventListener("change", function (e) { state.prioridadeFilter = e.target.value; render(); });
+  elSolicitante.addEventListener("change", function (e) { state.solicitanteFilter = e.target.value; render(); });
+  elSecondary.addEventListener("change", function (e) { state.secondaryFilter = e.target.value; render(); });
+  elClearFiltersBtn.addEventListener("click", function () {
+    state.etapaFilter = "all"; state.prioridadeFilter = "all"; state.solicitanteFilter = "all"; state.secondaryFilter = "all";
+    render();
+  });
+  document.getElementById("filter-closed").addEventListener("change", function (e) { state.showClosed = e.target.checked; resubscribeAll(); });
+  elRefreshBtn.addEventListener("click", manualRefresh);
+
+  elContent.addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-task-id]");
+    if (!btn) return;
+    openDetail(btn.getAttribute("data-task-id"));
+  });
+
+  elContent.addEventListener("change", function (e) {
+    var sel = e.target.closest("select[data-reparent-task-id]");
+    if (!sel) return;
+    var taskId = sel.getAttribute("data-reparent-task-id");
+    var newParentId = sel.value;
+    if (!newParentId) return;
+    updateTaskField(taskId, { parent: newParentId }, "parent-" + taskId);
+  });
+
+  document.getElementById("drawer-close").addEventListener("click", closeDrawer);
+  elOverlay.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+
+  // ---------- init ----------
+  setInterval(function () { Object.keys(state.activeSquads).forEach(fetchSquadData); }, 60000);
+  setInterval(renderLastUpdated, 30000);
+  ensureSubscriptions();
+  loadWorkspaceMembers();
+})();
+</script>
+</body>
+</html>

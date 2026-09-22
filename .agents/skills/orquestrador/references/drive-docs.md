@@ -39,7 +39,7 @@ A good PRD is **user-first**, **MVP-scoped**, and a **living document**. Recomme
 
 1. **Title + metadata block** — status, version, date, owner, product, audience, north-star metric.
 2. **Executive summary** — vision, the bet, strategic objective, KPIs, in one paragraph.
-3. **Roadmap Item (strategic bet)** — pain, product direction, target audience, north star + secondary objectives, value hypothesis, success signal, positioning.
+3. **Projeto de Delivery (the bet)** — pain, product direction, target audience, north star metric, value hypothesis, success signal, positioning.
 4. **Discovery** — assumptions to test, options/mechanics under exploration, open questions, compliance to confirm.
 5. **Delivery (v1)** — scope, navigation/architecture, screen-by-screen spec, data model, tracking events, design tokens, prototype/build handoff.
 6. **Subtasks** — deliverable breakdown.

@@ -1,6 +1,13 @@
 # Template: Objetivo (OKR/KR)
 
-Vive no folder **Roadmap → Objetivos** (lista Objetivos). Dois tipos de item:
+> ⚠️ **Legado/histórico, não usar.** O nível Objetivo (OKR/KR) saiu do processo de produto em 2026-09-10 — a
+> empresa decidiu não ter mais OKRs formais. O folder Roadmap/Strategy e a lista Objetivos (`901114034994`)
+> foram **removidos do ClickUp** (ver `knowledge/domains/processo.md` e
+> `knowledge/decisions/2026-09-10-migracao-esteira-continua-para-sprints-remocao-okr-e-discovery.md`). Não
+> crie Marco (OKR) nem Resultado-chave (KR) novos — esses task types não têm mais lista onde viver. Este
+> arquivo fica só como referência para quem precisar entender specs antigas que ainda citam OKR/KR.
+
+Vive no folder ~~Roadmap → Objetivos~~ (lista Objetivos, removida). Dois tipos de item:
 
 - **Marco (OKR)** — objetivo qualitativo do ciclo: "o que queremos alcançar".
 - **Resultado-chave (KR)** — métrica que prova o avanço do Marco OKR.
@@ -11,7 +18,8 @@ Vive no folder **Roadmap → Objetivos** (lista Objetivos). Dois tipos de item:
 
 ```markdown
 ### 🎯 Objetivo do ciclo
-[1-2 frases: o que queremos alcançar e por que importa agora. Sem métrica — isso vai nos KRs.]
+[1-2 frases: o problema/oportunidade e por que importa agora — não a solução nem a métrica (isso vai
+nos KRs). Ver [estilo-redacao.md](estilo-redacao.md).]
 
 ### 📈 Resultados-chave (KRs)
 - KR1: [métrica] de [baseline] → [meta] até [prazo]

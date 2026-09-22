@@ -1,0 +1,3576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tradicional — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #01131E; color: #F2F9F8; min-height: 100vh;
+  }
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image: linear-gradient(rgba(0,117,255,.03) 1px,transparent 1px), linear-gradient(90deg,rgba(0,117,255,.03) 1px,transparent 1px);
+    background-size:40px 40px;
+  }
+  .page { position:relative; z-index:1; }
+
+  /* HEADER */
+  .top-bar {
+    background: linear-gradient(135deg, #00348C 0%, #01131E 100%);
+    border-bottom: 2px solid #0075FF;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-dot { display: flex; align-items: center; gap: 10px; }
+  .brand-dot svg { height: 28px; width: auto; }
+  .brand-tname { font-size: 19px; font-weight: 900; color: #F2F9F8; letter-spacing: 0.5px; }
+  .brand-name { display: none; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .live-badge { display: flex; align-items: center; gap: 6px; background: rgba(62,170,0,0.15); border: 1px solid rgba(62,170,0,0.3); border-radius: 6px; padding: 5px 10px; font-size: 14px; color: #3EAA00; font-weight: 700; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #3EAA00; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .refresh-btn { display: flex; align-items: center; gap: 5px; background: rgba(0,117,255,.15); border: 1px solid rgba(0,117,255,.4); border-radius: 6px; padding: 5px 12px; font-size: 14px; color: #4FC2FF; cursor: pointer; font-family: inherit; transition: all .2s; font-weight: 600; }
+  .refresh-btn:hover { background: rgba(0,117,255,.3); color: #fff; }
+  .refresh-btn.spinning .ri { animation: spin .6s linear infinite; display:inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TAB LOADER */
+  .tab-loader {
+    position: absolute; inset: 0; background: rgba(0,10,30,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 50; border-radius: 10px;
+    flex-direction: column; gap: 12px;
+  }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #0075FF33;
+    border-top-color: #0075FF;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  /* TABS */
+  .tabs-bar { background: #00193A; border-bottom: 2px solid #0075FF33; padding: 0 24px; display: flex; gap: 0; }
+  .tab { padding: 13px 20px; font-size: 14px; font-weight: 700; color: #516067; cursor: pointer; border-bottom: 3px solid transparent; transition: all .2s; white-space: nowrap; margin-bottom: -2px; letter-spacing: .3px; }
+  .tab:hover { color: #4FC2FF; }
+  .tab.active { color: #0075FF; border-bottom-color: #0075FF; }
+  .tab-locked { color: #2a3a45 !important; cursor: not-allowed !important; border-bottom-color: transparent !important; }
+  .tab-locked:hover { color: #2a3a45 !important; }
+
+  /* FILTERS */
+  .filters-bar { background: #00193A; border-bottom: 1px solid #0075FF22; padding: 12px 24px; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; position: relative; }
+  .filter-label { font-size: 11px; color: #4FC2FF; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .filter-select, .filter-input {
+    background: #01131E; border: 1px solid #0075FF33; border-radius: 6px;
+    color: #F2F9F8; font-size: 14px; padding: 7px 10px; font-family: inherit;
+    cursor: pointer; outline: none; min-width: 120px; transition: border-color .2s;
+  }
+  .filter-select:focus, .filter-input:focus { border-color: #0075FF; }
+
+  /* MULTI-SELECT DROPDOWN */
+  .ms-wrap { position: relative; min-width: 160px; }
+  .ms-trigger {
+    background: #01131E; border: 1px solid #0075FF33; border-radius: 6px;
+    color: #F2F9F8; font-size: 14px; padding: 7px 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    transition: border-color .2s; white-space: nowrap;
+  }
+  .ms-trigger:hover, .ms-trigger.open { border-color: #0075FF; }
+  .ms-trigger .arrow { font-size: 12px; transition: transform .2s; }
+  .ms-trigger.open .arrow { transform: rotate(180deg); }
+  .ms-dropdown {
+    display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 200;
+    background: #00193A; border: 1px solid #0075FF33; border-radius: 8px;
+    min-width: 220px; max-height: 280px; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,.6);
+    flex-direction: column;
+  }
+  .ms-dropdown.open { display: flex; }
+  .ms-search {
+    background: #01131E; border: none; border-bottom: 1px solid #0075FF22;
+    color: #F2F9F8; padding: 8px 12px; font-size: 14px; outline: none; width: 100%;
+  }
+  .ms-search::placeholder { color: #516067; }
+  .ms-list { overflow-y: auto; max-height: 220px; }
+  .ms-item {
+    display: flex; align-items: center; gap: 8px; padding: 7px 12px;
+    cursor: pointer; font-size: 14px; color: #D7DFE0; transition: background .15s;
+  }
+  .ms-item:hover { background: #00324d; }
+  .ms-item input[type=checkbox] { accent-color: #0075FF; width: 14px; height: 14px; cursor: pointer; }
+  .ms-item.checked { color: #4FC2FF; }
+  .ms-empty { padding: 10px 12px; font-size: 14px; color: #516067; text-align: center; }
+
+  /* FRENTE PILLS */
+  .frente-pills { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 24px; background: #00193A; border-bottom: 1px solid #0075FF22; }
+  .f-pill {
+    padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700;
+    border: 1px solid #0075FF33; background: #01131E; color: #516067;
+    cursor: pointer; transition: all .2s;
+  }
+  .f-pill:hover { border-color: #0075FF; color: #4FC2FF; }
+  .f-pill.on { background: #0075FF; border-color: #0075FF; color: #fff; }
+  .filter-input { min-width: 140px; }
+  .filter-input::placeholder { color: #516067; }
+  .filter-divider { width: 1px; height: 32px; background: #0075FF22; margin: 0 4px; align-self: flex-end; }
+
+  /* MAIN */
+  .main { padding: 20px 24px; }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 12px; font-weight: 700; color: #4FC2FF; text-transform: uppercase;
+    letter-spacing: 1.2px; margin-bottom: 14px;
+    padding: 16px 0 10px;
+    border-bottom: 1px solid #0075FF22;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before {
+    content: ''; display: block; width: 3px; height: 14px;
+    background: #0075FF; border-radius: 2px; flex-shrink: 0;
+  }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi-grid-sec { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi-card {
+    background: #00193A; border: 1px solid #0075FF33; border-radius: 10px;
+    padding: 16px; position: relative; overflow: hidden;
+    transition: transform .2s, border-color .2s;
+  }
+  .kpi-card:hover { transform: translateY(-1px); border-color: #0075FF66; }
+  .kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #0075FF, #4FC2FF); border-radius: 10px 10px 0 0; }
+  /* legacy color classes — mantém o ::before vazio para compatibilidade */
+  .kpi-card::before { content: none; }
+  .kpi-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 19px; margin-bottom: 10px; background: rgba(0,117,255,.12); }
+  .kpi-label { font-size: 11px; color: #4FC2FF; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .kpi-value { font-size: 26px; font-weight: 900; color: #F2F9F8; line-height: 1; margin-bottom: 5px; }
+  .kpi-value span { font-size: 14px; font-weight: 400; color: #879397; }
+  .kpi-sub { font-size: 13px; color: #879397; }
+  .kpi-pct { font-size: 13px; color: #879397; margin-top: 4px; }
+  .kpi-pct strong { color: #D7DFE0; }
+  .kpi-title { font-size: 11px; color: #4FC2FF; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+  /* SEGMENT GRID */
+  .segment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .segment-card { background: #00193A; border: 1px solid #0075FF33; border-radius: 10px; padding: 16px; }
+  .segment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .segment-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 21px; }
+  .seg-casino  .segment-icon { background: rgba(174,160,235,.15); }
+  .seg-loteria .segment-icon { background: rgba(255,199,0,.15); }
+  .seg-esporte .segment-icon { background: rgba(62,170,0,.15); }
+  .segment-name { font-size: 16px; font-weight: 700; color: #F2F9F8; }
+  .segment-tag  { font-size: 12px; color: #516067; }
+  .ggr-highlight { font-size: 24px; font-weight: 900; margin-bottom: 3px; }
+  .seg-casino  .ggr-highlight { color: #AEA0EB; }
+  .seg-loteria .ggr-highlight { color: #FFC700; }
+  .seg-esporte .ggr-highlight { color: #3EAA00; }
+  .segment-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #0075FF22; }
+  .segment-row:last-child { border-bottom: none; }
+  .segment-row-label { font-size: 13px; color: #516067; }
+  .segment-row-value { font-size: 14px; font-weight: 700; color: #D7DFE0; }
+
+  /* TOP GGR */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .chart-card { background: #00193A; border: 1px solid #0075FF33; border-radius: 10px; padding: 16px; }
+  .chart-title { font-size: 16px; font-weight: 700; color: #F2F9F8; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+  .chart-title .dot-pos { width: 8px; height: 8px; border-radius: 50%; background: #3EAA00; }
+  .chart-title .dot-neg { width: 8px; height: 8px; border-radius: 50%; background: #FF5C6A; }
+  .chart-wrap { position: relative; height: 280px; }
+
+  /* FOOTER */
+  footer { text-align: center; color: #516067; font-size: 12px; padding: 20px 24px; border-top: 1px solid #0075FF22; letter-spacing: .3px; }
+
+  @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(3,1fr); } }
+  @media (max-width: 768px) { .kpi-grid { grid-template-columns: repeat(2,1fr); } .segment-grid,.charts-grid { grid-template-columns: 1fr; } }
+
+  /* ── AQUISIÇÃO TAB ── */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .frente-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .frente-btn {
+    padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 700;
+    border: 1px solid #0075FF33; background: #00193A; color: #516067;
+    cursor: pointer; transition: all .2s;
+  }
+  .frente-btn:hover { border-color: #0075FF; color: #4FC2FF; }
+  .frente-btn.active { background: #0075FF; border-color: #0075FF; color: #fff; }
+  .frente-btn.trafego.active   { background: #0075FF;  border-color: #0075FF; }
+  .frente-btn.midias.active    { background: #AEA0EB;  border-color: #AEA0EB; color: #01131E; }
+  .frente-btn.rf.active        { background: #FFC700;  border-color: #FFC700; color: #01131E; }
+  .frente-btn.organico.active  { background: #3EAA00;  border-color: #3EAA00; }
+  .frente-btn.app.active       { background: #4FC2FF;  border-color: #4FC2FF; color: #01131E; }
+  .frente-btn.afiliados.active { background: #AEA0EB;  border-color: #AEA0EB; color: #01131E; }
+
+  /* 3-col acquisition grid */
+  .acq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    border: 1px solid #0075FF33;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .acq-header {
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    background: #01131E;
+    border-bottom: 3px solid transparent;
+  }
+  .acq-header.novos       { color: #3EAA00; border-bottom-color: #3EAA00; }
+  .acq-header.recorrentes { color: #4FC2FF; border-bottom-color: #0075FF; }
+  .acq-header.total       { color: #AEA0EB; border-bottom-color: #AEA0EB; }
+
+  .acq-section-label {
+    grid-column: 1 / -1;
+    background: #01131E;
+    border-top: 1px solid #0075FF22;
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #516067;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .acq-cell {
+    background: #00193A;
+    border-top: 1px solid #0075FF22;
+    border-right: 1px solid #0075FF22;
+    padding: 12px 16px;
+    text-align: center;
+  }
+  .acq-cell:nth-child(3n) { border-right: none; }
+  .acq-cell-label { font-size: 13px; color: #516067; margin-bottom: 4px; }
+  .acq-cell-value { font-size: 24px; font-weight: 900; color: #F2F9F8; line-height: 1.1; }
+  .acq-cell-value.sm { font-size: 19px; }
+  .acq-cell.highlight { background: #01131E; }
+@keyframes alertPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="brand">
+    <div class="brand-dot">
+      <svg width="18" height="18" viewBox="0 0 18.014 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0.612196 0C0.274938 0 0 0.271794 0 0.605194V5.32897C0 5.66418 0.274938 5.93417 0.612196 5.93417H6.00465V0H0.612196Z" fill="#F2F9F8"/>
+        <path d="M17.3999 0H6.00464L12.0093 5.93598H17.4017C17.7408 5.93598 18.0139 5.66418 18.0139 5.33078V0.605194C18.0139 0.269982 17.739 0 17.4017 0H17.3999Z" fill="#F2F9F8"/>
+        <path d="M6.00476 11.8722V17.2029C6.00476 17.5382 6.2797 17.8081 6.61696 17.8081H11.3954C11.7345 17.8081 12.0076 17.5363 12.0076 17.2029V5.93799H6.00293V11.874L6.00476 11.8722Z" fill="#F2F9F8"/>
+      </svg>
+      <span class="brand-tname">Tradicional</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <a href="/dashboard_light.html" class="refresh-btn" style="text-decoration:none" title="Mudar para tema claro">☀️ Claro</a>
+    <button class="refresh-btn" id="refresh-btn" onclick="refreshData()">
+      <span class="ri">↻</span> Atualizar
+    </button>
+    <div class="live-badge"><div class="live-dot"></div> Ao vivo</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tab active">GERAL</div>
+  <div class="tab">TURNOVER</div>
+  <div class="tab">FUNIL DE AQUISIÇÃO</div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-bar">
+  <!-- DATA -->
+  <div class="filter-group">
+    <div class="filter-label">Data</div>
+    <select class="filter-select" id="filter-data" onchange="onDataChange()">
+      <option value="hoje">Hoje</option>
+      <option value="ontem">Ontem</option>
+      <option value="mes">Este Mês</option>
+      <option value="mes_ant">Mês Anterior</option>
+      <option value="ano">Este Ano</option>
+      <option value="custom">Personalizar</option>
+    </select>
+  </div>
+
+  <div class="filter-group" id="custom-dates" style="display:none;flex-direction:row;gap:6px;align-items:flex-end">
+    <div><div class="filter-label">De</div><input class="filter-input" type="date" id="filter-ini" style="min-width:130px"></div>
+    <div><div class="filter-label">Até</div><input class="filter-input" type="date" id="filter-fim" style="min-width:130px"></div>
+  </div>
+
+  <div class="filter-divider"></div>
+
+  <!-- FRENTE MULTI-SELECT -->
+  <div class="filter-group">
+    <div class="filter-label">Frente</div>
+    <div class="ms-wrap" id="ms-frente">
+      <div class="ms-trigger" onclick="toggleMs('frente')">
+        <span id="ms-frente-label">Todas</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="ms-dropdown" id="ms-frente-dd">
+        <div class="ms-list" id="ms-frente-list">
+          <div class="ms-item ms-todas" data-val="__all__"><input type="checkbox" onchange="toggleAllMs('frente',this)" checked> ✓ Todas</div>
+          <div class="ms-item" data-val="Tráfego"><input type="checkbox" onchange="onFrenteItemChange(this)"> 🚦 Tráfego</div>
+          <div class="ms-item" data-val="Mídias"><input type="checkbox" onchange="onFrenteItemChange(this)"> 📱 Mídias</div>
+          <div class="ms-item" data-val="Resultado Fácil"><input type="checkbox" onchange="onFrenteItemChange(this)"> 🎯 Resultado Fácil</div>
+          <div class="ms-item" data-val="App"><input type="checkbox" onchange="onFrenteItemChange(this)"> 📲 App</div>
+          <div class="ms-item" data-val="Orgânico"><input type="checkbox" onchange="onFrenteItemChange(this)"> 🌱 Orgânico</div>
+          <div class="ms-item" data-val="Afiliados"><input type="checkbox" onchange="onFrenteItemChange(this)"> 🤝 Afiliados</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BTAG MULTI-SELECT -->
+  <div class="filter-group">
+    <div class="filter-label">Btag</div>
+    <div class="ms-wrap" id="ms-btag">
+      <div class="ms-trigger" onclick="toggleMs('btag')">
+        <span id="ms-btag-label">Todas</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="ms-dropdown" id="ms-btag-dd">
+        <input class="ms-search" type="text" placeholder="Buscar btag..." oninput="filterMsList('btag',this.value)">
+        <div class="ms-list" id="ms-btag-list"><div class="ms-empty">Selecione uma frente primeiro</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFILIADO MULTI-SELECT -->
+  <div class="filter-group">
+    <div class="filter-label">Afiliado</div>
+    <div class="ms-wrap" id="ms-afiliado">
+      <div class="ms-trigger" onclick="toggleMs('afiliado')">
+        <span id="ms-afiliado-label">Todos</span>
+        <span class="arrow">▼</span>
+      </div>
+      <div class="ms-dropdown" id="ms-afiliado-dd">
+        <input class="ms-search" type="text" placeholder="Buscar afiliado..." oninput="filterMsList('afiliado',this.value)">
+        <div class="ms-list" id="ms-afiliado-list"><div class="ms-empty">Selecione uma frente primeiro</div></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="refresh-btn" style="align-self:flex-end;background:#0075FF;border-color:#0075FF;color:#fff" onclick="filtrarAbaAtual()">🔍 Filtrar</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="tab-geral" class="tab-content active" style="position:relative">
+<div id="loader-geral" class="tab-loader" style="display:none">
+  <div class="spinner"></div>
+  <span style="color:#4FC2FF;font-size:13px;font-weight:600">Carregando dados...</span>
+</div>
+<div class="main">
+
+  <!-- KPIs -->
+  <div class="section-title">Resumo — <span id="periodo-label">Hoje, 05/06/2026</span></div>
+  <!-- LINHA 1: DEPOSITO | APOSTAS | GGR | GGR% -->
+  <div class="kpi-grid">
+
+    <div class="kpi-card blue">
+      <div class="kpi-icon">⬇️</div>
+      <div class="kpi-label">Depósitos</div>
+      <div class="kpi-value" id="kpi-dep">—</div>
+      <div class="kpi-sub" id="kpi-dep-sub">— transações</div>
+    </div>
+
+    <div class="kpi-card cyan">
+      <div class="kpi-icon">🎯</div>
+      <div class="kpi-label">Apostas (Turnover)</div>
+      <div class="kpi-value" id="kpi-apo">—</div>
+      <div class="kpi-sub">Turnover: <strong id="kpi-turnover">—</strong></div>
+    </div>
+
+    <div class="kpi-card green">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-label">GGR</div>
+      <div class="kpi-value" id="kpi-ggr">—</div>
+      <div class="kpi-sub">% Dep: <strong id="kpi-ggr-dep">—</strong> · % Apo: <strong id="kpi-margem">—</strong></div>
+    </div>
+
+    <div class="kpi-card green">
+      <div class="kpi-icon">📊</div>
+      <div class="kpi-label">GGR % Depósito</div>
+      <div class="kpi-value" id="kpi-ggr-pct-card">—</div>
+      <div class="kpi-sub" id="kpi-ggr-pct-sub">GGR ÷ Depósitos</div>
+    </div>
+
+  </div>
+
+  <!-- LINHA 2: RECOMPENSA | NGR | SAQUES | JOGADORES ATIVOS -->
+  <div class="kpi-grid">
+
+    <div class="kpi-card pink">
+      <div class="kpi-icon">🎁</div>
+      <div class="kpi-label">Recompensas</div>
+      <div class="kpi-value" id="kpi-rec">—</div>
+      <div class="kpi-sub">% do GGR: <strong id="kpi-pct-rec">—</strong></div>
+    </div>
+
+    <div class="kpi-card blue">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-label">NGR</div>
+      <div class="kpi-value" id="kpi-ngr">—</div>
+      <div class="kpi-sub">Receita líquida</div>
+    </div>
+
+    <div class="kpi-card orange">
+      <div class="kpi-icon">⬆️</div>
+      <div class="kpi-label">Saques</div>
+      <div class="kpi-value" id="kpi-saq">—</div>
+      <div class="kpi-sub">Solicitações do período</div>
+    </div>
+
+    <div class="kpi-card purple">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-label">Jogadores Ativos</div>
+      <div class="kpi-value" id="kpi-jog">—</div>
+      <div class="kpi-sub">Únicos no período</div>
+    </div>
+
+  </div>
+
+  <!-- LINHA 3: CADASTROS | FTD | TM APOSTADOR | TM DEPÓSITO | FREQUÊNCIA (5 colunas) -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">
+
+    <div class="kpi-card blue">
+      <div class="kpi-icon">📋</div>
+      <div class="kpi-label">Cadastros</div>
+      <div class="kpi-value" id="kpi-cadastros">—</div>
+      <div class="kpi-sub">Novos registros</div>
+    </div>
+
+    <div class="kpi-card purple">
+      <div class="kpi-icon">⭐</div>
+      <div class="kpi-label">FTD</div>
+      <div class="kpi-value" id="kpi-ftd">—</div>
+      <div class="kpi-sub">1° depósito no período</div>
+    </div>
+
+    <div class="kpi-card cyan">
+      <div class="kpi-icon">🎲</div>
+      <div class="kpi-label">TM por Apostador</div>
+      <div class="kpi-value" id="kpi-tm-apostador">—</div>
+      <div class="kpi-sub" id="kpi-tm-apostador-sub">Apostas ÷ apostadores</div>
+    </div>
+
+    <div class="kpi-card green">
+      <div class="kpi-icon">💵</div>
+      <div class="kpi-label">Ticket Médio Depósito</div>
+      <div class="kpi-value" id="kpi-tm-dep">—</div>
+      <div class="kpi-sub" id="kpi-ggr-dep-sub">Por transação</div>
+    </div>
+
+    <div class="kpi-card orange">
+      <div class="kpi-icon">🔄</div>
+      <div class="kpi-label">Frequência</div>
+      <div class="kpi-value" id="kpi-freq">—</div>
+      <div class="kpi-sub">Depósitos ÷ depositantes</div>
+    </div>
+
+  </div>
+
+  <!-- NOVOS / RECORRENTES / TOTAL — Depósitos -->
+  <div id="geral-nr-wrap" style="margin-bottom:20px">
+    <div class="section-title">👤 Perfil de Jogadores</div>
+    <div id="geral-nr-content" style="text-align:center;padding:20px;color:#475569;font-size:14px">Carregando...</div>
+  </div>
+
+  <!-- TABELA DIÁRIA GERAL — aparece antes dos segmentos -->
+  <div id="geral-diario-wrap" style="margin-bottom:20px">
+    <div class="section-title">📅 Evolução Diária</div>
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid #0a3a55">
+      <table style="width:100%;border-collapse:collapse;font-size:14px;white-space:nowrap">
+        <thead>
+          <tr>
+            <th style="background:#00243A;padding:8px 10px;text-align:left;color:#4FC2FF;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">Data</th>
+            <th style="background:#003D1A;padding:8px 10px;text-align:right;color:#ACDFB0;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">💳 Depósito</th>
+            <th style="background:#00348C;padding:8px 10px;text-align:right;color:#4FC2FF;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">🎲 Apostas</th>
+            <th style="background:#00348C;padding:8px 10px;text-align:center;color:#4FC2FF;font-size:12px;font-weight:600;border-bottom:1px solid #0a3a55;opacity:.8">TUR/DEP</th>
+            <th style="background:#1C4000;padding:8px 10px;text-align:right;color:#B9DC33;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">📈 GGR</th>
+            <th style="background:#1C4000;padding:8px 10px;text-align:center;color:#B9DC33;font-size:12px;font-weight:600;border-bottom:1px solid #0a3a55;opacity:.8">GGR/DEP</th>
+            <th style="background:#3D2A00;padding:8px 10px;text-align:right;color:#FFC700;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">🎁 Recomp.</th>
+            <th style="background:#3D2A00;padding:8px 10px;text-align:center;color:#FFC700;font-size:12px;font-weight:600;border-bottom:1px solid #0a3a55;opacity:.8">REC/GGR</th>
+            <th style="background:#002B20;padding:8px 10px;text-align:right;color:#ACDFB0;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">💰 Receita</th>
+          </tr>
+        </thead>
+        <tbody id="geral-diario-body"><tr><td colspan="9" style="padding:16px;text-align:center;color:#475569">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MÉTRICAS DIÁRIAS (bar charts) -->
+  <div class="section-title" style="margin-top:24px;margin-bottom:12px">📊 Métricas Diárias</div>
+  <div id="geral-charts-wrap" style="display:flex;flex-direction:row;gap:12px;margin-bottom:20px">
+    <div id="chart-uap" style="flex:1;min-width:0;background:#001A30;border-radius:10px;border:1px solid #0075FF33;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;color:#FFC700;font-weight:700">👥 UAP DIÁRIO (Ativos no Site)</div>
+        <button id="btn-expand-uap" onclick="expandChartMetric('uap')" style="background:transparent;border:1px solid #0075FF33;color:#516067;border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer">⤢</button>
+      </div>
+      <div id="chart-uap-bars" style="display:flex;align-items:flex-end;gap:3px;overflow-x:auto;min-height:80px">
+        <div style="color:#475569;font-size:12px;padding:20px">Carregando...</div>
+      </div>
+    </div>
+    <div id="chart-dep" style="flex:1;min-width:0;background:#001A30;border-radius:10px;border:1px solid #0075FF33;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;color:#3EAA00;font-weight:700">💰 DEPÓSITO DIÁRIO</div>
+        <button id="btn-expand-dep" onclick="expandChartMetric('dep')" style="background:transparent;border:1px solid #0075FF33;color:#516067;border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer">⤢</button>
+      </div>
+      <div id="chart-dep-bars" style="display:flex;align-items:flex-end;gap:3px;overflow-x:auto;min-height:80px">
+        <div style="color:#475569;font-size:12px;padding:20px">Carregando...</div>
+      </div>
+    </div>
+    <div id="chart-ggr" style="flex:1;min-width:0;background:#001A30;border-radius:10px;border:1px solid #0075FF33;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;color:#CFFF6A;font-weight:700">📈 GGR DIÁRIO</div>
+        <button id="btn-expand-ggr" onclick="expandChartMetric('ggr')" style="background:transparent;border:1px solid #0075FF33;color:#516067;border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer">⤢</button>
+      </div>
+      <div id="chart-ggr-bars" style="display:flex;align-items:flex-end;gap:3px;overflow-x:auto;min-height:80px">
+        <div style="color:#475569;font-size:12px;padding:20px">Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EXPAND GRÁFICO -->
+  <div id="chart-modal" onclick="if(event.target===this)closeChartModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:9999;align-items:center;justify-content:center">
+    <div style="background:#001A30;border:1px solid #0075FF44;border-radius:14px;padding:24px;width:92vw;max-height:88vh;overflow:hidden;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div id="chart-modal-title" style="font-size:13px;font-weight:700;color:#FFC700"></div>
+        <button onclick="closeChartModal()" style="background:transparent;border:1px solid #0075FF44;color:#94a3b8;border-radius:6px;padding:4px 12px;font-size:13px;cursor:pointer">✕ fechar</button>
+      </div>
+      <div id="chart-modal-bars" style="overflow-x:auto;flex:1;display:flex;align-items:flex-end;gap:4px;min-height:260px"></div>
+    </div>
+  </div>
+
+  <!-- SEGMENTOS -->
+  <div class="section-title">Performance por segmento</div>
+  <div class="segment-grid">
+
+    <div class="segment-card seg-casino">
+      <div class="segment-header">
+        <div class="segment-icon">🎰</div>
+        <div><div class="segment-name">Cassino</div><div class="segment-tag">Maior volume</div></div>
+      </div>
+      <div class="ggr-highlight" id="seg-cas-ggr">—</div>
+      <div class="kpi-sub" style="margin-bottom:10px">GGR Cassino</div>
+      <div class="segment-row"><span class="segment-row-label">Apostas</span><span class="segment-row-value" id="seg-cas-apo">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">TM Aposta</span><span class="segment-row-value" id="seg-cas-tma">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">TM GGR</span><span class="segment-row-value" id="seg-cas-tmg">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">Margem</span><span class="segment-row-value" id="seg-cas-margem">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">% do GGR total</span><span class="segment-row-value" id="seg-cas-pct">—</span></div>
+    </div>
+
+    <div class="segment-card seg-loteria">
+      <div class="segment-header">
+        <div class="segment-icon">🎟️</div>
+        <div><div class="segment-name">Loteria / Prognóstico</div><div class="segment-tag">Alta margem</div></div>
+      </div>
+      <div class="ggr-highlight" id="seg-lot-ggr">—</div>
+      <div class="kpi-sub" style="margin-bottom:10px">GGR Loteria</div>
+      <div class="segment-row"><span class="segment-row-label">Apostas</span><span class="segment-row-value" id="seg-lot-apo">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">TM Aposta</span><span class="segment-row-value" id="seg-lot-tma">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">TM GGR</span><span class="segment-row-value" id="seg-lot-tmg">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">Margem</span><span class="segment-row-value" id="seg-lot-margem">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">% do GGR total</span><span class="segment-row-value" id="seg-lot-pct">—</span></div>
+    </div>
+
+    <div class="segment-card seg-esporte">
+      <div class="segment-header">
+        <div class="segment-icon">⚽</div>
+        <div><div class="segment-name">Esporte</div><div class="segment-tag">Em crescimento</div></div>
+      </div>
+      <div class="ggr-highlight" id="seg-esp-ggr">—</div>
+      <div class="kpi-sub" style="margin-bottom:10px">GGR Esporte</div>
+      <div class="segment-row"><span class="segment-row-label">Apostas</span><span class="segment-row-value" id="seg-esp-apo">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">TM Aposta</span><span class="segment-row-value" id="seg-esp-tma">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">TM GGR</span><span class="segment-row-value" id="seg-esp-tmg">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">Margem</span><span class="segment-row-value" id="seg-esp-margem">—</span></div>
+      <div class="segment-row"><span class="segment-row-label">% do GGR total</span><span class="segment-row-value" id="seg-esp-pct">—</span></div>
+    </div>
+
+  </div>
+
+  <!-- tabela antiga removida — nova está antes dos segmentos -->
+  <div style="display:none">
+    <div></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th style="background:#00243A;padding:8px 10px;text-align:left;color:#4FC2FF;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">Data</th>
+            <th style="background:#003D1A;padding:8px 10px;text-align:right;color:#ACDFB0;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">💳 Depósito</th>
+            <th style="background:#00348C;padding:8px 10px;text-align:right;color:#4FC2FF;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">🎲 Apostas</th>
+            <th style="background:#00348C;padding:8px 10px;text-align:center;color:#4FC2FF;font-size:12px;font-weight:600;border-bottom:1px solid #0a3a55;opacity:.8">TUR/DEP</th>
+            <th style="background:#1C4000;padding:8px 10px;text-align:right;color:#B9DC33;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">📈 GGR</th>
+            <th style="background:#1C4000;padding:8px 10px;text-align:center;color:#B9DC33;font-size:12px;font-weight:600;border-bottom:1px solid #0a3a55;opacity:.8">GGR/DEP</th>
+            <th style="background:#3D2A00;padding:8px 10px;text-align:right;color:#FFC700;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">🎁 Recomp.</th>
+            <th style="background:#3D2A00;padding:8px 10px;text-align:center;color:#FFC700;font-size:12px;font-weight:600;border-bottom:1px solid #0a3a55;opacity:.8">REC/GGR</th>
+            <th style="background:#002B20;padding:8px 10px;text-align:right;color:#ACDFB0;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">💰 Receita</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TOP GGR -->
+  <div class="section-title">Top GGR por jogador</div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title"><span class="dot-pos"></span> Top GGRs Positivos</div>
+      <div id="top-pos-tabela" style="min-height:80px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span class="dot-neg"></span> Top GGRs Negativos</div>
+      <div id="top-neg-tabela" style="min-height:80px"></div>
+    </div>
+  </div>
+
+  <!-- FUNIL DE CADASTRO -->
+  <div class="section-title" style="margin-top:24px;margin-bottom:12px">🚀 Funil de Cadastro
+    <span id="funil-cad-loading" style="font-size:11px;color:#516067;font-weight:400;margin-left:8px"></span>
+  </div>
+  <div id="funil-cad-wrap" style="overflow-x:auto;border-radius:10px;border:1px solid #0075FF33;margin-bottom:8px">
+    <div style="padding:20px;text-align:center;color:#475569">Carregando...</div>
+  </div>
+  <div style="margin-bottom:20px;padding:8px 12px;background:#0a1929;border-radius:6px;border-left:3px solid #0075FF44">
+    <span style="font-size:11px;color:#516067">ℹ️ <b style="color:#4FC2FF">DEPOSITANTE</b> aqui conta apenas quem se cadastrou <b>e</b> fez o 1º depósito no <b>mesmo dia</b>. Por isso o total pode ser menor que o FTD do Funil de Aquisição abaixo, que inclui jogadores cadastrados em períodos anteriores que depositaram agora.</span>
+  </div>
+
+  <!-- FUNIL DE RECORRÊNCIA DE DEPÓSITO (antigo "Funil de Aquisição" — renomeado para não
+       colidir com a aba "Funil de Aquisição", que cobre a jornada de cadastro) -->
+  <div class="section-title" style="margin-top:24px;margin-bottom:12px">🔁 Funil de Recorrência de Depósito
+    <span style="font-size:11px;color:#516067;font-weight:400;margin-left:8px">FTD → 2º...7º+ depósito</span>
+  </div>
+  <div id="funil-aq-wrap" style="overflow-x:auto;border-radius:10px;border:1px solid #0075FF33;margin-bottom:20px">
+    <div style="padding:20px;text-align:center;color:#475569">Carregando...</div>
+  </div>
+
+</div>
+
+</div><!-- /main --></div><!-- /tab-geral -->
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TAB: APOSTAS                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="tab-apostas" class="tab-content" style="position:relative">
+<div id="loader-apostas" class="tab-loader" style="display:none">
+  <div class="spinner"></div>
+  <span style="color:#4FC2FF;font-size:13px;font-weight:600">Carregando dados...</span>
+</div>
+<div class="main">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div class="section-title" style="margin-bottom:0">Apostas por Categoria — Novos · Recorrentes · Total</div>
+    <div style="font-size:13px;color:#475569" id="apostas-periodo"></div>
+  </div>
+
+  <!-- 4 CARDS TOPO: GGR vs Meta, Turnover, Hold, Projeção -->
+  <div id="apostas-kpi-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
+    <div class="kpi-card" id="akpi-ggr">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-title">GGR do Período</div>
+      <div class="kpi-value" id="akv-ggr">—</div>
+      <div class="kpi-sub" id="aks-ggr" style="margin-top:4px;font-size:12px;color:#64748b"></div>
+      <div style="height:4px;background:#0f172a;border-radius:2px;margin-top:8px;overflow:hidden">
+        <div id="akbar-ggr" style="height:100%;border-radius:2px;background:#0075FF;width:0%;transition:width .5s"></div>
+      </div>
+    </div>
+    <div class="kpi-card" id="akpi-tur">
+      <div class="kpi-icon">🎲</div>
+      <div class="kpi-title">Turnover Total</div>
+      <div class="kpi-value" id="akv-tur">—</div>
+      <div class="kpi-sub" id="aks-tur" style="margin-top:4px;font-size:12px;color:#64748b"></div>
+      <div style="height:4px;background:#0f172a;border-radius:2px;margin-top:8px;overflow:hidden">
+        <div id="akbar-tur" style="height:100%;border-radius:2px;background:#4FC2FF;width:0%;transition:width .5s"></div>
+      </div>
+    </div>
+    <div class="kpi-card" id="akpi-hold">
+      <div class="kpi-icon">📊</div>
+      <div class="kpi-title">Hold Médio</div>
+      <div class="kpi-value" id="akv-hold">—</div>
+      <div class="kpi-sub" id="aks-hold" style="margin-top:4px;font-size:12px;color:#64748b"></div>
+      <div style="height:4px;background:#0f172a;border-radius:2px;margin-top:8px;overflow:hidden">
+        <div id="akbar-hold" style="height:100%;border-radius:2px;background:#B9DC33;width:0%;transition:width .5s"></div>
+      </div>
+    </div>
+    <div class="kpi-card" id="akpi-proj">
+      <div class="kpi-icon">🎯</div>
+      <div class="kpi-title">Projeção GGR Mensal</div>
+      <div class="kpi-value" id="akv-proj">—</div>
+      <div class="kpi-sub" id="aks-proj" style="margin-top:4px;font-size:12px;color:#64748b"></div>
+      <div style="height:4px;background:#0f172a;border-radius:2px;margin-top:8px;overflow:hidden">
+        <div id="akbar-proj" style="height:100%;border-radius:2px;background:#FFC700;width:0%;transition:width .5s"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="apostas-loading" style="text-align:center;padding:40px;color:#475569;font-size:16px;display:none">
+    <div style="display:inline-block;width:24px;height:24px;border:2px solid #1e293b;border-top-color:#0075FF;border-radius:50%;animation:spin .7s linear infinite;margin-bottom:8px"></div><br>Carregando dados...
+  </div>
+
+  <!-- NOVOS / RECORRENTES / TOTAL — fica acima da tabela diária -->
+  <div id="apostas-tabela" style="margin-bottom:20px"></div>
+
+  <!-- TABELA DIÁRIA POR CATEGORIA -->
+  <div class="section-title" style="margin-bottom:10px">📅 Evolução Diária por Categoria</div>
+  <div style="overflow-x:auto;border-radius:10px;border:1px solid #0a3a55">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap">
+      <thead>
+        <tr>
+          <th style="background:#00243A;color:#4FC2FF;padding:8px 10px;text-align:left;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55" rowspan="2">Data</th>
+          <th style="background:#003070;color:#4FC2FF;padding:7px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #0a3a55" colspan="3">💥 CRASH</th>
+          <th style="background:#1C4000;color:#B9DC33;padding:7px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #0a3a55" colspan="3">🎰 SLOTS</th>
+          <th style="background:#3D2A00;color:#FFC700;padding:7px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #0a3a55" colspan="3">🎟️ LOTERIA</th>
+          <th style="background:#221A40;color:#AEA0EB;padding:7px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #0a3a55" colspan="3">🃏 AO VIVO</th>
+          <th style="background:#00296A;color:#4FC2FF;padding:7px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #0a3a55" colspan="3">🎱 BINGO</th>
+          <th style="background:#1a1a2e;color:#879397;padding:7px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #0a3a55" colspan="3">🎮 OUTROS</th>
+          <th style="background:#002B20;color:#ACDFB0;padding:7px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #0a3a55" colspan="3">⚽ ESPORTE</th>
+          <th style="background:#00348C;color:#F2F9F8;padding:7px 5px;text-align:center;font-size:11px;font-weight:700;border-bottom:1px solid #0a3a55" colspan="3">∑ TOTAL</th>
+        </tr>
+        <tr id="apostas-subheader">
+          <th style="background:#003070;color:rgba(79,194,255,.6);padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">Turn.</th><th style="background:#003070;color:#4FC2FF;padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">GGR</th><th style="background:#003070;color:#FFC700;padding:4px 6px;text-align:center;font-size:10px;border-bottom:2px solid #0a3a55">Hold%</th>
+          <th style="background:#1C4000;color:rgba(185,220,51,.6);padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">Turn.</th><th style="background:#1C4000;color:#B9DC33;padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">GGR</th><th style="background:#1C4000;color:#FFC700;padding:4px 6px;text-align:center;font-size:10px;border-bottom:2px solid #0a3a55">Hold%</th>
+          <th style="background:#3D2A00;color:rgba(255,199,0,.6);padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">Turn.</th><th style="background:#3D2A00;color:#FFC700;padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">GGR</th><th style="background:#3D2A00;color:#FFC700;padding:4px 6px;text-align:center;font-size:10px;border-bottom:2px solid #0a3a55">Hold%</th>
+          <th style="background:#221A40;color:rgba(174,160,235,.6);padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">Turn.</th><th style="background:#221A40;color:#AEA0EB;padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">GGR</th><th style="background:#221A40;color:#FFC700;padding:4px 6px;text-align:center;font-size:10px;border-bottom:2px solid #0a3a55">Hold%</th>
+          <th style="background:#00296A;color:rgba(79,194,255,.6);padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">Turn.</th><th style="background:#00296A;color:#4FC2FF;padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">GGR</th><th style="background:#00296A;color:#FFC700;padding:4px 6px;text-align:center;font-size:10px;border-bottom:2px solid #0a3a55">Hold%</th>
+          <th style="background:#1a1a2e;color:rgba(135,147,151,.6);padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">Turn.</th><th style="background:#1a1a2e;color:#879397;padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">GGR</th><th style="background:#1a1a2e;color:#FFC700;padding:4px 6px;text-align:center;font-size:10px;border-bottom:2px solid #0a3a55">Hold%</th>
+          <th style="background:#002B20;color:rgba(172,223,176,.6);padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">Turn.</th><th style="background:#002B20;color:#ACDFB0;padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">GGR</th><th style="background:#002B20;color:#FFC700;padding:4px 6px;text-align:center;font-size:10px;border-bottom:2px solid #0a3a55">Hold%</th>
+          <th style="background:#00348C;color:rgba(242,249,248,.6);padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">Turn.</th><th style="background:#00348C;color:#F2F9F8;padding:4px 6px;text-align:right;font-size:10px;border-bottom:2px solid #0a3a55">GGR</th><th style="background:#00348C;color:#FFC700;padding:4px 6px;text-align:center;font-size:10px;border-bottom:2px solid #0a3a55">Hold%</th>
+        </tr>
+      </thead>
+      <tbody id="apostas-body">
+        <tr><td colspan="25" style="padding:20px;text-align:center;color:#475569">Carregando...</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+  <!-- DIAGNÓSTICO -->
+  <div class="section-title" style="margin-bottom:12px">🔍 Diagnóstico por Categoria</div>
+  <div id="apostas-diag-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
+
+  <!-- LOTERIA TRADICIONAL -->
+  <div class="section-title" style="margin-top:24px;margin-bottom:12px">🎰 Loteria Tradicional</div>
+  <div id="loteria-kpi-row" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+    <div class="kpi-card"><div class="kpi-icon">🎯</div><div class="kpi-title">Turnover</div><div class="kpi-value" id="lot-turnover">—</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📊</div><div class="kpi-title">GGR</div><div class="kpi-value" id="lot-ggr">—</div></div>
+    <div class="kpi-card"><div class="kpi-icon">💰</div><div class="kpi-title">NGR</div><div class="kpi-value" id="lot-ngr">—</div></div>
+    <div class="kpi-card"><div class="kpi-icon">🎁</div><div class="kpi-title">Recompensas</div><div class="kpi-value" id="lot-reward">—</div></div>
+    <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-title">Jogadores</div><div class="kpi-value" id="lot-jogadores">—</div></div>
+  </div>
+  <div class="section-title" style="margin-top:4px;margin-bottom:12px">📊 Métricas Diárias</div>
+  <div id="loteria-chart-wrap" style="display:flex;flex-direction:row;gap:12px;margin-bottom:20px">
+    <div id="lot-chart-turnover" style="flex:1;min-width:0;background:#001A30;border-radius:10px;border:1px solid #0075FF33;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;color:#4FC2FF;font-weight:700">🎯 TURNOVER DIÁRIO</div>
+        <button id="btn-expand-lot-turnover" onclick="expandLotChart('turnover')" style="background:transparent;border:1px solid #0075FF33;color:#516067;border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer">⤢</button>
+      </div>
+      <div id="lot-bars-turnover" style="display:flex;align-items:flex-end;gap:3px;overflow-x:auto;min-height:80px"><div style="color:#475569;font-size:12px;padding:20px">Carregando...</div></div>
+    </div>
+    <div id="lot-chart-ggr" style="flex:1;min-width:0;background:#001A30;border-radius:10px;border:1px solid #0075FF33;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;color:#CFFF6A;font-weight:700">📈 GGR DIÁRIO</div>
+        <button id="btn-expand-lot-ggr" onclick="expandLotChart('ggr')" style="background:transparent;border:1px solid #0075FF33;color:#516067;border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer">⤢</button>
+      </div>
+      <div id="lot-bars-ggr" style="display:flex;align-items:flex-end;gap:3px;overflow-x:auto;min-height:80px"><div style="color:#475569;font-size:12px;padding:20px">Carregando...</div></div>
+    </div>
+    <div id="lot-chart-jog" style="flex:1;min-width:0;background:#001A30;border-radius:10px;border:1px solid #0075FF33;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;color:#FFC700;font-weight:700">👥 APOSTADORES DIÁRIOS</div>
+        <button id="btn-expand-lot-jog" onclick="expandLotChart('jog')" style="background:transparent;border:1px solid #0075FF33;color:#516067;border-radius:4px;padding:2px 7px;font-size:10px;cursor:pointer">⤢</button>
+      </div>
+      <div id="lot-bars-jog" style="display:flex;align-items:flex-end;gap:3px;overflow-x:auto;min-height:80px"><div style="color:#475569;font-size:12px;padding:20px">Carregando...</div></div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /tab-apostas -->
+
+<!-- FUNIL DE AQUISIÇÃO (jornada de cadastro, flags de progresso) -->
+<div id="tab-funil-aq" class="tab-content" style="position:relative">
+<div id="loader-funil-aq" class="tab-loader" style="display:none">
+  <div class="spinner"></div>
+  <span style="color:#4FC2FF;font-size:13px;font-weight:600">Carregando dados...</span>
+</div>
+<div class="main">
+
+  <div class="section-title">Funil de Aquisição — <span id="funil-aq-periodo-label">jornada de cadastro</span></div>
+
+  <div style="margin-bottom:20px;padding:10px 12px;background:#0a1929;border-radius:6px;border-left:3px solid #0075FF44">
+    <span style="font-size:11px;color:#516067">ℹ️ Esta aba usa eventos de <b style="color:#4FC2FF">dwh.player_events</b> (catálogo oficial
+    <b style="color:#4FC2FF">dwh.registration_steps</b>), migrado de <code>entities.json_flags.cadastroProgresso</code>
+    desde o go-live em 26/08/2026 — cobertura ainda curta, poucos dias de dado. É uma população
+    <b>diferente</b> da do Funil de Cadastro (aba Geral) e do bloco de KYC legado, então os números
+    <b>não somam nem se comparam degrau a degrau</b> entre as visões. Objetivo aqui é achar
+    onde a experiência está quebrando entre o início do cadastro e o handoff de KYC concluído.
+    <span style="color:#CFFF6A">●</span> marca gate oficial do catálogo (conversão real); passo sem marca
+    é telemetria opcional (reenvio, troca de destino etc.) e aparece com opacidade reduzida — perda perto
+    de zero ali é esperado, não é sinal de saúde do funil.</span>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-label">Entraram no cadastro</div>
+      <div class="kpi-value" id="faq-kpi-coorte">—</div>
+      <div class="kpi-sub" id="faq-kpi-coorte-sub">— no período</div>
+    </div>
+    <div class="kpi-card cyan">
+      <div class="kpi-icon">🏁</div>
+      <div class="kpi-label">Conversão ponta a ponta</div>
+      <div class="kpi-value" id="faq-kpi-conversao">—</div>
+      <div class="kpi-sub" id="faq-kpi-conversao-sub">cadastro iniciado → cadastro concluído</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">📉</div>
+      <div class="kpi-label">Não concluíram no mesmo dia</div>
+      <div class="kpi-value" id="faq-kpi-maior-perda">—</div>
+      <div class="kpi-sub" id="faq-kpi-maior-perda-sub">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">⚠️</div>
+      <div class="kpi-label">Sinal de atrito predominante</div>
+      <div class="kpi-value" id="faq-kpi-atrito" style="font-size:16px">—</div>
+      <div class="kpi-sub" id="faq-kpi-atrito-sub">—</div>
+    </div>
+  </div>
+
+  <!-- RESSALVAS DO DADO — o que o número não diz sozinho (vem de data.avisos) -->
+  <div id="faq-avisos" style="display:none;margin-top:8px;margin-bottom:16px"></div>
+
+  <!-- BLOCO 1 — FUNIL CONFIRMADO: só os níveis que o dado sustenta.
+       Barra e porcentagem AFIRMAM nível, então só entram aqui passos cuja contagem
+       não é piso. O resto vai para a tabela de instrumentação, sem barra. -->
+  <div class="section-title" style="margin-top:8px;margin-bottom:12px">🧭 Funil confirmado
+    <span id="faq-funil-loading" style="font-size:11px;color:#516067;font-weight:400;margin-left:8px"></span>
+  </div>
+  <div id="funil-jornada-wrap" style="border-radius:10px;border:1px solid #0075FF33;padding:16px;margin-bottom:20px;background:#00193A">
+    <div style="padding:20px;text-align:center;color:#475569">Carregando...</div>
+  </div>
+
+  <!-- BLOCO 2 — ONDE ESTÁ A PERDA: mesma prominência do bloco 1, porque a resposta
+       honesta hoje é "não sabemos", e esconder isso é o que produz número inventado. -->
+  <div class="section-title" style="margin-top:24px;margin-bottom:12px">🔎 Onde está a perda</div>
+  <div id="funil-perda-wrap" style="border-radius:10px;border:1px solid #0075FF33;padding:16px;margin-bottom:20px;background:#00193A">
+    <div style="padding:20px;text-align:center;color:#475569">Carregando...</div>
+  </div>
+
+  <!-- BLOCO 3 — SAÚDE DA INSTRUMENTAÇÃO: tabela pura, ordenada por cobertura
+       ascendente. Sem barra, sem "% do topo", sem conversão — de propósito, para não
+       ser printável como funil. É também o backlog priorizado. -->
+  <div class="section-title" style="margin-top:24px;margin-bottom:12px">
+    <span id="faq-instr-toggle" style="cursor:pointer;user-select:none">▸</span>
+    🩺 Saúde da instrumentação
+    <span id="faq-instr-resumo" style="font-size:11px;color:#516067;font-weight:400;margin-left:8px"></span>
+  </div>
+  <div id="funil-instr-wrap" style="display:none;overflow-x:auto;border-radius:10px;border:1px solid #0075FF33;margin-bottom:20px;background:#00193A">
+    <div style="padding:20px;text-align:center;color:#475569">Carregando...</div>
+  </div>
+
+  <!-- EVOLUÇÃO POR DIA (tabela, mesmo padrão da aba Geral) -->
+  <div class="section-title" style="margin-top:24px;margin-bottom:12px">📅 Evolução por dia
+    <span id="faq-diario-loading" style="font-size:11px;color:#516067;font-weight:400;margin-left:8px"></span>
+  </div>
+  <div id="funil-jornada-diario-wrap" style="overflow-x:auto;border-radius:10px;border:1px solid #0075FF33;margin-bottom:20px">
+    <div style="padding:20px;text-align:center;color:#475569">Carregando...</div>
+  </div>
+
+  <!-- SINAIS DE ATRITO -->
+  <div class="section-title" style="margin-top:24px;margin-bottom:12px">🧩 Sinais de atrito
+    <span style="font-size:11px;color:#516067;font-weight:400;margin-left:8px">onde a galera trava ou volta atrás</span>
+  </div>
+  <div id="funil-atrito-wrap" style="border-radius:10px;border:1px solid #0075FF33;padding:16px;margin-bottom:20px;background:#00193A">
+    <div style="padding:20px;text-align:center;color:#475569">Carregando...</div>
+  </div>
+
+  <!-- TEMPO ATÉ AVANÇAR -->
+  <div class="section-title" style="margin-top:24px;margin-bottom:12px">⏱️ Tempo até avançar
+    <span style="font-size:11px;color:#516067;font-weight:400;margin-left:8px">mediana e p90 entre um passo e o seguinte</span>
+  </div>
+  <div id="funil-tempo-wrap" style="border-radius:10px;border:1px solid #0075FF33;padding:16px;margin-bottom:8px;background:#00193A">
+    <div style="padding:20px;text-align:center;color:#475569">Carregando...</div>
+  </div>
+  <div style="margin-bottom:20px;padding:8px 12px;background:#0a1929;border-radius:6px;border-left:3px solid #0075FF44">
+    <span style="font-size:11px;color:#516067">ℹ️ Um passo pode não cair na conversão e ainda assim ser um gargalo — se a
+    <b style="color:#4FC2FF">mediana</b> de tempo até ele estiver alta, quem chega ali está com dúvida ou dificuldade,
+    mesmo sem desistir.</span>
+  </div>
+
+</div>
+</div><!-- /tab-funil-aq -->
+
+<footer id="footer-ts"><strong style="color:#0075FF">TRADICIONAL</strong> · Dados via banco trad_prd · Atualizado em <span id="footer-time">—</span></footer>
+
+</div><!-- /page -->
+
+<script>
+// Top GGR via API (dados reais)
+
+// ─── UTILS ───
+function brl(v) {
+  if (v == null || v === '') return '—';
+  const n = parseFloat(v);
+  return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+function pct(v) { return v != null ? parseFloat(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '%' : '—'; }
+function num(v) { return v != null ? parseInt(v).toLocaleString('pt-BR') : '—'; }
+
+function setText(id, val) { const el = document.getElementById(id); if(el) el.textContent = val; }
+
+// ─── getCurrentFilters ───
+function getCurrentFilters() {
+  const data = document.getElementById('filter-data').value;
+  const ini  = document.getElementById('filter-ini')?.value || '';
+  const fim  = document.getElementById('filter-fim')?.value || '';
+  const frentes = getChecked ? getChecked('frente') : [];
+  const btags   = getChecked ? getChecked('btag')   : [];
+  const afiliados = getChecked ? getChecked('afiliado') : [];
+  return { data, ini, fim, frentes, btags, afiliados };
+}
+
+// ─── FILTROS DATA ───
+function onDataChange() {
+  const v = document.getElementById('filter-data').value;
+  document.getElementById('custom-dates').style.display = v === 'custom' ? 'flex' : 'none';
+  if (v !== 'custom') filtrarAbaAtual();
+}
+
+// ─── MULTI-SELECT ───
+let filtrosData = {};
+
+async function loadFiltros() {
+  try {
+    const r = await fetch('/api/filtros');
+    const j = await r.json();
+    if (j.ok) filtrosData = j.data;
+  } catch(e) { console.warn('Filtros não carregados:', e); }
+}
+
+function toggleMs(name) {
+  const dd = document.getElementById(`ms-${name}-dd`);
+  const tr = document.querySelector(`#ms-${name} .ms-trigger`);
+  const isOpen = dd.classList.contains('open');
+  // Fecha todos
+  document.querySelectorAll('.ms-dropdown').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.ms-trigger').forEach(t => t.classList.remove('open'));
+  if (!isOpen) { dd.classList.add('open'); tr.classList.add('open'); }
+}
+
+// Fecha dropdowns ao clicar fora
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ms-wrap')) {
+    document.querySelectorAll('.ms-dropdown').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.ms-trigger').forEach(t => t.classList.remove('open'));
+  }
+});
+
+function getChecked(name) {
+  return [...document.querySelectorAll(`#ms-${name}-list .ms-item input:checked`)]
+    .map(cb => cb.closest('.ms-item').dataset.val)
+    .filter(v => v !== '__all__'); // Ignora o "Todos"
+}
+
+function updateLabel(name) {
+  const checked = getChecked(name);
+  const label = document.getElementById(`ms-${name}-label`);
+  label.textContent = checked.length === 0
+    ? (name === 'afiliado' ? 'Todos' : 'Todas')
+    : checked.length === 1 ? checked[0] : `${checked.length} selecionados`;
+}
+
+function onFrenteChange() {
+  updateLabel('frente');
+  const frentes = getChecked('frente');
+  // Cascatear btag e afiliado
+  buildBtagList(frentes);
+  buildAfiliadoList(frentes);
+}
+
+
+function filterMsList(name, query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll(`#ms-${name}-list .ms-item`).forEach(item => {
+    if (item.classList.contains('ms-todas')) return; // "Todos" sempre visível
+    item.style.display = item.dataset.val.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function toggleAllMs(name, cb) {
+  // When "Todas/Todos" is clicked: uncheck all individual items regardless of cb.checked direction
+  document.querySelectorAll(`#ms-${name}-list .ms-item:not(.ms-todas) input`).forEach(c => {
+    c.checked = false;
+  });
+  // Always keep "Todas" checked after clicking it (it represents "no filter")
+  cb.checked = true;
+  if (name === 'frente') { onFrenteChange(); } else { updateLabel(name); }
+}
+
+// Called when an individual frente item is toggled
+function onFrenteItemChange(cb) {
+  const anyChecked = [...document.querySelectorAll('#ms-frente-list .ms-item:not(.ms-todas) input')].some(c => c.checked);
+  // If any individual item is checked, uncheck "Todas"; if none checked, re-check "Todas"
+  const todasCb = document.querySelector('#ms-frente-list .ms-todas input');
+  if (todasCb) todasCb.checked = !anyChecked;
+  onFrenteChange();
+}
+
+function onMsItemChange(name, cb) {
+  const anyChecked = [...document.querySelectorAll(`#ms-${name}-list .ms-item:not(.ms-todas) input`)].some(c => c.checked);
+  const todasCb = document.querySelector(`#ms-${name}-list .ms-todas input`);
+  if (todasCb) todasCb.checked = !anyChecked;
+  updateLabel(name);
+}
+
+function buildBtagList(frentes) {
+  const list = document.getElementById('ms-btag-list');
+  const btags = frentes.length === 0
+    ? Object.values(filtrosData).flatMap(f => f.btags)
+    : frentes.flatMap(f => (filtrosData[f] || {btags:[]}).btags);
+  const unique = [...new Set(btags)].sort();
+  const todosHtml = `<div class="ms-item ms-todas" data-val="__all__"><input type="checkbox" onchange="toggleAllMs('btag',this)" checked> ✓ Todas</div>`;
+  if (unique.length === 0) {
+    list.innerHTML = todosHtml + '<div class="ms-empty">Nenhuma btag encontrada</div>';
+  } else {
+    list.innerHTML = todosHtml + unique.map(b =>
+      `<div class="ms-item" data-val="${b}"><input type="checkbox" onchange="onMsItemChange('btag',this)"> ${b}</div>`
+    ).join('');
+  }
+  updateLabel('btag');
+}
+
+function buildAfiliadoList(frentes) {
+  const list = document.getElementById('ms-afiliado-list');
+  const afis = frentes.length === 0
+    ? Object.values(filtrosData).flatMap(f => f.afiliados)
+    : frentes.flatMap(f => (filtrosData[f] || {afiliados:[]}).afiliados);
+  const unique = [...new Set(afis)].sort();
+  const todosHtml = `<div class="ms-item ms-todas" data-val="__all__"><input type="checkbox" onchange="toggleAllMs('afiliado',this)" checked> ✓ Todos</div>`;
+  if (unique.length === 0) {
+    list.innerHTML = todosHtml + '<div class="ms-empty">Nenhum afiliado encontrado</div>';
+  } else {
+    list.innerHTML = todosHtml + unique.map(a =>
+      `<div class="ms-item" data-val="${a}"><input type="checkbox" onchange="onMsItemChange('afiliado',this)"> ${a}</div>`
+    ).join('');
+  }
+  updateLabel('afiliado');
+}
+
+// ─── LOAD GERAL ───
+async function loadGeral(force=false) {
+  const data    = document.getElementById('filter-data').value;
+  const frentes = getChecked('frente');
+  const btags   = getChecked('btag');
+  const afis    = getChecked('afiliado');
+  const ini     = document.getElementById('filter-ini')?.value || '';
+  const fim     = document.getElementById('filter-fim')?.value || '';
+
+  // Montar params
+  const frente  = frentes.join(',') || 'todas';
+  const btag    = btags.join(',');
+  const afi     = afis.join(',');
+
+  // Mostrar loading em todos os KPI cards
+  ['kpi-dep','kpi-apo','kpi-ggr','kpi-rec','kpi-ngr','kpi-saq',
+   'kpi-jog','kpi-tm-dep','kpi-cadastros','kpi-ftd','kpi-tm-apostador','kpi-ggr-pct-card',
+   'kpi-freq','kpi-turnover','kpi-margem','kpi-ggr-dep','kpi-pct-rec'].forEach(id => setText(id, '...'));
+
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning'); btn.disabled = true;
+  document.getElementById('loader-geral').style.display = 'flex';
+
+  try {
+    let url = `/api/geral_completo?data=${data}&frente=${encodeURIComponent(frente)}&btag=${encodeURIComponent(btag)}&afiliado=${encodeURIComponent(afi)}`;
+    if (data === 'custom') url += `&ini=${ini}&fim=${fim}`;
+    if (force) url += `&force=1`;
+
+    const res  = await fetch(url);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+
+    const k = json.data.kpis;
+    const p = json.periodo;
+
+    // Atualiza label do período
+    setText('periodo-label', `${p.ini} → ${p.fim}${json.cache ? ' (cache)' : ''}`);
+
+    // KPIs
+    setText('kpi-dep',      brl(k.depositos));
+    setText('kpi-dep-sub',  num(k.qtd_depositos) + ' transações');
+    setText('kpi-apo',      brl(k.apo_total));
+    const turnover = k.depositos ? (k.apo_total / k.depositos).toFixed(2).replace('.',',') + 'x' : '—';
+    setText('kpi-turnover', turnover);
+    setText('kpi-ggr',     brl(k.ggr));
+    setText('kpi-ggr-dep', pct(k.pct_ggr_dep));   // % Dep dentro do card GGR
+    setText('kpi-margem',  pct(k.pct_ggr_apo));   // % Apo dentro do card GGR
+    setText('kpi-rec',     brl(k.recompensas));
+    setText('kpi-pct-rec', pct(k.pct_recomp_ggr));
+    setText('kpi-ngr',     brl(k.ngr));
+    setText('kpi-saq',     brl(k.saques));
+    setText('kpi-jog',     num(k.jogadores_ativos));
+    setText('kpi-tm-dep',      brl(k.ticket_dep));
+    setText('kpi-cadastros',   num(k.cadastros));
+    setText('kpi-ftd',         num(k.ftd_count));
+    setText('kpi-tm-apostador', brl(k.tm_apostador));
+    setText('kpi-tm-apostador-sub', `Apostas ÷ ${num(k.apostadores)} apostadores`);
+    const depositantes = json.data.nr?.total?.depositantes || 0;
+    const freq = k.qtd_depositos && depositantes > 0 ? (k.qtd_depositos / depositantes).toFixed(2) + 'x' : '—';
+    setText('kpi-freq', freq);
+    const freqEl = document.getElementById('kpi-freq');
+    if (freqEl && depositantes > 0) freqEl.title = `${num(k.qtd_depositos)} dep ÷ ${num(depositantes)} depositantes`;
+    const pctGGR = k.pct_ggr_dep || 0;
+    const pctColor = pctGGR >= 15 ? '#3EAA00' : pctGGR >= 5 ? '#FFC700' : '#ef4444';
+    const pctEl = document.getElementById('kpi-ggr-pct-card');
+    if (pctEl) { pctEl.textContent = pctGGR.toFixed(2) + '%'; pctEl.style.color = pctColor; }
+    setText('kpi-ggr-pct-sub', `${brl(k.ggr)} ÷ ${brl(k.depositos)}`);
+
+    // Segmentos
+    updateSegmentos(k);
+    // Tabela diária — vem da MESMA resposta, dados sempre consistentes
+    if (json.data.diario) renderGeralDiario(json.data.diario);
+    // Novos/Recorrentes — vem da MESMA resposta (dados consistentes com os cards)
+    if (json.data.nr) renderGeralNR(json.data.nr);
+
+    // Top GGR (só se veio na resposta)
+    if (json.data.top_ggr) updateTopGGR(json.data.top_ggr);
+
+    // Atualiza footer
+    setText('footer-time', new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}));
+
+  } catch(e) {
+    alert('Erro ao carregar dados: ' + e.message);
+    console.error(e);
+  } finally {
+    btn.classList.remove('spinning'); btn.disabled = false;
+    document.getElementById('loader-geral').style.display = 'none';
+  }
+}
+
+function updateSegmentos(k) {
+  const jog = k.jogadores_ativos || 1;
+  // Cassino
+  setText('seg-cas-ggr',    brl(k.ggr_casino));
+  setText('seg-cas-apo',    brl(k.apo_casino));
+  setText('seg-cas-tma',    brl(k.apo_casino / jog));
+  setText('seg-cas-tmg',    brl(k.ggr_casino / jog));
+  setText('seg-cas-margem', pct(k.apo_casino ? k.ggr_casino/k.apo_casino*100 : 0));
+  setText('seg-cas-pct',    pct(k.ggr ? k.ggr_casino/k.ggr*100 : 0));
+  // Loteria
+  setText('seg-lot-ggr',    brl(k.ggr_loteria));
+  setText('seg-lot-apo',    brl(k.apo_loteria));
+  setText('seg-lot-tma',    brl(k.apo_loteria / jog));
+  setText('seg-lot-tmg',    brl(k.ggr_loteria / jog));
+  setText('seg-lot-margem', pct(k.apo_loteria ? k.ggr_loteria/k.apo_loteria*100 : 0));
+  setText('seg-lot-pct',    pct(k.ggr ? k.ggr_loteria/k.ggr*100 : 0));
+  // Esporte
+  setText('seg-esp-ggr',    brl(k.ggr_sport));
+  setText('seg-esp-apo',    brl(k.apo_sport));
+  setText('seg-esp-tma',    brl(k.apo_sport / jog));
+  setText('seg-esp-tmg',    brl(k.ggr_sport / jog));
+  setText('seg-esp-margem', pct(k.apo_sport ? k.ggr_sport/k.apo_sport*100 : 0));
+  setText('seg-esp-pct',    pct(k.ggr ? k.ggr_sport/k.ggr*100 : 0));
+}
+
+function updateTopGGR(top) {
+  function renderTabela(id, rows) {
+    const el = document.getElementById(id);
+    if (!el || !rows.length) { if(el) el.innerHTML = '<p style="color:#475569;font-size:14px;padding:12px">Sem dados</p>'; return; }
+    const isPos = rows[0].ggr >= 0;
+    const cor = isPos ? '#3EAA00' : '#ef4444';
+    const RANK_COLORS = ['#FFD700','#C0C0C0','#CD7F32'];
+    const RANK_ICONS  = ['🥇','🥈','🥉'];
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="border-bottom:2px solid #0a3a55">
+        <th style="text-align:center;padding:5px 6px;color:#475569;font-weight:600;width:30px">#</th>
+        <th style="text-align:left;padding:5px 6px;color:#475569;font-weight:600;width:65px">ID</th>
+        <th style="text-align:left;padding:5px 6px;color:#475569;font-weight:600">Nome</th>
+        <th style="text-align:left;padding:5px 6px;color:#475569;font-weight:600">Tags</th>
+        <th style="text-align:left;padding:5px 6px;color:#475569;font-weight:600">Categoria</th>
+        <th style="text-align:left;padding:5px 6px;color:#475569;font-weight:600">Afiliado</th>
+        <th style="text-align:right;padding:5px 6px;color:#475569;font-weight:600">GGR</th>
+      </tr></thead>
+      <tbody>${rows.map((r,i) => {
+        const rank = i < 3 ? `<span style="font-size:16px">${RANK_ICONS[i]}</span>` : `<span style="color:#475569;font-size:12px">${i+1}</span>`;
+        const bg = i === 0 ? 'background:rgba(255,215,0,.06);' : i%2===0?'background:#111827;':'';
+        const border = i === 0 ? 'border-left:3px solid #FFD700;' : '';
+        const tagHTML = (r.tags||[]).map(t => {
+          const tc = t==='VIP'?'#FFC700':t==='Novo'?'#3EAA00':'#6495ED';
+          const tb = t==='VIP'?'rgba(255,199,0,.15)':t==='Novo'?'rgba(62,170,0,.15)':'rgba(100,149,237,.15)';
+          return `<span style="padding:1px 6px;border-radius:10px;font-size:11px;font-weight:700;color:${tc};background:${tb};margin-right:3px">${t}</span>`;
+        }).join('');
+        return `<tr style="${bg}${border}border-bottom:1px solid #0a1929">
+          <td style="padding:5px 6px;text-align:center">${rank}</td>
+          <td style="padding:5px 6px;color:#94a3b8;font-size:12px">${r.entity_id}</td>
+          <td style="padding:5px 6px;color:#e2e8f0;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.nome||'—'}</td>
+          <td style="padding:5px 6px;white-space:nowrap">${tagHTML}</td>
+          <td style="padding:5px 6px;color:#AEA0EB;font-size:12px">${r.jogo||'—'}</td>
+          <td style="padding:5px 6px;color:#94a3b8;font-size:12px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.afiliado||'—'}</td>
+          <td style="padding:5px 6px;text-align:right;font-weight:700;color:${cor}">${brl(r.ggr)}</td>
+        </tr>`;}).join('')}
+      </tbody></table>`;
+  }
+  renderTabela('top-pos-tabela', top.positivos || []);
+  renderTabela('top-neg-tabela', top.negativos || []);
+}
+
+
+// Carrega ao abrir
+window.addEventListener('load', async () => {
+  await loadFiltros();
+  buildBtagList([]);
+  buildAfiliadoList([]);
+  loadGeral();
+  loadGeralCharts();
+  loadFunilCad();
+  loadFunilAq();
+});
+
+// ─── TABS ───
+const tabMap = {
+  'GERAL':               'tab-geral',
+  'TURNOVER':            'tab-apostas',
+  'FUNIL DE AQUISIÇÃO':  'tab-funil-aq',
+};
+
+// Filtros padrão por aba (data diferente = intenções diferentes)
+const TAB_DEFAULTS = {
+  'tab-geral':     { data: 'hoje',    frentes: [], btags: [], afiliados: [] },
+  'tab-apostas':   { data: 'mes_ant', frentes: [], btags: [], afiliados: [] },
+  'tab-funil-aq':  { data: 'mes',     frentes: [], btags: [], afiliados: [] },
+};
+
+const GERAL_ONLY = ['ms-frente','ms-btag','ms-afiliado'];
+let currentTab = 'tab-geral';
+
+// Estado de filtros e carga por aba — completamente isolados
+const tabFilterState = {};   // { tabId: {data, ini, fim, frentes, btags, afiliados} }
+const tabLoaded      = {};   // { tabId: boolean } — se já foi carregado ao menos 1x
+
+function saveFilterState(tabId) {
+  tabFilterState[tabId] = {
+    data:      document.getElementById('filter-data').value,
+    ini:       document.getElementById('filter-ini')?.value || '',
+    fim:       document.getElementById('filter-fim')?.value || '',
+    frentes:   getChecked('frente'),
+    btags:     getChecked('btag'),
+    afiliados: getChecked('afiliado'),
+  };
+}
+
+function restoreFilterState(tabId) {
+  // Se nunca foi visitada, usa padrões da aba
+  const s = tabFilterState[tabId] || TAB_DEFAULTS[tabId] || TAB_DEFAULTS['tab-geral'];
+
+  document.getElementById('filter-data').value = s.data;
+  document.getElementById('custom-dates').style.display = s.data === 'custom' ? 'flex' : 'none';
+
+  // Frentes
+  document.querySelectorAll('#ms-frente-list .ms-item:not(.ms-todas) input').forEach(cb => {
+    cb.checked = (s.frentes||[]).includes(cb.closest('.ms-item').dataset.val);
+  });
+  const fCb = document.querySelector('#ms-frente-list .ms-todas input');
+  if (fCb) fCb.checked = (s.frentes||[]).length === 0;
+  updateLabel('frente');
+
+  buildBtagList(s.frentes||[]);
+  buildAfiliadoList(s.frentes||[]);
+
+  // Btags
+  document.querySelectorAll('#ms-btag-list .ms-item:not(.ms-todas) input').forEach(cb => {
+    cb.checked = (s.btags||[]).includes(cb.closest('.ms-item').dataset.val);
+  });
+  const bCb = document.querySelector('#ms-btag-list .ms-todas input');
+  if (bCb) bCb.checked = (s.btags||[]).length === 0;
+  updateLabel('btag');
+
+  // Afiliados
+  document.querySelectorAll('#ms-afiliado-list .ms-item:not(.ms-todas) input').forEach(cb => {
+    cb.checked = (s.afiliados||[]).includes(cb.closest('.ms-item').dataset.val);
+  });
+  const aCb = document.querySelector('#ms-afiliado-list .ms-todas input');
+  if (aCb) aCb.checked = (s.afiliados||[]).length === 0;
+  updateLabel('afiliado');
+}
+
+function setTabFilters(tabId) {
+  GERAL_ONLY.forEach(id => {
+    const wrap = document.getElementById(id)?.closest('.filter-group');
+    if (wrap) wrap.style.display = '';
+  });
+  document.querySelectorAll('.filter-divider').forEach(d => d.style.display = '');
+  // Esconde filtros de frente/btag/afiliado na aba Tráfego Pago e NOVOS (não se aplica)
+  if (tabId === 'tab-trafego' || tabId === 'tab-frentes') {
+    ['ms-frente','ms-btag','ms-afiliado'].forEach(id => {
+      const wrap = document.getElementById(id)?.closest('.filter-group');
+      if (wrap) wrap.style.display = 'none';
+    });
+    document.querySelectorAll('.filter-divider').forEach(d => d.style.display = 'none');
+  }
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    if (tab.dataset.locked) return; // aba bloqueada
+
+    // 1. Salva filtros da aba que está saindo
+    saveFilterState(currentTab);
+
+    // 2. Troca visual de aba
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    const id = tabMap[tab.textContent.trim()];
+    if (!id) return;
+    document.getElementById(id).classList.add('active');
+    currentTab = id;
+    setTabFilters(id);
+
+    // 3. Restaura filtros ISOLADOS da nova aba (nunca contamina com filtros de outra aba)
+    restoreFilterState(id);
+
+    // 4. Só carrega dados se for a PRIMEIRA vez nesta aba
+    //    Nas próximas visitas, mostra os dados já carregados sem nova query
+    if (!tabLoaded[id]) {
+      tabLoaded[id] = true;
+      if (id === 'tab-apostas') { loadApostas(); loadApostasDiario(); loadLoteria(); }
+      if (id === 'tab-frentes') { loadFrentes(); }
+      if (id === 'tab-trafego') { loadTrafego(); loadFunil(); loadTrafegoDiario(); }
+      if (id === 'tab-coorte')  { loadCoorte(); }
+      if (id === 'tab-funil-aq') {
+        loadFunilJornada(); loadFunilJornadaDiario(); loadFunilAtrito(); loadFunilTempo();
+      }
+    }
+  });
+});
+
+// ─── GERAL NOVOS / RECORRENTES / TOTAL ───
+// NR data comes from json.data.nr inside loadGeral (via /api/geral_completo).
+// The old loadGeralNR() that called /api/geral_novos_rec separately has been removed
+// to guarantee NR table is always in sync with the KPI cards.
+
+function renderGeralNR(d) {
+  const el = document.getElementById('geral-nr-content');
+  if (!el) return;
+
+  const COL_N = '#4CAF50', COL_R = '#6495ED', COL_T = '#9B7FD4';
+  const gc = v => parseFloat(v||0) >= 0 ? '#3EAA00' : '#ef4444';
+
+  const rows = [
+    { label: 'Depositantes',             fn: d => num(d.depositantes) },
+    { label: 'Valor FTD',                fn: d => brl(d.ftd) },
+    { label: 'Valor Depósitos',          fn: d => brl(d.depositos) },
+    { label: 'Qtd. Depósitos',           fn: d => num(d.qtd_depositos) },
+    { label: 'Ticket Médio Dep.',        fn: d => brl(d.tm_deposito) },
+    { label: 'Ticket Médio Depositante', fn: d => brl(d.tm_depositante) },
+    { label: 'Frequência',               fn: d => (parseFloat(d.frequencia||0)).toFixed(2)+'x' },
+    { label: 'GGR',                      fn: d => `<span style="font-weight:700;color:${gc(d.ggr)}">${brl(d.ggr)}</span>` },
+    { label: '% GGR/Dep',               fn: d => { const v = d.depositos ? (d.ggr / d.depositos * 100) : null; if (v === null) return '—'; const c = v > 0 ? '#3EAA00' : '#ef4444'; return `<span style="font-weight:700;color:${c}">${v.toFixed(2)}%</span>`; } },
+    { label: 'Recompensas',              fn: d => `<span style="color:#FFC700">${brl(d.recompensas)}</span>` },
+    { label: 'TM por Apostador',         fn: d => brl(d.tm_apostador) },
+  ];
+
+  const thH = (txt, col, sub='') => `<th style="background:${col};color:#fff;padding:9px 14px;font-size:13px;font-weight:700;text-align:center;border-bottom:1px solid #0a3a55">
+    ${txt}${sub?`<div style="font-size:11px;opacity:.75;font-weight:500;margin-top:2px">${sub}</div>`:''}
+  </th>`;
+
+  const novos_dep = (d.novos||{}).depositantes||0;
+  const rec_dep   = (d.recorrentes||{}).depositantes||0;
+  const tot_dep   = (d.total||{}).depositantes||1;
+
+  let tableRows = rows.map((r,i) => {
+    const alt = i % 2 === 0 ? '#111827' : '#0d1a2e';
+    return `<tr style="background:${alt};border-bottom:1px solid #0a1929">
+      <td style="padding:8px 14px;color:#94a3b8;font-size:13px;font-weight:500">${r.label}</td>
+      <td style="padding:8px 14px;text-align:right;font-size:14px;color:#86efac">${r.fn(d.novos||{})}</td>
+      <td style="padding:8px 14px;text-align:right;font-size:14px;color:#93c5fd">${r.fn(d.recorrentes||{})}</td>
+      <td style="padding:8px 14px;text-align:right;font-size:14px;font-weight:700;color:#fbbf24">${r.fn(d.total||{})}</td>
+    </tr>`;}).join('');
+
+  el.innerHTML = `
+  <div style="overflow-x:auto;border-radius:10px;border:1px solid #0a3a55">
+  <table style="width:100%;border-collapse:collapse;font-size:14px">
+    <thead>
+      <tr style="border-bottom:2px solid #0a3a55">
+        <th style="background:#00193A;color:#475569;padding:10px 14px;text-align:left;font-size:12px;font-weight:700;border-bottom:1px solid #0a3a55">Métrica</th>
+        ${thH(`👤 Novos`, '#4CAF50', `${num(novos_dep)} depositantes`)}
+        ${thH(`🔄 Recorrentes`, '#6495ED', `${num(rec_dep)} depositantes`)}
+        ${thH(`∑ Total`, '#9B7FD4', `${num(tot_dep)} depositantes`)}
+      </tr>
+    </thead>
+    <tbody>${tableRows}</tbody>
+  </table>
+  </div>`;
+}
+
+// ─── RENDER TABELA DIÁRIA (dados já carregados pelo endpoint combinado) ───
+function renderGeralDiario(dias) {
+  const wrap = document.getElementById('geral-diario-wrap');
+  const body = document.getElementById('geral-diario-body');
+  if (!wrap || !body) return;
+  wrap.style.display = 'block';
+
+  if (!dias || !dias.length) {
+    body.innerHTML = '<tr><td colspan="9" style="padding:16px;text-align:center;color:#475569">Sem dados</td></tr>';
+    return;
+  }
+
+  const DIAS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  let html = '';
+  const tot = {dep:0, apo:0, ggr:0, rec:0, ngr:0};
+
+  // Média do período para alertas (mesma base da linha do gráfico)
+  const depVals = dias.map(x => x.deposito||0).filter(v => v > 0);
+  const ggrVals = dias.map(x => x.ggr||0).filter(v => v > 0);
+  const avgDepPeriodo = depVals.length > 0 ? depVals.reduce((a,b)=>a+b,0)/depVals.length : 0;
+  const avgGgrPeriodo = ggrVals.length > 0 ? ggrVals.reduce((a,b)=>a+b,0)/ggrVals.length : 0;
+
+  function alertStyle(val, avg) {
+    if (avg <= 0) return { bg: 'transparent', anim: '' };
+    const rel = (val - avg) / avg;
+    if (rel < -0.10) return { bg: 'rgba(239,68,68,0.18)', anim: 'animation:alertPulse 1.5s ease-in-out infinite;' };
+    if (rel < -0.05) return { bg: 'rgba(234,179,8,0.13)', anim: '' };
+    return { bg: 'transparent', anim: '' };
+  }
+
+  for (let i = 0; i < dias.length; i++) {
+    const d = dias[i];
+    const dt = new Date(d.data + 'T12:00:00');
+    const dia = DIAS_PT[dt.getDay()];
+    const dep = d.deposito||0, apo = d.apostas||0, ggr = d.ggr||0, rec = d.recompensas||0;
+    tot.dep += dep; tot.apo += apo; tot.ggr += ggr; tot.rec += rec; tot.ngr += (d.ngr||0);
+    const gc = ggr >= 0 ? '#3EAA00' : '#ef4444';
+    const tur_dep = dep ? (apo/dep).toFixed(2)+'x' : '—';
+    const ggr_dep = dep ? (ggr/dep*100).toFixed(2)+'%' : '—';
+    const rec_ggr = ggr ? (rec/ggr*100).toFixed(1)+'%' : '—';
+
+    const depAlert = alertStyle(dep, avgDepPeriodo);
+    const ggrAlert = alertStyle(ggr, avgGgrPeriodo);
+
+    // Formata data como DD/MM
+    const parts = d.data.split('-');
+    const dateLbl = parts.length === 3 ? `${parts[2]}/${parts[1]}` : d.data.slice(5);
+
+    html += `<tr style="border-bottom:1px solid #0a1929">
+      <td style="padding:7px 10px;color:#94a3b8;font-size:13px">${dateLbl} <span style="color:#475569;font-size:12px">${dia}</span></td>
+      <td style="padding:7px 10px;text-align:right;color:#ACDFB0;background:${depAlert.bg};${depAlert.anim}">${brl(dep)}</td>
+      <td style="padding:7px 10px;text-align:right;color:#4FC2FF">${brl(apo)}</td>
+      <td style="padding:7px 10px;text-align:center;color:#516067;font-size:13px">${tur_dep}</td>
+      <td style="padding:7px 10px;text-align:right;font-weight:700;color:${gc};background:${ggrAlert.bg};${ggrAlert.anim}">${brl(ggr)}</td>
+      <td style="padding:7px 10px;text-align:center;font-weight:600;color:${gc};font-size:13px">${ggr_dep}</td>
+      <td style="padding:7px 10px;text-align:right;color:#FFC700">${brl(rec)}</td>
+      <td style="padding:7px 10px;text-align:center;color:#879397;font-size:13px">${rec_ggr}</td>
+      <td style="padding:7px 10px;text-align:right;font-weight:700;color:${(d.ngr||0)>=0?'#3EAA00':'#ef4444'}">${brl(d.ngr)}</td>
+    </tr>`;
+  }
+
+  const tgc = tot.ggr >= 0 ? '#3EAA00' : '#ef4444';
+  html += `<tr style="background:#0f172a;border-top:2px solid #0075FF44">
+    <td style="padding:8px 10px;font-weight:700;color:#fbbf24">TOTAL</td>
+    <td style="padding:8px 10px;text-align:right;font-weight:700;color:#ACDFB0">${brl(tot.dep)}</td>
+    <td style="padding:8px 10px;text-align:right;font-weight:700;color:#4FC2FF">${brl(tot.apo)}</td>
+    <td style="padding:8px 10px;text-align:center;color:#516067">${tot.dep?(tot.apo/tot.dep).toFixed(2)+'x':'—'}</td>
+    <td style="padding:8px 10px;text-align:right;font-weight:700;color:${tgc}">${brl(tot.ggr)}</td>
+    <td style="padding:8px 10px;text-align:center;font-weight:700;color:${tgc}">${tot.dep?(tot.ggr/tot.dep*100).toFixed(2)+'%':'—'}</td>
+    <td style="padding:8px 10px;text-align:right;font-weight:700;color:#FFC700">${brl(tot.rec)}</td>
+    <td style="padding:8px 10px;text-align:center;color:#879397">${tot.ggr?(tot.rec/tot.ggr*100).toFixed(1)+'%':'—'}</td>
+    <td style="padding:8px 10px;text-align:right;font-weight:700;color:${tot.ngr>=0?'#3EAA00':'#ef4444'}">${brl(tot.ngr)}</td>
+  </tr>`;
+
+  body.innerHTML = html;
+}
+
+// loadGeralDiario() removed — diario data comes from json.data.diario inside loadGeral().
+
+// ─── APOSTAS DIÁRIO TABLE ───
+async function loadApostasDiario(force=false) {
+  const data = document.getElementById('filter-data').value;
+  const ini  = document.getElementById('filter-ini')?.value || '';
+  const fim  = document.getElementById('filter-fim')?.value || '';
+  const body = document.getElementById('apostas-body');
+  if (!body) return;
+
+  body.innerHTML = '<tr><td colspan="16" style="padding:20px;text-align:center;color:#475569">Carregando...</td></tr>';
+
+  try {
+    const frentes_d = getChecked('frente');
+    const btags_d   = getChecked('btag');
+    const afis_d    = getChecked('afiliado');
+    let url = `/api/apostas_diario?data=${data}&frente=${encodeURIComponent(frentes_d.join(',')||'todas')}&btag=${encodeURIComponent(btags_d.join(','))}&afiliado=${encodeURIComponent(afis_d.join(','))}`;
+    if (data === 'custom') url += `&ini=${ini}&fim=${fim}`;
+    if (force) url += `&force=1`;
+    const res  = await fetch(url);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+
+    const dias = json.data;
+    if (!dias.length) {
+      body.innerHTML = '<tr><td colspan="16" style="padding:20px;text-align:center;color:#475569">Sem dados para o período</td></tr>';
+      return;
+    }
+
+    const DIAS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    const gc = v => `color:${parseFloat(v||0)>=0?'#3EAA00':'#ef4444'}`;
+    const td_t = v => `<td style="padding:6px 7px;text-align:right;color:#516067;font-size:12px">${brl(v)}</td>`;
+    const td_g = v => `<td style="padding:6px 7px;text-align:right;font-weight:700;font-size:12px;${gc(v)}">${brl(v)}</td>`;
+    const td_h = (t,g) => { const h=t?(g/t*100):0; const hc=h>=5?'#3EAA00':h>=3?'#FFC700':'#ef4444'; return `<td style="padding:6px 7px;text-align:center;font-size:12px;color:${hc}">${h.toFixed(2)}%</td>`; };
+
+    // Totais
+    const CATS = ['crash','slot','loteria','ao_vivo','bingo','outros','esporte'];
+    const tots = {};
+    CATS.forEach(k => tots[k] = {t:0, g:0});
+    tots.total = {t:0, g:0};
+
+    let html = '';
+    for (const d of dias) {
+      const dt = new Date(d.data + 'T12:00:00');
+      const dia = DIAS_PT[dt.getDay()];
+      CATS.forEach(k => { tots[k].t += (d[k]?.t||0); tots[k].g += (d[k]?.g||0); });
+      tots.total.t += (d.total?.t||0); tots.total.g += (d.total?.g||0);
+
+      html += `<tr style="border-bottom:1px solid #0a1929">
+        <td style="padding:6px 9px;color:#94a3b8;font-size:12px">${d.data.slice(5)} <span style="color:#475569;font-size:11px">${dia}</span></td>
+        ${td_t(d.crash?.t)} ${td_g(d.crash?.g)} ${td_h(d.crash?.t, d.crash?.g)}
+        ${td_t(d.slot?.t)}  ${td_g(d.slot?.g)}  ${td_h(d.slot?.t, d.slot?.g)}
+        ${td_t(d.loteria?.t)}${td_g(d.loteria?.g)}${td_h(d.loteria?.t, d.loteria?.g)}
+        ${td_t(d.ao_vivo?.t)}${td_g(d.ao_vivo?.g)}${td_h(d.ao_vivo?.t, d.ao_vivo?.g)}
+        ${td_t(d.bingo?.t)} ${td_g(d.bingo?.g)} ${td_h(d.bingo?.t, d.bingo?.g)}
+        ${td_t(d.outros?.t)}${td_g(d.outros?.g)}${td_h(d.outros?.t, d.outros?.g)}
+        ${td_t(d.esporte?.t)}${td_g(d.esporte?.g)}${td_h(d.esporte?.t, d.esporte?.g)}
+        ${td_t(d.total?.t)} ${td_g(d.total?.g)} ${td_h(d.total?.t, d.total?.g)}
+      </tr>`;
+    }
+
+    // Linha Total
+    html += `<tr style="background:#0f172a;border-top:2px solid #0075FF44">
+      <td style="padding:7px 9px;font-weight:700;color:#fbbf24;font-size:12px">TOTAL</td>
+      ${td_t(tots.crash.t)}   <td style="padding:7px 7px;text-align:right;font-weight:700;font-size:12px;${gc(tots.crash.g)}">${brl(tots.crash.g)}</td>   ${td_h(tots.crash.t,tots.crash.g)}
+      ${td_t(tots.slot.t)}    <td style="padding:7px 7px;text-align:right;font-weight:700;font-size:12px;${gc(tots.slot.g)}">${brl(tots.slot.g)}</td>     ${td_h(tots.slot.t,tots.slot.g)}
+      ${td_t(tots.loteria.t)} <td style="padding:7px 7px;text-align:right;font-weight:700;font-size:12px;${gc(tots.loteria.g)}">${brl(tots.loteria.g)}</td> ${td_h(tots.loteria.t,tots.loteria.g)}
+      ${td_t(tots.ao_vivo.t)} <td style="padding:7px 7px;text-align:right;font-weight:700;font-size:12px;${gc(tots.ao_vivo.g)}">${brl(tots.ao_vivo.g)}</td> ${td_h(tots.ao_vivo.t,tots.ao_vivo.g)}
+      ${td_t(tots.bingo.t)}   <td style="padding:7px 7px;text-align:right;font-weight:700;font-size:12px;${gc(tots.bingo.g)}">${brl(tots.bingo.g)}</td>    ${td_h(tots.bingo.t,tots.bingo.g)}
+      ${td_t(tots.outros.t)}  <td style="padding:7px 7px;text-align:right;font-weight:700;font-size:12px;${gc(tots.outros.g)}">${brl(tots.outros.g)}</td>  ${td_h(tots.outros.t,tots.outros.g)}
+      ${td_t(tots.esporte.t)} <td style="padding:7px 7px;text-align:right;font-weight:700;font-size:12px;${gc(tots.esporte.g)}">${brl(tots.esporte.g)}</td> ${td_h(tots.esporte.t,tots.esporte.g)}
+      ${td_t(tots.total.t)}   <td style="padding:7px 7px;text-align:right;font-weight:700;font-size:12px;${gc(tots.total.g)}">${brl(tots.total.g)}</td>    ${td_h(tots.total.t,tots.total.g)}
+    </tr>`;
+
+    body.innerHTML = html;
+  } catch(e) {
+    body.innerHTML = `<tr><td colspan="16" style="padding:16px;color:#ef4444">Erro: ${e.message}</td></tr>`;
+  }
+}
+
+// ─── APOSTAS TAB ───
+async function loadApostas(force=false) {
+  const data = document.getElementById('filter-data').value;
+  const ini  = document.getElementById('filter-ini')?.value || '';
+  const fim_v= document.getElementById('filter-fim')?.value || '';
+
+  document.getElementById('apostas-loading').style.display = 'block';
+  document.getElementById('apostas-tabela').innerHTML = '';
+  document.getElementById('loader-apostas').style.display = 'flex';
+
+  try {
+    const frentes_a = getChecked('frente');
+    const btags_a   = getChecked('btag');
+    const afis_a    = getChecked('afiliado');
+    const frente_a  = frentes_a.join(',') || 'todas';
+    const btag_a    = btags_a.join(',');
+    const afi_a     = afis_a.join(',');
+    let url = `/api/apostas?data=${data}&frente=${encodeURIComponent(frente_a)}&btag=${encodeURIComponent(btag_a)}&afiliado=${encodeURIComponent(afi_a)}`;
+    if (data === 'custom') url += `&ini=${ini}&fim=${fim_v}`;
+    if (force) url += `&force=1`;
+    const res  = await fetch(url);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+
+    const p = json.periodo;
+    document.getElementById('apostas-periodo').textContent = `${p.ini} → ${p.fim}`;
+    renderApostas(json.data);
+    updateApostasKpiCards(json.data, p);
+    renderApostasMeta(json.data, p);
+    renderApostasDiag(json.data);
+  } catch(e) {
+    document.getElementById('apostas-tabela').innerHTML =
+      `<p style="color:#ef4444;padding:16px">Erro: ${e.message}</p>`;
+  } finally {
+    document.getElementById('apostas-loading').style.display = 'none';
+    document.getElementById('loader-apostas').style.display = 'none';
+  }
+}
+
+function renderApostas(d) {
+  const cats = d.categorias || [];
+  const GN='#4CAF50', GR='#6495ED', GT='#9B7FD4';
+
+  const gg = v => {
+    const n = parseFloat(v||0);
+    return n < 0 ? `<span style="color:#ef4444">${brl(v)}</span>` : `<span style="color:#3EAA00">${brl(v)}</span>`;
+  };
+
+  const S = `border-bottom:1px solid #0a3a55;font-size:13px;padding:8px 10px;`;
+
+  const mkRow = (row, label, isGroup=false, indent=0, pct_ret=null) => {
+    const bg = isGroup ? '#0d1f35' : '#111827';
+    const fw = isGroup ? 'font-weight:700;' : '';
+    const ret = pct_ret != null
+      ? `<td style="${S}text-align:center;${fw}color:${pct_ret>60?'#3EAA00':pct_ret>40?'#fbbf24':'#ef4444'}">${pct_ret}%</td>`
+      : `<td style="${S}text-align:center;color:#475569">—</td>`;
+    return `<tr style="background:${bg}">
+      <td style="${S}padding-left:${10+indent}px;${fw}">${isGroup?`<span style="color:#e2e8f0">${label}</span>`:label}</td>
+      <td style="${S}text-align:right;color:#86efac;${fw}">${brl(row.novos?.apostado)}</td>
+      <td style="${S}text-align:right">${gg(row.novos?.ggr)}</td>
+      <td style="${S}text-align:right;color:#94a3b8">${brl(row.novos?.tm_aposta)}</td>
+      <td style="${S}text-align:right;color:#94a3b8">${brl(row.novos?.tm_ggr)}</td>
+      <td style="${S}text-align:right;color:#93c5fd;${fw}">${brl(row.recorrentes?.apostado)}</td>
+      <td style="${S}text-align:right">${gg(row.recorrentes?.ggr)}</td>
+      <td style="${S}text-align:right;color:#94a3b8">${brl(row.recorrentes?.tm_aposta)}</td>
+      <td style="${S}text-align:right;color:#94a3b8">${brl(row.recorrentes?.tm_ggr)}</td>
+      ${ret}
+      <td style="${S}text-align:right;color:#fbbf24;${fw}">${brl(row.total?.apostado)}</td>
+      <td style="${S}text-align:right">${gg(row.total?.ggr)}</td>
+      <td style="${S}text-align:right;color:#94a3b8">${brl(row.total?.tm_aposta)}</td>
+      <td style="${S}text-align:right;color:#94a3b8">${brl(row.total?.tm_ggr)}</td>
+    </tr>`;
+  };
+
+  let rows = '';
+  for (const cat of cats) {
+    rows += mkRow(cat, `${cat.icon} ${cat.nome}`, true, 0, cat.recorrentes?.pct_ret ?? null);
+    for (const sub of (cat.subs || [])) {
+      rows += mkRow(sub, `&nbsp;&nbsp;&nbsp;${sub.nome}`, false, 8, null);
+    }
+  }
+
+  rows += `<tr style="background:#00193A;border-top:2px solid #0075FF44">
+    <td style="${S}font-weight:700;color:#fbbf24">∑ TOTAL GERAL</td>
+    <td style="${S}text-align:right;font-weight:700;color:#86efac">${brl(d.totais_novos?.apostado)}</td>
+    <td style="${S}text-align:right">${gg(d.totais_novos?.ggr)}</td>
+    <td style="${S}text-align:right;color:#64748b">${brl(d.totais_novos?.tm_aposta)}</td>
+    <td style="${S}text-align:right;color:#64748b">${brl(d.totais_novos?.tm_ggr)}</td>
+    <td style="${S}text-align:right;font-weight:700;color:#93c5fd">${brl(d.totais_rec?.apostado)}</td>
+    <td style="${S}text-align:right">${gg(d.totais_rec?.ggr)}</td>
+    <td style="${S}text-align:right;color:#64748b">${brl(d.totais_rec?.tm_aposta)}</td>
+    <td style="${S}text-align:right;color:#64748b">${brl(d.totais_rec?.tm_ggr)}</td>
+    <td style="${S}text-align:center;color:#64748b">—</td>
+    <td style="${S}text-align:right;font-weight:700;color:#fbbf24">${brl(d.totais?.apostado)}</td>
+    <td style="${S}text-align:right">${gg(d.totais?.ggr)}</td>
+    <td style="${S}text-align:right;color:#64748b">${brl(d.totais?.tm_aposta)}</td>
+    <td style="${S}text-align:right;color:#64748b">${brl(d.totais?.tm_ggr)}</td>
+  </tr>`;
+
+  const thG = (txt, col, span=1) =>
+    `<th colspan="${span}" style="background:${col};color:#fff;padding:9px 10px;font-size:12px;font-weight:700;text-align:center;border-bottom:1px solid #0a3a55;white-space:nowrap">${txt}</th>`;
+  const thS = (txt, col) =>
+    `<th style="background:${col};color:rgba(255,255,255,.75);padding:6px 10px;font-size:11px;font-weight:600;text-align:right;border-bottom:2px solid #0a3a55;white-space:nowrap">${txt}</th>`;
+
+  const html = `
+  <div style="overflow-x:auto;border-radius:10px;border:1px solid #0a3a55;margin-bottom:20px">
+  <table style="width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap">
+    <thead>
+      <tr>
+        <th rowspan="2" style="background:#00243A;color:#4FC2FF;padding:9px 14px;text-align:left;font-size:12px;font-weight:700;border-bottom:2px solid #0a3a55">Categoria</th>
+        ${thG('NOVOS', GN, 4)}
+        ${thG('RECORRENTES', GR, 4)}
+        ${thG('% vs Mês Ant.', GR, 1)}
+        ${thG('TOTAL', GT, 4)}
+      </tr>
+      <tr>
+        ${thS('Apostado',GN)} ${thS('GGR',GN)} ${thS('TM Aposta',GN)} ${thS('TM GGR',GN)}
+        ${thS('Apostado',GR)} ${thS('GGR',GR)} ${thS('TM Aposta',GR)} ${thS('TM GGR',GR)}
+        ${thS('Retenção',GR)}
+        ${thS('Apostado',GT)} ${thS('GGR',GT)} ${thS('TM Aposta',GT)} ${thS('TM GGR',GT)}
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  </div>
+  <p style="font-size:12px;color:#475569;margin-top:-14px;margin-bottom:16px;padding-left:4px">
+    * TM Aposta = apostado ÷ apostadores · TM GGR = GGR ÷ apostadores · % Retenção = recorrentes ÷ apostadores mês anterior · Novos = 1º depósito no período
+  </p>`;
+
+  document.getElementById('apostas-tabela').innerHTML = html;
+}
+
+// ─── FRENTE SELECTOR ───
+function setFrente(frente, btn) {
+  document.querySelectorAll('.frente-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+// METAS MENSAIS (Junho 2026)
+// ═══════════════════════════════════════════════════════════
+const META_CAT = {
+  crash:   { metaT: 100000000, metaG: 3300000, holdTarget: 0.033,  label: 'Crash 💥',           cor: '#4FC2FF' },
+  slot:    { metaT: 82500000,  metaG: 3300000, holdTarget: 0.04,   label: 'Slots 🎰',            cor: '#B9DC33' },
+  loteria: { metaT: 8500000,   metaG: 1500000, holdTarget: 0.1765, label: 'Loteria 🎟️',          cor: '#FFC700' },
+  ao_vivo: { metaT: 25000000,  metaG: 1000000, holdTarget: 0.04,   label: 'Cassino ao Vivo 🃏',  cor: '#AEA0EB' },
+  bingo:   { metaT: 17500000,  metaG: 700000,  holdTarget: 0.04,   label: 'Bingo 🎱',            cor: '#4FC2FF' },
+  esporte: { metaT: 5000000,   metaG: 200000,  holdTarget: 0.04,   label: 'Esportes ⚽',          cor: '#ACDFB0' },
+};
+const META_GGR_TOTAL = 10000000;
+const META_TUR_TOTAL = 238500000;
+const META_DEP_TOTAL = 48000000;
+
+const META_FRENTE = {
+  'Tráfego':          { metaG: 1000000, label: 'Tráfego',         cor: '#3EAA00', bg: '#001A00', border: '#3EAA0055' },
+  'App':              { metaG: 70000,   label: 'App',             cor: '#4FC2FF', bg: '#001428', border: '#4FC2FF44' },
+  'Mídias':           { metaG: 70000,   label: 'Mídias',          cor: '#AEA0EB', bg: '#0F0A1F', border: '#AEA0EB44' },
+  'Resultado Fácil':  { metaG: 50000,   label: 'Resultado Fácil', cor: '#B9DC33', bg: '#1A1F00', border: '#B9DC3344' },
+  'Orgânico':         { metaG: 8100000, label: 'Orgânico',        cor: '#0075FF', bg: '#00193A', border: '#0075FF55' },
+  'Afiliados':        { metaG: 100000,  label: 'Afiliados',       cor: '#FF8100', bg: '#1A0800', border: '#FF810044' },
+};
+
+function fmtBRL(v) {
+  const a = Math.abs(v);
+  let s = a >= 1e6 ? 'R$ '+(v/1e6).toFixed(2).replace('.',',')+'M'
+        : a >= 1e3 ? 'R$ '+(v/1e3).toFixed(1).replace('.',',')+'k'
+        : 'R$ '+a.toLocaleString('pt-BR',{maximumFractionDigits:0});
+  return v < 0 ? s.replace('R$ ','-R$ ') : s;
+}
+function fmtFull(v) { return (v<0?'-R$ ':'R$ ')+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtPct(v)  { return (v*100).toFixed(1).replace('.',',')+'%'; }
+function pctColor(r){ return r>=0.9?'#3EAA00':r>=0.7?'#FFC700':'#FF5C6A'; }
+function gapColor(v){ return v>=0?'#3EAA00':'#FF5C6A'; }
+
+// ═══════════════════════════════════════════════════════════
+// APOSTAS: 4 CARDS TOPO + META + DIAGNÓSTICO
+// ═══════════════════════════════════════════════════════════
+function updateApostasKpiCards(d, periodo) {
+  if (!d || !periodo) return;
+  const ini = new Date(periodo.ini), fim = new Date(periodo.fim);
+  const diasDecorridos = Math.round((fim - ini) / 86400000) + 1;
+  const diasMes = new Date(fim.getFullYear(), fim.getMonth()+1, 0).getDate();
+  const PR = diasDecorridos / diasMes;
+
+  // Soma totais: usa totais diretos (Loteria, Esporte) + total do Cassino já agrega subs
+  const cats = d.categorias || [];
+  let totGGR = 0, totTUR = 0;
+  cats.forEach(c => { totGGR += c.total?.ggr||0; totTUR += c.total?.apostado||0; });
+  // Se totais são zero (pode ser que a API retorna Cassino + subs), usa totais globais
+  if ((totGGR === 0) && d.totais) { totGGR = d.totais.ggr||0; totTUR = d.totais.apostado||0; }
+
+  const metaGGR_pr = META_GGR_TOTAL * PR;
+  const metaTUR_pr = META_TUR_TOTAL * PR;
+  const hold       = totTUR > 0 ? totGGR / totTUR : 0;
+  const projGGR    = PR > 0 ? totGGR / PR : 0;
+  const pGGR       = metaGGR_pr > 0 ? totGGR / metaGGR_pr : 0;
+  const pTUR       = metaTUR_pr > 0 ? totTUR / metaTUR_pr : 0;
+  const pProj      = META_GGR_TOTAL > 0 ? projGGR / META_GGR_TOTAL : 0;
+  const holdMeta   = 0.0418;
+
+  const setCard = (id, val, sub, pct, corBar) => {
+    document.getElementById('akv-'+id).textContent = val;
+    document.getElementById('aks-'+id).textContent = sub;
+    const bar = document.getElementById('akbar-'+id);
+    bar.style.width = Math.min(Math.max(pct*100,0),100)+'%';
+    bar.style.background = corBar || pctColor(pct);
+  };
+
+  setCard('ggr',  fmtBRL(totGGR),
+    `Pro-rata: ${fmtBRL(metaGGR_pr)} · ${fmtPct(pGGR)} atingido · Meta: R$10M`,
+    pGGR, pctColor(pGGR));
+  setCard('tur',  fmtBRL(totTUR),
+    `Pro-rata: ${fmtBRL(metaTUR_pr)} · ${fmtPct(pTUR)} atingido`,
+    pTUR, '#4FC2FF');
+  setCard('hold', fmtPct(hold),
+    `Meta: ${fmtPct(holdMeta)} · ${hold >= holdMeta ? '✅ Acima' : '⚠️ Abaixo'} da meta`,
+    hold / holdMeta, hold >= holdMeta ? '#3EAA00' : '#FF5C6A');
+  setCard('proj', fmtBRL(projGGR),
+    `Meta mensal: R$10M · ${fmtPct(pProj)} projetado · ${diasDecorridos}/${diasMes} dias`,
+    pProj, pctColor(pProj));
+}
+
+function renderApostasMeta(d, periodo) {
+  const el = document.getElementById('apostas-meta-grid');
+  if (!el || !d || !periodo) return;
+
+  const ini = new Date(periodo.ini), fim = new Date(periodo.fim);
+  const diasDecorridos = Math.round((fim - ini) / 86400000) + 1;
+  const diasMes = new Date(fim.getFullYear(), fim.getMonth()+1, 0).getDate();
+  const PR = diasDecorridos / diasMes;
+
+  // Flatten categorias: extrai subs do Cassino + Loteria/Esporte como diretos
+  const catKeyMap = { 'Crash':'crash', 'Slot':'slot', 'Ao Vivo':'ao_vivo', 'Bingo':'bingo', 'Loteria':'loteria', 'Esporte':'esporte' };
+  const catData = {};
+  (d.categorias||[]).forEach(c => {
+    if (c.subs && c.subs.length) {
+      // Pai (ex: Cassino) → usa os subs individuais
+      c.subs.forEach(sub => {
+        const k = catKeyMap[sub.nome];
+        if (k) catData[k] = sub;
+      });
+    } else {
+      // Direto (Loteria, Esporte)
+      const k = catKeyMap[c.nome];
+      if (k) catData[k] = c;
+    }
+  });
+
+  let html = '';
+  Object.entries(META_CAT).forEach(([key, meta]) => {
+    const cat = catData[key] || {};
+    const aT  = cat.total?.apostado || 0;
+    const aG  = cat.total?.ggr      || 0;
+    const pT  = meta.metaT * PR, pG = meta.metaG * PR;
+    const rT  = pT > 0 ? aT/pT : 0, rG = pG > 0 ? aG/pG : 0;
+    const gapT= aT - pT, gapG = aG - pG;
+    const aH  = aT > 0 ? aG/aT : 0;
+    const dH  = aH - meta.holdTarget;
+    const hBadge = Math.abs(dH) < 0.003 ? ['#3D2A00','#FFC700','Hold na meta']
+                 : dH > 0               ? ['#1C4000','#3EAA00',`Hold +${fmtPct(dH)} acima`]
+                 :                        ['#3A0005','#FF5C6A',`Hold ${fmtPct(dH)} abaixo`];
+
+    html += `<div style="background:#00193A;border:1px solid #0075FF33;border-radius:10px;padding:16px">
+      <div style="font-size:16px;font-weight:800;color:${meta.cor};margin-bottom:12px">${meta.label}</div>
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+        <span style="font-size:12px;color:#516067">Turnover realizado</span>
+        <div style="text-align:right">
+          <div style="font-size:16px;font-weight:700;color:#F2F9F8">${fmtFull(aT)}</div>
+          <div style="font-size:11px;color:#516067">Pro-rata: ${fmtFull(pT)} · Meta: ${fmtBRL(meta.metaT)}</div>
+        </div>
+      </div>
+      <div style="height:4px;background:#01131E;border-radius:2px;margin:6px 0;overflow:hidden">
+        <div style="height:100%;border-radius:2px;background:${pctColor(rT)};width:${Math.min(rT*100,100)}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px">
+        <span style="font-weight:700;color:${pctColor(rT)}">${fmtPct(rT)} do pro-rata</span>
+        <span style="color:${gapColor(gapT)}">${gapT>=0?'+':''}${fmtFull(gapT)}</span>
+      </div>
+
+      <div style="height:1px;background:#0075FF22;margin:8px 0"></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-top:8px;margin-bottom:4px">
+        <span style="font-size:12px;color:#516067">GGR realizado</span>
+        <div style="text-align:right">
+          <div style="font-size:16px;font-weight:700;color:${aG>=0?'#3EAA00':'#FF5C6A'}">${fmtFull(aG)}</div>
+          <div style="font-size:11px;color:#516067">Pro-rata: ${fmtFull(pG)} · Meta: ${fmtBRL(meta.metaG)}</div>
+        </div>
+      </div>
+      <div style="height:4px;background:#01131E;border-radius:2px;margin:6px 0;overflow:hidden">
+        <div style="height:100%;border-radius:2px;background:${pctColor(rG)};width:${Math.min(Math.max(rG*100,0),100)}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px">
+        <span style="font-weight:700;color:${pctColor(rG)}">${fmtPct(rG)} do pro-rata</span>
+        <span style="color:${gapColor(gapG)}">${gapG>=0?'+':''}${fmtFull(gapG)}</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+        <span style="font-size:12px;color:#516067">Hold: <strong style="color:#F2F9F8">${fmtPct(aH)}</strong> · Meta: <strong style="color:#516067">${fmtPct(meta.holdTarget)}</strong></span>
+        <span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${hBadge[0]};color:${hBadge[1]}">${hBadge[2]}</span>
+      </div>
+    </div>`;
+  });
+
+  // Card total
+  const totT = (d.totais?.apostado||0), totG = (d.totais?.ggr||0);
+  const pTT = META_TUR_TOTAL*PR, pTG = META_GGR_TOTAL*PR;
+  const rTT = pTT>0?totT/pTT:0, rTG = pTG>0?totG/pTG:0;
+  html += `<div style="background:#00193A;border:2px solid #0075FF;border-radius:10px;padding:16px">
+    <div style="font-size:16px;font-weight:800;color:#4FC2FF;margin-bottom:12px">∑ TOTAL GERAL</div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+      <span style="color:#516067">Turnover total</span>
+      <span style="color:#F2F9F8;font-weight:700">${fmtFull(totT)}</span>
+    </div>
+    <div style="height:4px;background:#01131E;border-radius:2px;margin-bottom:8px;overflow:hidden">
+      <div style="height:100%;border-radius:2px;background:${pctColor(rTT)};width:${Math.min(rTT*100,100)}%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:12px">
+      <span style="color:${pctColor(rTT)};font-weight:700">${fmtPct(rTT)} atingido</span>
+      <span style="color:#516067">Meta: ${fmtBRL(META_TUR_TOTAL)}</span>
+    </div>
+    <div style="height:1px;background:#0075FF22;margin:8px 0"></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:8px;margin-bottom:4px">
+      <span style="color:#516067">GGR total</span>
+      <span style="color:${totG>=0?'#3EAA00':'#FF5C6A'};font-weight:700">${fmtFull(totG)}</span>
+    </div>
+    <div style="height:4px;background:#01131E;border-radius:2px;margin-bottom:8px;overflow:hidden">
+      <div style="height:100%;border-radius:2px;background:${pctColor(rTG)};width:${Math.min(Math.max(rTG*100,0),100)}%"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px">
+      <span style="color:${pctColor(rTG)};font-weight:700">${fmtPct(rTG)} atingido</span>
+      <span style="color:#516067">Meta: R$10M</span>
+    </div>
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+function renderApostasDiag(d) {
+  const el = document.getElementById('apostas-diag-grid');
+  if (!el || !d) return;
+
+  // Flatten: subs do Cassino + Loteria/Esporte diretos
+  const catKeyMap = { 'Crash':'crash', 'Slot':'slot', 'Ao Vivo':'ao_vivo', 'Bingo':'bingo', 'Loteria':'loteria', 'Esporte':'esporte' };
+  const flatCats = [];
+  (d.categorias||[]).forEach(c => {
+    if (c.subs && c.subs.length) {
+      c.subs.forEach(sub => { if (catKeyMap[sub.nome]) flatCats.push(sub); });
+    } else {
+      if (catKeyMap[c.nome]) flatCats.push(c);
+    }
+  });
+
+  // Category accent colors
+  const CAT_COLOR = {
+    crash: '#4FC2FF', slot: '#B9DC33', ao_vivo: '#AEA0EB',
+    bingo: '#4FC2FF', loteria: '#FFC700', esporte: '#ACDFB0',
+  };
+
+  // Max GGR for proportional bar widths
+  const maxGGR = Math.max(...flatCats.map(c => Math.abs(c.total?.ggr || 0)), 1);
+
+  let html = '';
+  flatCats.forEach(c => {
+    const key      = catKeyMap[c.nome];
+    const meta     = META_CAT[key];
+    const catColor = CAT_COLOR[key] || meta.cor;
+    const aT       = c.total?.apostado          || 0;
+    const aG       = c.total?.ggr               || 0;
+    const aRec     = c.total?.recompensas        || 0;
+    const aNGR     = aG - aRec;
+    const aNov     = c.novos?.apostadores        || 0;
+    const aRcJ     = c.recorrentes?.apostadores  || 0;
+    const aTotJog  = aNov + aRcJ;
+    const aH       = aT > 0 ? aG/aT : 0;
+    const dH       = aH - meta.holdTarget;
+    const barPct   = maxGGR > 0 ? Math.max(0, Math.abs(aG) / maxGGR * 100) : 0;
+
+    // Status badge
+    let bg, bord, badge, badgeBg, badgeC, statusDesc;
+    if (aG < 0) {
+      bg = '#1A0003'; bord = '#FF5C6A';
+      badge = '🚨 GGR Negativo'; badgeBg = '#3A0005'; badgeC = '#FF5C6A';
+      statusDesc = 'Revisar concentração e limites.';
+    } else if (dH < -0.005) {
+      bg = '#1A0800'; bord = '#FF8100';
+      badge = '⚠️ Hold Baixo'; badgeBg = '#3A1800'; badgeC = '#FF8100';
+      statusDesc = 'Margem abaixo do esperado.';
+    } else if (dH > 0.005) {
+      bg = '#021A08'; bord = '#3EAA00';
+      badge = '✅ Hold Acima'; badgeBg = '#1C4000'; badgeC = '#3EAA00';
+      statusDesc = 'Performando acima da meta.';
+    } else {
+      bg = '#00193A'; bord = catColor;
+      badge = '✅ Na Meta'; badgeBg = '#001A3A'; badgeC = catColor;
+      statusDesc = 'Dentro do esperado.';
+    }
+
+    html += `<div style="background:${bg};border:1px solid ${bord}44;border-top:3px solid ${catColor};border-radius:10px;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:15px;font-weight:800;color:#F2F9F8">${meta.label}</div>
+        <span style="padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700;background:${badgeBg};color:${badgeC};white-space:nowrap">${badge}</span>
+      </div>
+      <div style="font-size:22px;font-weight:900;color:${aG>=0?catColor:'#FF5C6A'};margin-bottom:4px">${fmtFull(aG)}</div>
+      <div style="height:5px;background:#0f172a;border-radius:3px;margin-bottom:12px;overflow:hidden">
+        <div style="height:100%;border-radius:3px;background:${aG>=0?catColor:'#FF5C6A'};width:${barPct.toFixed(1)}%;transition:width .4s"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-bottom:8px">
+        <div style="font-size:11px;color:#516067">Turnover
+          <div style="font-size:13px;font-weight:700;color:#4FC2FF">${fmtBRL(aT)}</div>
+        </div>
+        <div style="font-size:11px;color:#516067">GGR%
+          <div style="font-size:13px;font-weight:700;color:${aH>=meta.holdTarget?'#3EAA00':'#FF8100'}">${fmtPct(aH)} <span style="font-size:10px;color:#516067">meta ${fmtPct(meta.holdTarget)}</span></div>
+        </div>
+        <div style="font-size:11px;color:#516067">Apostadores
+          <div style="font-size:13px;font-weight:700;color:#D7DFE0">${aTotJog.toLocaleString('pt-BR')}</div>
+        </div>
+        <div style="font-size:11px;color:#516067">NGR est.
+          <div style="font-size:13px;font-weight:700;color:${aNGR>=0?'#CFFF6A':'#FF5C6A'}">${fmtBRL(aNGR)}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#879397;border-top:1px solid #0075FF22;padding-top:6px">${statusDesc}</div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════
+// ABA FRENTES DE JOGADORES
+// ═══════════════════════════════════════════════════════════
+let _frentesData = null;
+let _frentesResumo = null;
+
+async function loadFrentes(force=false) {
+  const data = document.getElementById('filter-data').value;
+  const ini  = document.getElementById('filter-ini')?.value || '';
+  const fim  = document.getElementById('filter-fim')?.value || '';
+  const dailyWrap = document.getElementById('frentes-daily-cards');
+  const btn = document.getElementById('refresh-btn');
+
+  if (dailyWrap) dailyWrap.innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:#475569;background:#00193A;border:1px solid #0075FF33;border-radius:10px;font-size:14px"><div style="display:inline-block;width:22px;height:22px;border:2px solid #0a3a55;border-top-color:#0075FF;border-radius:50%;animation:spin .7s linear infinite;margin-bottom:8px"></div><br>Carregando dados por frente...</div>';
+  if (btn) { btn.classList.add('spinning'); btn.disabled = true; }
+  const loaderFrentes = document.getElementById('loader-frentes');
+  if (loaderFrentes) loaderFrentes.style.display = 'flex';
+
+  const params = new URLSearchParams({ data, ini, fim, novos_only: 1, force: force?1:0 });
+  try {
+    const json = await fetch('/api/frentes_diario?'+params).then(r=>r.json());
+    if (!json.ok) throw new Error(json.error || 'resposta inválida');
+    _frentesData = json.data;
+    _frentesResumo = json.data?.resumo || null;
+    const p = json.periodo || json.data?.periodo || {};
+    document.getElementById('frentes-periodo').textContent = `${p.ini||''} → ${p.fim||''}`;
+    renderFrentes(json.data, p);
+  } catch(e) {
+    console.error('Frentes error:', e);
+    if (dailyWrap) dailyWrap.innerHTML = `<div style="grid-column:1/-1;padding:24px;text-align:center;color:#FF5C6A;background:#00193A;border:1px solid #FF5C6A;border-radius:10px;font-size:14px">Erro ao carregar: ${e.message}</div>`;
+  } finally {
+    if (btn) { btn.classList.remove('spinning'); btn.disabled = false; }
+    const loaderFrentesF = document.getElementById('loader-frentes');
+    if (loaderFrentesF) loaderFrentesF.style.display = 'none';
+  }
+}
+
+function renderFrentes(data, periodo) {
+  const dias    = data.dias || [];
+  const FRENTES = ['Tráfego','App','Mídias','Resultado Fácil','Orgânico','Afiliados'];
+  const kpiWrap   = document.getElementById('frentes-kpi-cards');
+  const dailyWrap = document.getElementById('frentes-daily-cards');
+  const metaWrap  = document.getElementById('frentes-meta-grid');
+
+  if (!dias.length) {
+    if (dailyWrap) dailyWrap.innerHTML = '<div style="grid-column:1/-1;padding:24px;text-align:center;color:#475569;background:#00193A;border:1px solid #0075FF33;border-radius:10px">Nenhum dado encontrado</div>';
+    if (kpiWrap)  kpiWrap.innerHTML  = '';
+    if (metaWrap) metaWrap.innerHTML = '';
+    return;
+  }
+
+  // ── TOTAIS POR FRENTE ──
+  const totais = {};
+  FRENTES.forEach(f => { totais[f] = {ggr:0, dep:0, turn:0, jog:0}; });
+  totais['_total'] = {ggr:0, dep:0, turn:0, jog:0};
+  dias.forEach(d => {
+    FRENTES.forEach(f => {
+      const v = d[f] || {ggr:0, depositos:0, turnover:0, jogadores:0};
+      totais[f].ggr  += v.ggr||0;
+      totais[f].dep  += v.depositos||0;
+      totais[f].turn += v.turnover||0;
+      totais[f].jog  += v.jogadores||0;
+    });
+    totais['_total'].ggr  += d.total?.ggr||0;
+    totais['_total'].dep  += d.total?.depositos||0;
+    totais['_total'].turn += d.total?.turnover||0;
+    totais['_total'].jog  += d.total?.jogadores||0;
+  });
+  const totalGGR = totais['_total'].ggr;
+
+  // ── TABELA RESUMO POR FRENTE (Depósito + Turnover + GGR + novos cols) ──
+  const resumoWrap = document.getElementById('frentes-resumo-table');
+  if (resumoWrap) {
+    const FRENTERows = FRENTES.map(f => {
+      const m  = META_FRENTE[f] || {cor:'#4FC2FF', label:f};
+      const t  = totais[f];
+      const gC = t.ggr >= 0 ? '#CFFF6A' : '#ef4444';
+      const shr = totalGGR !== 0 ? (t.ggr/totalGGR*100).toFixed(1) : '0.0';
+      const ftdCount = _frentesResumo?.[f]?.ftd_count ?? t.jog;
+      const pctGGRDep = t.dep > 0 ? (t.ggr/t.dep*100).toFixed(1)+'%' : '—';
+      const pctGGRApo = t.turn > 0 ? (t.ggr/t.turn*100).toFixed(1)+'%' : '—';
+      const giro = t.dep > 0 ? (t.turn/t.dep).toFixed(2)+'x' : '—';
+      return `<tr style="border-bottom:1px solid #0075FF10">
+        <td style="padding:8px 14px;color:${m.cor};font-weight:700">${m.label}</td>
+        <td style="padding:8px 12px;text-align:right;color:#4FC2FF;font-weight:700">${(ftdCount||0).toLocaleString('pt-BR')}</td>
+        <td style="padding:8px 12px;text-align:right;color:#B0D8B3">${fmtBRL(t.dep)}</td>
+        <td style="padding:8px 12px;text-align:right;color:#FFC700">${fmtBRL(t.turn)}</td>
+        <td style="padding:8px 12px;text-align:right;color:${gC};font-weight:700">${fmtBRL(t.ggr)}</td>
+        <td style="padding:8px 12px;text-align:right;color:#516067;font-size:11px">${pctGGRDep}</td>
+        <td style="padding:8px 12px;text-align:right;color:#516067;font-size:11px">${pctGGRApo}</td>
+        <td style="padding:8px 12px;text-align:right;color:#879397;font-size:11px">${giro}</td>
+      </tr>`;
+    }).join('');
+    const tot = totais['_total'];
+    const totPctGGRDep = tot.dep > 0 ? (tot.ggr/tot.dep*100).toFixed(1)+'%' : '—';
+    const totPctGGRApo = tot.turn > 0 ? (tot.ggr/tot.turn*100).toFixed(1)+'%' : '—';
+    const totGiro = tot.dep > 0 ? (tot.turn/tot.dep).toFixed(2)+'x' : '—';
+    const totFtd = FRENTES.reduce((s,f) => s + (_frentesResumo?.[f]?.ftd_count ?? totais[f].jog ?? 0), 0);
+    resumoWrap.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr>
+          <th style="background:#001A30;color:#4FC2FF;padding:8px 14px;text-align:left;font-size:11px;font-weight:700">FRENTE</th>
+          <th style="background:#001A30;color:#4FC2FF;padding:8px 12px;text-align:right;font-size:11px;font-weight:700">FTDs</th>
+          <th style="background:#001A30;color:#3EAA00;padding:8px 12px;text-align:right;font-size:11px;font-weight:700">DEPÓSITO</th>
+          <th style="background:#001A30;color:#FFC700;padding:8px 12px;text-align:right;font-size:11px;font-weight:700">TURNOVER</th>
+          <th style="background:#001A30;color:#CFFF6A;padding:8px 12px;text-align:right;font-size:11px;font-weight:700">GGR</th>
+          <th style="background:#001A30;color:#516067;padding:8px 12px;text-align:right;font-size:11px;font-weight:700">% GGR/Dep</th>
+          <th style="background:#001A30;color:#516067;padding:8px 12px;text-align:right;font-size:11px;font-weight:700">% GGR/Apo</th>
+          <th style="background:#001A30;color:#879397;padding:8px 12px;text-align:right;font-size:11px;font-weight:700">Giro</th>
+        </tr>
+      </thead>
+      <tbody style="background:#00193A">
+        ${FRENTERows}
+        <tr style="background:#00243A;font-weight:700">
+          <td style="padding:8px 14px;color:#fff">TOTAL</td>
+          <td style="padding:8px 12px;text-align:right;color:#4FC2FF">${totFtd.toLocaleString('pt-BR')}</td>
+          <td style="padding:8px 12px;text-align:right;color:#B0D8B3">${fmtBRL(tot.dep)}</td>
+          <td style="padding:8px 12px;text-align:right;color:#FFC700">${fmtBRL(tot.turn)}</td>
+          <td style="padding:8px 12px;text-align:right;color:#CFFF6A">${fmtBRL(tot.ggr)}</td>
+          <td style="padding:8px 12px;text-align:right;color:#516067">${totPctGGRDep}</td>
+          <td style="padding:8px 12px;text-align:right;color:#516067">${totPctGGRApo}</td>
+          <td style="padding:8px 12px;text-align:right;color:#879397">${totGiro}</td>
+        </tr>
+      </tbody>
+    </table>`;
+  }
+
+  // ── PRO-RATA ──
+  const ini = new Date(periodo.ini), fim = new Date(periodo.fim);
+  const diasDec = Math.round((fim-ini)/86400000)+1;
+  const diasMes = new Date(fim.getFullYear(), fim.getMonth()+1, 0).getDate();
+  const PR = diasDec / diasMes;
+
+  // ── CARDS DE RESUMO (topo) ──
+  let cardsHtml = '';
+  FRENTES.forEach(f => {
+    const m   = META_FRENTE[f] || {metaG:0, cor:'#4FC2FF', bg:'#00193A', border:'#0075FF33', label:f};
+    const t   = totais[f];
+    const gC  = t.ggr >= 0 ? m.cor : '#FF5C6A';
+    const shr = totalGGR !== 0 ? (t.ggr/totalGGR*100).toFixed(1) : '0.0';
+    cardsHtml += `<div style="background:${m.bg};border:1px solid ${m.border};border-radius:10px;padding:12px 14px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:${m.cor};margin-bottom:4px">${m.label}</div>
+      <div style="font-size:18px;font-weight:900;color:${gC}">${fmtBRL(t.ggr)}</div>
+      <div style="font-size:11px;color:#516067;margin-top:3px">${(t.jog||0).toLocaleString('pt-BR')} jog. únicos</div>
+      <div style="font-size:11px;color:${m.cor};margin-top:1px">${shr}% do GGR total</div>
+    </div>`;
+  });
+  if (kpiWrap) kpiWrap.innerHTML = cardsHtml;
+
+  // ── CARDS DIÁRIOS POR FRENTE (substitui a tabela gigante) ──
+  const DIAS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  let dailyHtml = '';
+  FRENTES.forEach(f => {
+    const m   = META_FRENTE[f] || {metaG:0, cor:'#4FC2FF', bg:'#00193A', border:'#0075FF33', label:f};
+    const t   = totais[f];
+    const pr  = m.metaG * PR;
+    const r   = pr > 0 ? t.ggr/pr : 0;
+    const gap = t.ggr - pr;
+    const gC  = t.ggr >= 0 ? m.cor : '#FF5C6A';
+
+    let rowsHtml = `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0 5px;border-bottom:2px solid #0075FF22;font-size:9px;font-weight:700;color:#516067;text-transform:uppercase;letter-spacing:.5px">
+      <span style="min-width:60px;flex-shrink:0">DATA</span>
+      <span style="text-align:right;flex:1;margin-right:6px;color:#B0D8B3">DEP</span>
+      <span style="text-align:right;flex:1;margin-right:6px;color:#FFC700">TURN</span>
+      <span style="min-width:60px;text-align:right;color:#CFFF6A">GGR</span>
+    </div>`;
+    dias.forEach(d => {
+      const v   = d[f] || {ggr:0, jogadores:0};
+      const dt  = new Date(d.data+'T12:00:00');
+      const dia = DIAS_PT[dt.getDay()];
+      const p   = d.data.split('-');
+      const gc  = (v.ggr||0) >= 0 ? m.cor : '#FF5C6A';
+      rowsHtml += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #0a1929;font-size:11px">
+        <span style="color:#879397;min-width:60px;flex-shrink:0">${p[2]}/${p[1]} <span style="color:#516067;font-size:10px">${dia}</span></span>
+        <span style="color:#B0D8B3;text-align:right;flex:1;margin-right:6px">${fmtK(v.depositos||0)}</span>
+        <span style="color:#FFC700;text-align:right;flex:1;margin-right:6px">${fmtK(v.turnover||0)}</span>
+        <span style="font-weight:700;color:${gc};min-width:60px;text-align:right">${fmtFull(v.ggr||0)}</span>
+      </div>`;
+    });
+
+    dailyHtml += `<div style="background:#00193A;border:1px solid ${m.border};border-top:3px solid ${m.cor};border-radius:10px;padding:14px 16px;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px">
+        <span style="font-size:13px;font-weight:800;color:${m.cor}">${m.label}</span>
+        <span style="font-size:16px;font-weight:900;color:${gC}">${fmtBRL(t.ggr)}</span>
+      </div>
+      <div style="font-size:10px;color:#516067;margin-bottom:8px">${(t.jog||0).toLocaleString('pt-BR')} jog. únicos · Dep: ${fmtK(t.dep)} · Turn: ${fmtK(t.turn)}</div>
+      <div style="max-height:300px;overflow-y:auto">${rowsHtml}</div>
+      <div style="border-top:2px solid #0075FF22;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:10px;color:#516067">Meta pro-rata: <strong style="color:#D7DFE0">${m.metaG>0?fmtFull(pr):'—'}</strong></span>
+        ${m.metaG>0?`<span style="font-size:11px;font-weight:700;color:${gap>=0?'#3EAA00':'#FF5C6A'}">${gap>=0?'+':''}${fmtBRL(gap)} · ${fmtPct(r)}</span>`:''}
+      </div>
+    </div>`;
+  });
+  if (dailyWrap) dailyWrap.innerHTML = dailyHtml;
+
+  // ── CARDS META POR FRENTE ──
+  let metaHtml = '';
+  FRENTES.forEach(f => {
+    const m   = META_FRENTE[f] || {metaG:0, cor:'#4FC2FF', bg:'#00193A', border:'#0075FF33', label:f};
+    const t   = totais[f];
+    const pr  = m.metaG * PR;
+    const r   = pr > 0 ? t.ggr/pr : 0;
+    const gap = t.ggr - pr;
+    const gc  = t.ggr >= 0 ? m.cor : '#FF5C6A';
+
+    metaHtml += `<div style="background:${m.bg};border:1px solid ${m.border};border-radius:10px;padding:16px">
+      <div style="font-size:14px;font-weight:800;color:${m.cor};margin-bottom:10px">${m.label}</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px;color:#516067">GGR realizado</span>
+        <span style="font-size:16px;font-weight:700;color:${gc}">${fmtFull(t.ggr)}</span>
+      </div>
+      <div style="height:4px;background:#01131E;border-radius:2px;margin-bottom:6px;overflow:hidden">
+        <div style="height:100%;border-radius:2px;background:${pctColor(r)};width:${Math.min(Math.max(r*100,0),100)}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px">
+        <span style="color:${pctColor(r)};font-weight:700">${fmtPct(r)} do pro-rata</span>
+        <span style="color:${gapColor(gap)}">${gap>=0?'+':''}${fmtFull(gap)}</span>
+      </div>
+      <div style="font-size:11px;color:#516067">Pro-rata: ${fmtFull(pr)} · Meta: ${fmtBRL(m.metaG)} · ${diasDec}/${diasMes} dias</div>
+    </div>`;
+  });
+  if (metaWrap) metaWrap.innerHTML = metaHtml;
+}
+
+// ─── FILTRAR — só afeta a aba atual ───
+function filtrarAbaAtual() {
+  saveFilterState(currentTab);   // persiste os filtros desta aba
+  tabLoaded[currentTab] = true;  // marca como carregada
+  if (currentTab === 'tab-apostas') { loadApostas(true); loadApostasDiario(true); loadLoteria(true); }
+  else if (currentTab === 'tab-frentes') { loadFrentes(true); }
+  else if (currentTab === 'tab-trafego') { loadTrafego(true); loadFunil(true); loadTrafegoDiario(true); }
+  else if (currentTab === 'tab-coorte')  { loadCoorte(true); }
+  else if (currentTab === 'tab-funil-aq') {
+    loadFunilJornada(true); loadFunilJornadaDiario(true); loadFunilAtrito(true); loadFunilTempo(true);
+  }
+  else { loadGeral(true); loadGeralCharts(true); loadFunilCad(true); loadFunilAq(true); }
+}
+
+// ─── TRÁFEGO PAGO ───────────────────────────────────────────────
+const PLAT_COLORS = {
+  'META':      '#1877F2',
+  'INSTAGRAM': '#E1306C',
+  'GOOGLE 1':  '#4285F4',
+  'GOOGLE 2':  '#EA4335',
+  'KWAI':      '#FF4343',
+  'TIKTOK':    '#69C9D0',
+  'APP':       '#3EAA00',
+  'DV360':     '#00BCD4',
+  'RMKT':      '#94a3b8',
+};
+const PLAT_ICONS = {
+  'META':'📘','INSTAGRAM':'📸','GOOGLE 1':'🔵','GOOGLE 2':'🔴',
+  'KWAI':'🎬','TIKTOK':'🎵','APP':'📱','DV360':'📺','RMKT':'🔁',
+};
+const TRAFEGO_ORDER = ['META','INSTAGRAM','GOOGLE 1','GOOGLE 2','KWAI','TIKTOK','APP','DV360','RMKT'];
+
+let _trafegoData   = null;   // cache dos dados brutos
+let _funilData     = null;   // cache do funil (para CADASTROS na tabela de plataforma)
+let _trafegoVista  = 'novos'; // 'novos' | 'recorrentes' | 'total'
+
+function setTrafegoVista(vista) {
+  _trafegoVista = vista;
+  ['novos','recorrentes','total'].forEach(v => {
+    const btn = document.getElementById('btn-'+v);
+    if (!btn) return;
+    btn.style.background = v === vista ? '#0075FF' : 'transparent';
+    btn.style.color      = v === vista ? '#fff'    : '#516067';
+  });
+  const thFtd = document.getElementById('th-ftd-label');
+  if (thFtd) thFtd.textContent = vista === 'recorrentes' ? 'JOGADORES' : 'FTD';
+  if (_trafegoData) renderTrafegoTabela(_trafegoData);
+}
+
+function _getVistaData(plataformas, plat) {
+  const p = plataformas[plat] || {};
+  if (_trafegoVista === 'novos')       return (p.novos       || {}).total || {};
+  if (_trafegoVista === 'recorrentes') return (p.recorrentes || {}).total || {};
+  // total: soma novos + recorrentes
+  const n = (p.novos       || {}).total || {};
+  const r = (p.recorrentes || {}).total || {};
+  return {
+    ftd:         (n.ftd         || 0),
+    jogadores:   (n.jogadores   || 0) + (r.jogadores   || 0),
+    depositos:   (n.depositos   || 0) + (r.depositos   || 0),
+    qtd_dep:     (n.qtd_dep     || 0) + (r.qtd_dep     || 0),
+    ggr:         (n.ggr         || 0) + (r.ggr         || 0),
+    recompensas: (n.recompensas || 0) + (r.recompensas || 0),
+    ngr:         (n.ngr         || 0) + (r.ngr         || 0),
+    tm_dep:      ((n.qtd_dep||0)+(r.qtd_dep||0)) > 0
+                   ? ((n.depositos||0)+(r.depositos||0)) / ((n.qtd_dep||0)+(r.qtd_dep||0)) : 0,
+    ltv_ftd:     n.ltv_ftd || 0,
+  };
+}
+
+function renderTrafegoTabela(plataformas) {
+  const tbody = document.getElementById('trafego-body');
+  const totals = { ftd:0, jogadores:0, depositos:0, qtd_dep:0, ggr:0, recompensas:0, ngr:0, cadastros:0 };
+
+  // KPI cards — sempre usa novos p/ FTD, recorrentes p/ jogadores rec, total p/ GGR
+  let tot_ftd=0, tot_rec_jog=0, tot_ggr=0, tot_dep_novos=0;
+  TRAFEGO_ORDER.forEach(plat => {
+    const p  = plataformas[plat] || {};
+    const n  = (p.novos       || {}).total || {};
+    const r  = (p.recorrentes || {}).total || {};
+    tot_ftd     += n.ftd       || 0;
+    tot_rec_jog += r.jogadores || 0;
+    tot_ggr     += (n.ggr || 0) + (r.ggr || 0);
+    tot_dep_novos += n.depositos || 0;
+  });
+  document.getElementById('tr-ftd').textContent     = num(tot_ftd)     || '—';
+  document.getElementById('tr-rec-jog').textContent = num(tot_rec_jog) || '—';
+  document.getElementById('tr-ggr').textContent     = brl(tot_ggr)     || '—';
+  const ltv = tot_ftd > 0 ? tot_dep_novos / tot_ftd : 0;
+  document.getElementById('tr-ltv').textContent     = ltv ? brl(ltv)   : '—';
+
+  const rows = TRAFEGO_ORDER.map(plat => {
+    const d      = _getVistaData(plataformas, plat);
+    const color  = PLAT_COLORS[plat] || '#4FC2FF';
+    const icon   = PLAT_ICONS[plat]  || '📌';
+    const ltv_p  = (d.ftd||0) > 0 ? (d.ggr||0) / d.ftd : 0;
+    ['ftd','jogadores','depositos','qtd_dep','ggr','recompensas','ngr'].forEach(k => {
+      totals[k] = (totals[k]||0) + (d[k]||0);
+    });
+    const cadastros = (_funilData && _funilData[plat]) ? (_funilData[plat].cadastro || 0) : 0;
+    totals.cadastros = (totals.cadastros||0) + cadastros;
+    const ftdCell = _trafegoVista === 'recorrentes'
+      ? `<td style="padding:10px 12px;text-align:right;background:#001A00;color:#B0D8B3">${num(d.jogadores)||'—'}</td>`
+      : `<td style="padding:10px 12px;text-align:right;background:#001A00;color:#3EAA00;font-weight:700">${num(d.ftd)||'—'}</td>`;
+    return `<tr style="border-bottom:1px solid #0075FF18">
+      <td style="padding:10px 16px;background:#00193A">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:8px"></span>
+        <span style="color:${color};font-weight:700">${icon} ${plat}</span>
+      </td>
+      <td style="padding:10px 12px;text-align:right;background:#00193A;color:#516067">—</td>
+      <td style="padding:10px 12px;text-align:right;background:#00193A;color:#4FC2FF">${cadastros > 0 ? num(cadastros) : '—'}</td>
+      ${ftdCell}
+      <td style="padding:10px 12px;text-align:right;background:#001A00;color:#B0D8B3">${num(d.jogadores)||'—'}</td>
+      <td style="padding:10px 12px;text-align:right;background:#001A00;color:#B0D8B3">${brl(d.depositos)||'—'}</td>
+      <td style="padding:10px 12px;text-align:right;background:#0A1F00;color:#CFFF6A;font-weight:700">${brl(d.ggr)||'—'}</td>
+      <td style="padding:10px 12px;text-align:right;background:#1E1500;color:#FFC700">${brl(d.recompensas)||'—'}</td>
+      <td style="padding:10px 12px;text-align:right;background:#0A1F00;color:#C4F08A">${brl(d.ngr)||'—'}</td>
+      <td style="padding:10px 12px;text-align:right;background:#001038;color:#4FC2FF">${ltv_p ? brl(ltv_p) : '—'}</td>
+      <td style="padding:10px 12px;text-align:right;background:#001038;color:#4FC2FF">${d.tm_dep ? brl(d.tm_dep) : '—'}</td>
+      <td style="padding:10px 12px;text-align:right;background:#111;color:#516067">—</td>
+      <td style="padding:10px 12px;text-align:right;background:#111;color:#516067">—</td>
+    </tr>`;
+  });
+
+  const lt2 = totals.ftd > 0 ? totals.ggr / totals.ftd : 0;
+  const tm2 = totals.qtd_dep > 0 ? totals.depositos / totals.qtd_dep : 0;
+  const totalFtdCell = _trafegoVista === 'recorrentes'
+    ? `<td style="padding:10px 12px;text-align:right;color:#B0D8B3">${num(totals.jogadores)||'—'}</td>`
+    : `<td style="padding:10px 12px;text-align:right;color:#3EAA00">${num(totals.ftd)||'—'}</td>`;
+  rows.push(`<tr style="background:#00243A;font-weight:700;font-size:13px">
+    <td style="padding:10px 16px;color:#fff">TOTAL</td>
+    <td style="padding:10px 12px;text-align:right;color:#516067">—</td>
+    <td style="padding:10px 12px;text-align:right;color:#4FC2FF">${totals.cadastros > 0 ? num(totals.cadastros) : '—'}</td>
+    ${totalFtdCell}
+    <td style="padding:10px 12px;text-align:right;color:#B0D8B3">${num(totals.jogadores)||'—'}</td>
+    <td style="padding:10px 12px;text-align:right;color:#B0D8B3">${brl(totals.depositos)||'—'}</td>
+    <td style="padding:10px 12px;text-align:right;color:#CFFF6A">${brl(totals.ggr)||'—'}</td>
+    <td style="padding:10px 12px;text-align:right;color:#FFC700">${brl(totals.recompensas)||'—'}</td>
+    <td style="padding:10px 12px;text-align:right;color:#C4F08A">${brl(totals.ngr)||'—'}</td>
+    <td style="padding:10px 12px;text-align:right;color:#4FC2FF">${lt2 ? brl(lt2) : '—'}</td>
+    <td style="padding:10px 12px;text-align:right;color:#4FC2FF">${tm2 ? brl(tm2) : '—'}</td>
+    <td style="padding:10px 12px;text-align:right;color:#516067">—</td>
+    <td style="padding:10px 12px;text-align:right;color:#516067">—</td>
+  </tr>`);
+  tbody.innerHTML = rows.join('');
+}
+
+async function loadTrafego(force = false) {
+  const data = document.getElementById('filter-data').value;
+  const ini  = document.getElementById('filter-ini')?.value  || '';
+  const fim  = document.getElementById('filter-fim')?.value  || '';
+  const params = new URLSearchParams({ data, ini, fim, force: force ? 1 : 0 });
+
+  document.getElementById('trafego-loader').style.display = 'flex';
+  document.getElementById('trafego-body').innerHTML =
+    '<tr><td colspan="13" style="padding:28px;text-align:center;color:#475569;background:#00193A">Carregando...</td></tr>';
+
+  try {
+    const res  = await fetch(`/api/trafego_pago?${params}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Erro no servidor');
+
+    _trafegoData = (json.data || {}).plataformas || {};
+    const per    = json.periodo || {};
+
+    const pel = document.getElementById('trafego-periodo');
+    if (pel && per.ini) pel.textContent = `📅 ${per.ini} → ${per.fim}`;
+
+    renderTrafegoTabela(_trafegoData);
+    loadTrafegoDiario(force);
+
+  } catch(e) {
+    document.getElementById('trafego-body').innerHTML =
+      `<tr><td colspan="13" style="padding:20px;text-align:center;color:#ef4444">${e.message}</td></tr>`;
+  } finally {
+    document.getElementById('trafego-loader').style.display = 'none';
+  }
+}
+
+async function loadFunil(force = false) {
+  const data = document.getElementById('filter-data').value;
+  const ini  = document.getElementById('filter-ini')?.value  || '';
+  const fim  = document.getElementById('filter-fim')?.value  || '';
+  const params = new URLSearchParams({ data, ini, fim, force: force ? 1 : 0 });
+  const lbl = document.getElementById('funil-loading');
+  if (lbl) lbl.textContent = 'calculando...';
+
+  try {
+    const res  = await fetch(`/api/funil_trafego?${params}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    if (lbl) lbl.textContent = json.cache ? '(cache)' : '';
+    renderFunil((json.data || {}).funil || {});
+  } catch(e) {
+    document.getElementById('funil-wrap').innerHTML =
+      `<div style="padding:14px;color:#ef4444;background:#00193A;border-radius:10px">${e.message}</div>`;
+    if (lbl) lbl.textContent = '';
+  }
+}
+
+function renderFunil(funil) {
+  _funilData = funil;
+  const wrap = document.getElementById('funil-wrap');
+  const STEPS = [
+    { key:'cadastro', label:'CADASTRO',     color:'#4FC2FF' },
+    { key:'kyc',      label:'KYC',          color:'#a78bfa' },
+    { key:'ftd',      label:'FTD',          color:'#3EAA00' },
+    { key:'ftd_lot',  label:'FTD LOT.',     color:'#FFC700' },
+    { key:'std',      label:'2° DEP',       color:'#34d399' },
+    { key:'ttd',      label:'3° DEP',       color:'#34d399' },
+    { key:'dep4',     label:'4° DEP',       color:'#34d399' },
+    { key:'dep5',     label:'5° DEP',       color:'#34d399' },
+    { key:'dep6',     label:'6° DEP',       color:'#34d399' },
+    { key:'rec',      label:'REC (7°+)',     color:'#f59e0b' },
+  ];
+
+  let thSteps = STEPS.map(s =>
+    `<th style="background:#001A30;color:${s.color};padding:8px 10px;text-align:right;font-size:10px;font-weight:700;white-space:nowrap">${s.label}</th>`
+  ).join('');
+
+  const rowHtml = TRAFEGO_ORDER.map(plat => {
+    const d     = funil[plat] || {};
+    const color = PLAT_COLORS[plat] || '#4FC2FF';
+    const icon  = PLAT_ICONS[plat]  || '📌';
+    const cad   = d.cadastro || 0;
+
+    const ftdV = d.ftd || 0;
+    const cadV = d.cadastro || 0;
+    const cells = STEPS.map((s, i) => {
+      const v    = d[s.key] || 0;
+      const prevV = i > 0 ? (d[STEPS[i-1].key] || 0) : 0;
+      let pctHtml = '';
+      if (i === 2 && cadV > 0) {
+        pctHtml = ` <span style="font-size:10px;color:#3EAA00">${(v/cadV*100).toFixed(0)}%</span>`;
+      } else if (i > 2 && ftdV > 0) {
+        const pctFtd  = (v/ftdV*100).toFixed(0);
+        const pctPrev = prevV > 0 ? (v/prevV*100).toFixed(0) : '—';
+        pctHtml = ` <span style="font-size:9px;color:#516067">${pctFtd}%</span>`
+                 + ` <span style="font-size:9px;color:#334155">(${pctPrev}%↑)</span>`;
+      }
+      return `<td style="padding:7px 10px;text-align:right;color:${s.color};border-bottom:1px solid #0075FF10">${v > 0 ? num(v) : '—'}${pctHtml}</td>`;
+    }).join('');
+
+    return `<tr>
+      <td style="padding:8px 14px;background:#00193A;border-bottom:1px solid #0075FF10">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${color};margin-right:7px"></span>
+        <span style="color:${color};font-weight:700;font-size:13px">${icon} ${plat}</span>
+      </td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  // Linha TOTAL
+  const tots = {};
+  STEPS.forEach(s => {
+    tots[s.key] = TRAFEGO_ORDER.reduce((sum, p) => sum + ((funil[p] || {})[s.key] || 0), 0);
+  });
+  const totFtdV = tots.ftd || 0;
+  const totCadV = tots.cadastro || 0;
+  const totCells = STEPS.map((s, i) => {
+    const v = tots[s.key] || 0;
+    const prevV = i > 0 ? (tots[STEPS[i-1].key] || 0) : 0;
+    let pctHtml = '';
+    if (i === 2 && totCadV > 0) {
+      pctHtml = ` <span style="font-size:10px;color:#3EAA00">${(v/totCadV*100).toFixed(0)}%</span>`;
+    } else if (i > 2 && totFtdV > 0) {
+      const pctFtd  = (v/totFtdV*100).toFixed(0);
+      const pctPrev = prevV > 0 ? (v/prevV*100).toFixed(0) : '—';
+      pctHtml = ` <span style="font-size:9px;color:#94a3b8">${pctFtd}%</span>`
+               + ` <span style="font-size:9px;color:#334155">(${pctPrev}%↑)</span>`;
+    }
+    return `<td style="padding:7px 10px;text-align:right;color:${s.color};font-weight:700">${v > 0 ? num(v) : '—'}${pctHtml}</td>`;
+  }).join('');
+
+  wrap.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap">
+    <thead>
+      <tr>
+        <th style="background:#001A30;color:#4FC2FF;padding:8px 14px;text-align:left;font-size:11px;font-weight:700">PLATAFORMA</th>
+        ${thSteps}
+      </tr>
+    </thead>
+    <tbody style="background:#00193A">
+      ${rowHtml}
+      <tr style="background:#00243A;font-weight:700">
+        <td style="padding:8px 14px;color:#fff">TOTAL</td>
+        ${totCells}
+      </tr>
+    </tbody>
+  </table>`;
+}
+
+async function loadTrafegoDiario(force = false) {
+  const wrap = document.getElementById('trafego-diario-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="padding:20px;color:#475569;text-align:center">Carregando...</div>';
+
+  const {data, ini, fim} = getCurrentFilters();
+  try {
+    const resp = await fetch(`/api/trafego_diario?data=${data}&ini=${ini}&fim=${fim}` + (force ? '&force=1' : ''));
+    const json = await resp.json();
+    if (!json.ok || !json.data) { wrap.innerHTML = '<div style="padding:20px;color:#475569">Sem dados.</div>'; return; }
+    renderTrafegoDiario(json.data);
+  } catch(e) { wrap.innerHTML = '<div style="padding:20px;color:#ef4444">Erro ao carregar.</div>'; }
+}
+
+const PLAT_ORDER_TRAFEGO = ['META','INSTAGRAM','GOOGLE 1','GOOGLE 2','KWAI','TIKTOK','APP','DV360','RMKT'];
+
+function renderTrafegoDiario(data) {
+  const wrap = document.getElementById('trafego-diario-wrap');
+  if (!wrap) return;
+
+  const dates = Object.keys(data).sort().reverse();
+  if (!dates.length) { wrap.innerHTML = '<div style="padding:20px;color:#475569">Sem dados.</div>'; return; }
+
+  const thStyle = 'background:#00243A;padding:7px 10px;font-size:11px;font-weight:700;white-space:nowrap;border-bottom:1px solid #0075FF33;color:#94a3b8';
+  const thead = `<thead><tr>
+    <th style="${thStyle};text-align:left;color:#4FC2FF">Data</th>
+    <th style="${thStyle};text-align:left;color:#4FC2FF">Plataforma</th>
+    <th style="${thStyle};text-align:right">Cadastro</th>
+    <th style="${thStyle};text-align:right">FTD</th>
+    <th style="${thStyle};text-align:right">KYC</th>
+    <th style="${thStyle};text-align:right">Lotérico</th>
+    <th style="${thStyle};text-align:right;color:#516067">CAC FTD</th>
+    <th style="${thStyle};text-align:right;color:#516067">CAC Lot.</th>
+    <th style="${thStyle};text-align:right">Ticket FTD</th>
+  </tr></thead>`;
+
+  let tbody = '<tbody>';
+  dates.forEach(dia => {
+    const plats = data[dia];
+    const dayPlats = PLAT_ORDER_TRAFEGO.filter(p => plats[p]);
+    if (!dayPlats.length) return;
+
+    // Day totals
+    const tot = { cad:0, ftd:0, kyc:0, lot:0, ftd_val:0 };
+    dayPlats.forEach(p => { const d = plats[p]; tot.cad+=d.cadastros||0; tot.ftd+=d.ftds||0; tot.kyc+=d.kyc||0; tot.lot+=d.lotericos||0; tot.ftd_val+=d.ftd_value_total||0; });
+    const totTm = tot.ftd > 0 ? brlK(tot.ftd_val/tot.ftd) : '—';
+
+    tbody += `<tr style="background:#001A30">
+      <td style="padding:7px 12px;color:#4FC2FF;font-weight:700;font-size:12px;white-space:nowrap;border-bottom:1px solid #0075FF33" rowspan="${dayPlats.length+1}">${dia.slice(5).replace('-','/')}</td>
+      <td style="padding:6px 10px;color:#FFC700;font-size:11px;font-weight:700;border-bottom:1px solid #0075FF22">TOTAL</td>
+      <td style="padding:6px 10px;text-align:right;color:#B0D8B3;font-size:11px;border-bottom:1px solid #0075FF22">${num(tot.cad)}</td>
+      <td style="padding:6px 10px;text-align:right;color:#4FC2FF;font-weight:700;font-size:11px;border-bottom:1px solid #0075FF22">${num(tot.ftd)}</td>
+      <td style="padding:6px 10px;text-align:right;color:#94a3b8;font-size:11px;border-bottom:1px solid #0075FF22">${num(tot.kyc)}</td>
+      <td style="padding:6px 10px;text-align:right;color:#CFFF6A;font-size:11px;border-bottom:1px solid #0075FF22">${num(tot.lot)}</td>
+      <td style="padding:6px 10px;text-align:right;color:#516067;font-size:11px;border-bottom:1px solid #0075FF22">—</td>
+      <td style="padding:6px 10px;text-align:right;color:#516067;font-size:11px;border-bottom:1px solid #0075FF22">—</td>
+      <td style="padding:6px 10px;text-align:right;color:#3EAA00;font-size:11px;border-bottom:1px solid #0075FF22">${totTm}</td>
+    </tr>`;
+
+    dayPlats.forEach(plat => {
+      const d = plats[plat];
+      const tm = d.ftds > 0 ? brlK(d.ftd_value_total/d.ftds) : '—';
+      tbody += `<tr>
+        <td style="padding:5px 10px;color:#879397;font-size:11px;border-bottom:1px solid #0075FF11">${plat}</td>
+        <td style="padding:5px 10px;text-align:right;color:#B0D8B3;font-size:11px;border-bottom:1px solid #0075FF11">${d.cadastros||0 ? num(d.cadastros) : '—'}</td>
+        <td style="padding:5px 10px;text-align:right;color:#4FC2FF;font-size:11px;border-bottom:1px solid #0075FF11">${d.ftds||0 ? num(d.ftds) : '—'}</td>
+        <td style="padding:5px 10px;text-align:right;color:#94a3b8;font-size:11px;border-bottom:1px solid #0075FF11">${d.kyc||0 ? num(d.kyc) : '—'}</td>
+        <td style="padding:5px 10px;text-align:right;color:#CFFF6A;font-size:11px;border-bottom:1px solid #0075FF11">${d.lotericos||0 ? num(d.lotericos) : '—'}</td>
+        <td style="padding:5px 10px;text-align:right;color:#516067;font-size:11px;border-bottom:1px solid #0075FF11">—</td>
+        <td style="padding:5px 10px;text-align:right;color:#516067;font-size:11px;border-bottom:1px solid #0075FF11">—</td>
+        <td style="padding:5px 10px;text-align:right;color:#3EAA00;font-size:11px;border-bottom:1px solid #0075FF11">${tm}</td>
+      </tr>`;
+    });
+  });
+  tbody += '</tbody>';
+
+  wrap.innerHTML = `<div style="overflow-x:auto;border-radius:10px;border:1px solid #0075FF33">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">${thead}${tbody}</table>
+  </div>`;
+}
+
+// ─── ATUALIZAR (botão topo direito) — só aba atual ───
+function refreshData() {
+  filtrarAbaAtual();
+}
+
+// ─── HELPER: fmtK (compact BRL) ───
+function fmtK(v) {
+  if (!v) return '—';
+  const abs = Math.abs(v), s = v < 0 ? '-' : '';
+  if (abs >= 1000000) return s+'R$'+(abs/1e6).toFixed(1)+'M';
+  if (abs >= 1000)    return s+'R$'+(abs/1e3).toFixed(0)+'K';
+  return s+'R$'+abs.toFixed(0);
+}
+
+// ─── HELPER: brlK ───
+function brlK(v) {
+  if (v === null || v === undefined) return '—';
+  const abs = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+  if (abs >= 1000000) return sign + 'R$' + (abs/1000000).toFixed(1) + 'M';
+  if (abs >= 1000) return sign + 'R$' + (abs/1000).toFixed(0) + 'K';
+  return sign + 'R$' + abs.toFixed(0);
+}
+
+// brlK com 2 casas decimais (usado no gráfico de depósito)
+function brlK2(v) {
+  if (v === null || v === undefined) return '—';
+  const abs = Math.abs(v);
+  const sign = v < 0 ? '-' : '';
+  if (abs >= 1000000) return sign + 'R$' + (abs/1000000).toFixed(2) + 'M';
+  if (abs >= 1000) return sign + 'R$' + (abs/1000).toFixed(2) + 'K';
+  return sign + 'R$' + abs.toFixed(2);
+}
+
+// ─── GERAL: BAR CHARTS DIÁRIOS ───
+async function loadGeralCharts(force = false) {
+  const {data, ini, fim, frentes, btags, afiliados} = getCurrentFilters();
+  const frente = frentes?.length ? frentes.join(',') : 'todas';
+  const btag   = btags?.length   ? btags.join(',')   : '';
+  const afi    = afiliados?.length ? afiliados.join(',') : '';
+  const params = new URLSearchParams({ data, ini, fim, frente, btag, afiliado: afi, force: force ? 1 : 0 });
+  try {
+    const res  = await fetch(`/api/geral_diario?${params}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    const diasRaw = Array.isArray(json.data) ? json.data : (json.data?.dias || json.data || []);
+
+    // Aggregate by date (sum across frentes)
+    const byDate = {};
+    diasRaw.forEach(row => {
+      const d = row.data;
+      if (!byDate[d]) byDate[d] = { uap: 0, depositos: 0, ggr: 0 };
+      byDate[d].uap      += row.uap      || 0;
+      byDate[d].depositos += (row.deposito || row.depositos || 0);
+      byDate[d].ggr      += row.ggr      || 0;
+    });
+    const dates = Object.keys(byDate).sort();
+    renderBarChart('chart-uap-bars', dates, d => byDate[d].uap,      '#FFC700', v => num(v));
+    renderBarChart('chart-dep-bars', dates, d => byDate[d].depositos, '#3EAA00', v => brlK2(v));
+    renderBarChart('chart-ggr-bars', dates, d => byDate[d].ggr,      '#CFFF6A', v => brlK(v));
+  } catch(e) {
+    ['chart-uap-bars','chart-dep-bars','chart-ggr-bars'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = `<div style="color:#ef4444;padding:10px">${e.message}</div>`;
+    });
+  }
+}
+
+function renderBarChart(containerId, dates, getValue, color, fmtLabel) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!dates.length) { el.innerHTML = '<div style="color:#475569;font-size:12px;padding:10px">Sem dados.</div>'; return; }
+  const values = dates.map(d => getValue(d) || 0);
+  const posValues = values.filter(v => v > 0);
+  const maxV = Math.max(...values.map(v => Math.abs(v)), 1);
+  const globalAvg = posValues.length > 0 ? posValues.reduce((a,b)=>a+b,0)/posValues.length : 0;
+  const avgLineH = globalAvg > 0 ? Math.max(1, globalAvg / maxV * 100) : 0;
+
+  const bars = dates.map((d, i) => {
+    const v = values[i];
+    const barH = Math.max(4, Math.abs(v) / maxV * 100);
+    const barColor = v < 0 ? '#ef4444' : color;
+
+    let alertAnim = '';
+    let wrapBg = 'transparent';
+    if (globalAvg > 0 && v >= 0) {
+      const relDiff = (v - globalAvg) / globalAvg;
+      if (relDiff < -0.10) {
+        wrapBg = 'rgba(239,68,68,0.14)';
+        alertAnim = 'animation:alertPulse 1.5s ease-in-out infinite;';
+      } else if (relDiff < -0.05) {
+        wrapBg = 'rgba(234,179,8,0.11)';
+      }
+    }
+
+    const parts = d.split('-');
+    const dt = parts.length === 3 ? `${parts[2]}/${parts[1]}` : d.slice(5);
+
+    return `<div style="display:flex;flex-direction:column;align-items:center;min-width:32px;border-radius:4px;background:${wrapBg};${alertAnim}padding:0 1px">
+      <div style="font-size:9px;color:${barColor};margin-bottom:2px;white-space:nowrap">${fmtLabel(v)}</div>
+      <div style="width:24px;background:${barColor};border-radius:3px 3px 0 0;height:${barH}px;opacity:0.85"></div>
+      <div style="font-size:9px;color:#516067;margin-top:3px;white-space:nowrap">${dt}</div>
+    </div>`;
+  }).join('');
+
+  // Linha de média sobre o gráfico
+  const avgLineStyle = avgLineH > 0
+    ? `<div style="position:absolute;bottom:${avgLineH + 16}px;left:0;right:0;height:1px;background:rgba(255,255,255,0.25);pointer-events:none">
+         <span style="position:absolute;right:4px;top:-9px;font-size:8px;color:rgba(255,255,255,0.4)">avg</span>
+       </div>`
+    : '';
+
+  el.innerHTML = `<div style="position:relative;display:inline-flex;align-items:flex-end;gap:2px;min-height:116px;padding-bottom:16px">
+    ${bars}
+    ${avgLineStyle}
+  </div>`;
+}
+
+const CHART_CFG = {
+  uap: { title: '👥 UAP DIÁRIO (Ativos no Site)', fn: row => row.uap || 0,                          color: '#FFC700', fmt: v => num(v) },
+  dep: { title: '💰 DEPÓSITO DIÁRIO',             fn: row => (row.deposito || row.depositos || 0),  color: '#3EAA00', fmt: v => brlK2(v) },
+  ggr: { title: '📈 GGR DIÁRIO',                  fn: row => row.ggr || 0,                          color: '#CFFF6A', fmt: v => brlK(v) },
+};
+
+function closeChartModal() {
+  const m = document.getElementById('chart-modal');
+  if (m) m.style.display = 'none';
+  document.querySelectorAll('[id^="btn-expand-"]').forEach(b => { b.textContent = '⤢'; b.style.color = '#516067'; });
+}
+
+async function expandChartMetric(metric) {
+  const btn = document.getElementById(`btn-expand-${metric}`);
+  const modal = document.getElementById('chart-modal');
+  if (!modal) return;
+
+  modal.style.display = 'flex';
+  document.getElementById('chart-modal-title').textContent = CHART_CFG[metric].title;
+  document.getElementById('chart-modal-bars').innerHTML = '<div style="color:#475569;font-size:12px;padding:20px">Carregando...</div>';
+  if (btn) { btn.textContent = '⤢'; btn.style.color = '#4FC2FF'; }
+
+  try {
+    const {data, ini, fim, frentes, btags, afiliados} = getCurrentFilters();
+    const frente = frentes?.length ? frentes.join(',') : 'todas';
+    const btag   = btags?.length   ? btags.join(',')   : '';
+    const afi    = afiliados?.length ? afiliados.join(',') : '';
+    const params = new URLSearchParams({ data, ini, fim, frente, btag, afiliado: afi });
+    const res = await fetch(`/api/geral_diario?${params}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    const diasRaw = Array.isArray(json.data) ? json.data : (json.data?.dias || json.data || []);
+    const byDate = {};
+    diasRaw.forEach(row => { byDate[row.data] = row; });
+    const dates = Object.keys(byDate).sort();
+    const cfg = CHART_CFG[metric];
+    renderBarChart('chart-modal-bars', dates, d => cfg.fn(byDate[d] || {}), cfg.color, cfg.fmt);
+  } catch(e) {
+    document.getElementById('chart-modal-bars').innerHTML = `<div style="color:#ef4444;padding:10px">${e.message}</div>`;
+  }
+}
+
+// ─── GERAL: FUNIL DE CADASTRO ───
+async function loadFunilCad(force = false) {
+  const {data, ini, fim, frentes, btags, afiliados} = getCurrentFilters();
+  const frente = frentes?.length ? frentes.join(',') : '';
+  const btag   = btags?.length   ? btags.join(',')   : '';
+  const afi    = afiliados?.length ? afiliados.join(',') : '';
+  const lbl  = document.getElementById('funil-cad-loading');
+  const params = new URLSearchParams({ data, ini, fim, frente, btag, afiliado: afi, force: force ? 1 : 0 });
+  if (lbl) lbl.textContent = 'calculando...';
+  try {
+    const res  = await fetch(`/api/funil_cadastro?${params}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    if (lbl) lbl.textContent = json.cache ? '(cache)' : '';
+    renderFunilCad(json.data?.dias || {}, json.data?.total || {});
+  } catch(e) {
+    document.getElementById('funil-cad-wrap').innerHTML =
+      `<div style="padding:14px;color:#ef4444">${e.message}</div>`;
+    if (lbl) lbl.textContent = '';
+  }
+}
+
+function renderFunilCad(dias, total) {
+  const wrap = document.getElementById('funil-cad-wrap');
+  const STEPS = [
+    { key:'pre_cadastros',   label:'PRÉ-CAD.',   color:'#4FC2FF' },
+    { key:'tel_preenchido',  label:'TEL.',       color:'#a78bfa' },
+    { key:'tel_verificado',  label:'TEL. VER.',  color:'#a78bfa' },
+    { key:'email_preenchido',label:'EMAIL',      color:'#94a3b8' },
+    { key:'cadastrado',      label:'CADASTRADO', color:'#3EAA00' },
+    { key:'verificado',      label:'VERIFICADO', color:'#FFC700' },
+    { key:'depositante',     label:'DEPOSITANTE',color:'#CFFF6A' },
+  ];
+
+  const dates = Object.keys(dias).sort();   // crescente: dia 1 → último
+
+  // Compute step averages for color-coding
+  const allDates = Object.keys(dias);
+  const stepAvgs = {};
+  STEPS.forEach((s, i) => {
+    if (i === 0) return;
+    const prevKey = STEPS[i-1].key;
+    const vals = allDates.map(d => {
+      const base = dias[d][prevKey] || 0;
+      return base > 0 ? (dias[d][s.key] || 0) / base : null;
+    }).filter(v => v !== null);
+    stepAvgs[s.key] = vals.length > 0 ? vals.reduce((a,b) => a+b, 0) / vals.length : null;
+  });
+
+  const ths = STEPS.map(s =>
+    `<th style="background:#001A30;color:${s.color};padding:8px 10px;text-align:right;font-size:10px;font-weight:700;white-space:nowrap">${s.label}</th>`
+  ).join('');
+
+  function makeRowCad(label, d, isTotalRow) {
+    const cad = d.pre_cadastros || 0;
+    const cells = STEPS.map((s, i) => {
+      const v = d[s.key] || 0;
+      if (i === 0) return `<td style="padding:5px 10px;text-align:right;color:${s.color};font-weight:700;border-bottom:1px solid #0075FF08">${v > 0 ? num(v) : '—'}</td>`;
+
+      const prevKey = STEPS[i-1].key;
+      const prevV   = d[prevKey] || 0;
+      const pctPrev = prevV > 0 ? v/prevV : null;
+      const pctStart = cad > 0 ? v/cad : null;
+
+      let bgColor = 'transparent';
+      const avg = stepAvgs[s.key];
+      if (!isTotalRow && avg !== null && avg > 0 && pctPrev !== null) {
+        const relDiff = (pctPrev - avg) / avg;
+        if (relDiff < -0.10) bgColor = 'rgba(239,68,68,0.15)';
+        else if (relDiff < -0.05) bgColor = 'rgba(234,179,8,0.12)';
+      }
+
+      const pctPrevStr  = pctPrev  !== null ? (pctPrev*100).toFixed(0)+'%' : '—';
+      const pctStartStr = pctStart !== null ? (pctStart*100).toFixed(0)+'%' : '—';
+
+      const isAlert = !isTotalRow && avg !== null && avg > 0 && pctPrev !== null && (pctPrev - avg) / avg < -0.10;
+      const alertStyle = isAlert ? 'animation:alertPulse 1.5s ease-in-out infinite;' : '';
+
+      return `<td style="padding:5px 10px;text-align:right;color:${s.color};border-bottom:1px solid #0075FF08;background:${bgColor};${alertStyle}">
+        ${v > 0 ? num(v) : '—'}
+        <div style="font-size:9px;line-height:1.3">
+          <span style="color:#94a3b8">${pctPrevStr}</span>
+          <span style="color:#475569"> / ${pctStartStr}</span>
+        </div>
+      </td>`;
+    }).join('');
+
+    return `<tr ${isTotalRow ? 'style="background:#00243A;font-weight:700"' : ''}>
+      <td style="padding:5px 12px;color:#4FC2FF;white-space:nowrap;border-bottom:1px solid #0075FF08">${label}</td>
+      ${cells}
+    </tr>`;
+  }
+
+  const totalRow = makeRowCad('TOTAL', total, true);
+  const dateRows = dates.map(d => {
+    const parts = d.split('-');
+    const lbl = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : d;
+    return makeRowCad(lbl, dias[d], false);
+  }).join('');
+
+  wrap.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap">
+    <thead>
+      <tr>
+        <th style="background:#001A30;color:#4FC2FF;padding:8px 12px;text-align:left;font-size:11px;font-weight:700">DATA</th>
+        ${ths}
+      </tr>
+    </thead>
+    <tbody style="background:#00193A">
+      ${dateRows}
+      ${totalRow}
+    </tbody>
+  </table>`;
+}
+
+// ─── FUNIL DE RECORRÊNCIA DE DEPÓSITO (FTD → Recorrente; nomes de função mantidos
+// como loadFunilAq/renderFunilAq/funil-aq-wrap por compatibilidade — só o título
+// visível na aba Geral mudou, para não colidir com a aba "Funil de Aquisição") ───
+async function loadFunilAq(force = false) {
+  const wrap = document.getElementById('funil-aq-wrap');
+  if (!wrap) return;
+
+  const {data, ini, fim, frentes, btags, afiliados} = getCurrentFilters();
+  const frenteParam = frentes?.length ? frentes.join(',') : '';
+  const btagParam   = btags?.length   ? btags.join(',')   : '';
+  const afiParam    = afiliados?.length ? afiliados.join(',') : '';
+  const url = `/api/funil_aquisicao?data=${data}&ini=${ini}&fim=${fim}`
+    + (frenteParam ? `&frentes=${encodeURIComponent(frenteParam)}` : '')
+    + (btagParam   ? `&btag=${encodeURIComponent(btagParam)}`      : '')
+    + (afiParam    ? `&afiliado=${encodeURIComponent(afiParam)}`   : '')
+    + (force ? '&force=1' : '');
+
+  try {
+    const resp = await fetch(url);
+    const json = await resp.json();
+    if (!json.ok) { wrap.innerHTML = '<div style="padding:20px;color:#516067">Sem dados.</div>'; return; }
+    renderFunilAq(json.data);
+  } catch(e) { console.error('loadFunilAq', e); }
+}
+
+function renderFunilAq(d) {
+  const wrap = document.getElementById('funil-aq-wrap');
+  if (!wrap || !d) return;
+
+  const steps = [
+    { label: '1° Depósito (FTD)', key: 'ftd',  color: '#4FC2FF' },
+    { label: '2° Depósito',       key: 'd2',   color: '#3EAA00' },
+    { label: '3° Depósito',       key: 'd3',   color: '#CFFF6A' },
+    { label: '4° Depósito',       key: 'd4',   color: '#FFC700' },
+    { label: '5° Depósito',       key: 'd5',   color: '#FF9F40' },
+    { label: '6° Depósito',       key: 'd6',   color: '#F87171' },
+    { label: 'Recorrente (7+)',   key: 'rec',  color: '#A78BFA' },
+  ];
+
+  const ftdV = d.ftd || 1;
+
+  let rows = steps.map((s, i) => {
+    const v = d[s.key] || 0;
+    const prevV = i > 0 ? (d[steps[i-1].key] || 0) : v;
+    const pctFtd  = (v / ftdV * 100).toFixed(0) + '%';
+    const pctPrev = i > 0 && prevV > 0 ? (v / prevV * 100).toFixed(0) + '%' : '—';
+    const barW    = ftdV > 0 ? Math.max(2, v / ftdV * 100) : 0;
+
+    return `<tr>
+      <td style="padding:8px 14px;color:${s.color};font-weight:600;font-size:13px;white-space:nowrap;border-bottom:1px solid #0075FF0A;width:220px">${s.label}</td>
+      <td style="padding:8px 14px;text-align:right;color:${s.color};font-weight:700;font-size:15px;border-bottom:1px solid #0075FF0A">${num(v)}</td>
+      <td style="padding:8px 14px;text-align:right;border-bottom:1px solid #0075FF0A">
+        <span style="color:#94a3b8;font-size:12px">${pctFtd}</span>
+        ${i > 0 ? `<span style="color:#475569;font-size:11px;margin-left:6px">(${pctPrev}↑)</span>` : ''}
+      </td>
+      <td style="padding:8px 14px;border-bottom:1px solid #0075FF0A;min-width:200px">
+        <div style="background:#002040;border-radius:4px;height:10px;overflow:hidden">
+          <div style="background:${s.color};height:10px;width:${barW}%;border-radius:4px;opacity:0.8;transition:width 0.4s"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `<table style="width:100%;border-collapse:collapse">
+    <thead><tr>
+      <th style="background:#00243A;padding:8px 14px;text-align:left;color:#94a3b8;font-size:11px;border-bottom:1px solid #0075FF33">Etapa</th>
+      <th style="background:#00243A;padding:8px 14px;text-align:right;color:#94a3b8;font-size:11px;border-bottom:1px solid #0075FF33">Jogadores</th>
+      <th style="background:#00243A;padding:8px 14px;text-align:right;color:#94a3b8;font-size:11px;border-bottom:1px solid #0075FF33">% vs FTD / vs anterior</th>
+      <th style="background:#00243A;padding:8px 14px;color:#94a3b8;font-size:11px;border-bottom:1px solid #0075FF33"></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ─── FUNIL DE AQUISIÇÃO (jornada de cadastro — dwh.player_events + dwh.registration_steps) ───
+let _faqEtapas = [];
+let _faqTopo = null;         // passo de entrada: denominador de pct_do_topo
+let _faqCoorteBruta = 0;     // quem teve qualquer evento — diagnóstico, não denominador
+let _faqAtrito = [];
+
+function _faqParams(force) {
+  const {data, ini, fim, frentes, btags, afiliados} = getCurrentFilters();
+  const frente = frentes?.length ? frentes.join(',') : '';
+  const btag   = btags?.length   ? btags.join(',')   : '';
+  const afi    = afiliados?.length ? afiliados.join(',') : '';
+  return new URLSearchParams({ data, ini, fim, frente, btag, afiliado: afi, force: force ? 1 : 0 });
+}
+
+function updateFaqKpis(perda, conversao) {
+  if (_faqEtapas.length) {
+    const last = _faqEtapas[_faqEtapas.length - 1];
+    // Denominador do funil é o passo de ENTRADA (data.topo), não "quem teve qualquer
+    // evento" (data.coorte_bruta) — essa coorte crua incluía gente que só apareceu em
+    // eventos de câmera e afundava toda porcentagem.
+    const topo  = _faqTopo?.pessoas || 0;
+    const bruta = _faqCoorteBruta || 0;
+    setText('faq-kpi-coorte', num(topo));
+    setText('faq-kpi-coorte-sub', _faqTopo?.nome
+      ? `emitiram "${_faqTopo.nome.replace(/^\d+\s*/, '')}"${bruta > topo ? ` · ${num(bruta)} tiveram algum evento` : ''}`
+      : 'no período selecionado');
+    // Conversão é PISO: o marco final subconta contra a tabela de entidades, então o
+    // verdadeiro é maior. O "≥" é a regra do painel aplicada ao próprio painel.
+    const pct = conversao?.pct != null ? conversao.pct : (last.pct_do_topo || 0);
+    setText('faq-kpi-conversao', (conversao?.e_piso ? '≥ ' : '') + pct + '%');
+    setText('faq-kpi-conversao-sub', conversao?.e_piso && conversao.pct_ajustado_por_entidades != null
+      ? `piso · ${conversao.pct_ajustado_por_entidades}% pela tabela de entidades`
+      : 'cadastro iniciado → cadastro concluído');
+
+    // Mostra a perda TOTAL do funil, nunca a de um passo. Um passo cego tem contagem-piso,
+    // e a diferença dele contra o topo superestima a perda em exatamente a subcontagem do
+    // evento — foi assim que o painel publicou uma perda de passo MAIOR que a do funil
+    // inteiro. E o rótulo é "não concluíram no mesmo dia": a coorte é de mesmo dia, então
+    // quem termina em D+1 cai aqui como se tivesse abandonado.
+    if (perda) {
+      setText('faq-kpi-maior-perda', (perda.e_teto ? '≤ ' : '') + num(perda.pessoas));
+      const partes = [`${perda.pct_do_topo}% de quem entrou`];
+      if (perda.e_teto) partes.push('teto');
+      if (!perda.localizada) partes.push('passo não identificado');
+      setText('faq-kpi-maior-perda-sub', partes.join(' · '));
+    }
+  }
+  if (_faqAtrito.length) {
+    const atritos = _faqAtrito.filter(s => s.tipo === 'atrito');
+    if (atritos.length) {
+      const worst = [...atritos].sort((a,b) => (b.pessoas||0) - (a.pessoas||0))[0];
+      setText('faq-kpi-atrito', worst.sinal);
+      setText('faq-kpi-atrito-sub', `${num(worst.pessoas)} pessoas (${worst.pct_da_coorte != null ? worst.pct_da_coorte+'%' : '—'})`);
+    }
+  }
+}
+
+// Tabela de instrumentação nasce colapsada: é diagnóstico de telemetria, não a leitura
+// principal da aba. Fica atrás de um clique para não competir com o funil confirmado.
+function _faqBindInstrToggle() {
+  const t = document.getElementById('faq-instr-toggle');
+  const w = document.getElementById('funil-instr-wrap');
+  if (!t || !w || t.dataset.bound) return;
+  t.dataset.bound = '1';
+  const alterna = () => {
+    const aberto = w.style.display !== 'none';
+    w.style.display = aberto ? 'none' : 'block';
+    t.textContent = aberto ? '▸' : '▾';
+  };
+  t.addEventListener('click', alterna);
+  const titulo = t.parentElement;
+  if (titulo) { titulo.style.cursor = 'pointer'; titulo.addEventListener('click', ev => {
+    if (ev.target !== t) alterna();
+  }); }
+}
+
+// Cor por fase — vem do catálogo oficial (dwh.registration_steps.phase), não mais de uma
+// lista fixa de 13 passos. Assim o funil não desalinha se o catálogo ganhar/perder passo.
+const FAQ_PHASE_COLORS = {
+  visit:     '#4FC2FF',
+  signup:    '#4FC2FF',
+  phone:     '#a78bfa',
+  email:     '#94a3b8',
+  consent:   '#60a5fa',
+  address:   '#60a5fa',
+  kyc:       '#FFC700',
+  conclusao: '#CFFF6A',
+};
+function faqFaseColor(fase) { return FAQ_PHASE_COLORS[fase] || '#4FC2FF'; }
+
+async function loadFunilJornada(force = false) {
+  const lbl = document.getElementById('faq-funil-loading');
+  if (lbl) lbl.textContent = 'calculando...';
+  try {
+    const json = await fetch(`/api/funil_jornada?${_faqParams(force)}`).then(r => r.json());
+    if (!json.ok) throw new Error(json.error);
+    if (lbl) lbl.textContent = json.cache ? '(cache)' : '';
+    _faqEtapas      = json.data?.etapas || [];
+    _faqTopo        = json.data?.topo || null;
+    _faqCoorteBruta = json.data?.coorte_bruta || 0;
+    renderFaqAvisos(json.data?.avisos || []);
+    renderFunilConfirmado(json.data?.funil_confirmado || [], json.data?.referencia || null,
+                          json.data?.validacao || null);
+    renderFunilPerda(json.data?.perda_total || null, _faqEtapas, _faqTopo);
+    renderInstrumentacao(_faqEtapas, json.data?.referencia || null);
+    _faqBindInstrToggle();
+    updateFaqKpis(json.data?.perda_total || null, json.data?.conversao || null);
+  } catch(e) {
+    const wrap = document.getElementById('funil-jornada-wrap');
+    if (wrap) wrap.innerHTML = `<div style="padding:14px;color:#ef4444">${e.message}</div>`;
+    if (lbl) lbl.textContent = '';
+  }
+}
+
+// Ressalvas do dado, vindas da API (data.avisos). Ficam acima do funil porque mudam a
+// leitura dele: sub-instrumentação parece perda, e série truncada parece queda.
+function renderFaqAvisos(avisos) {
+  const wrap = document.getElementById('faq-avisos');
+  if (!wrap) return;
+  if (!avisos.length) { wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
+  wrap.style.display = 'block';
+  wrap.innerHTML = avisos.map(a => `
+    <div style="display:flex;gap:8px;align-items:flex-start;border-radius:8px;
+                border:1px solid #FFC70055;background:#FFC7000F;padding:10px 12px;margin-bottom:8px">
+      <span style="font-size:12px;line-height:1.5">⚠️</span>
+      <span style="font-size:12px;color:#E8D9A0;line-height:1.5">${a}</span>
+    </div>`).join('');
+}
+
+// BLOCO 1 — só os passos cujo nível o dado sustenta (API: funil_confirmado).
+// Barra + porcentagem + ordem sequencial AFIRMAM nível. Passo cuja contagem é piso não
+// entra aqui de jeito nenhum: opacidade reduzida e selo de ressalva não desfazem o que a
+// barra afirma, e alguém sempre printa a barra e cola num deck.
+function renderFunilConfirmado(confirmados, referencia, validacao) {
+  const wrap = document.getElementById('funil-jornada-wrap');
+  if (!wrap) return;
+  if (!confirmados.length) {
+    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#475569">Sem dados no período — a jornada por eventos só existe a partir de 27/08/2026 (primeiro dia inteiro da instrumentação nova).</div>';
+    return;
+  }
+  // Selo de validação REAL: os dois números vêm medidos da API. A versão anterior deste
+  // selo era fabricada — dizia "confere com a tabela de entidades" sem que a rota jamais
+  // consultasse a tabela. Num painel cuja premissa é rigor, isso era o pior defeito de
+  // todos, e não dava erro nenhum.
+  const selo = (() => {
+    if (!validacao || validacao.entidades == null) return '';
+    const bom = validacao.ok;
+    const cor = bom ? '#CFFF6A' : '#FF5C6A';
+    const ico = bom ? '✓' : '⚠';
+    return `<div style="margin-bottom:14px;font-size:11px;color:${cor};line-height:1.5">
+      ${ico} marco final <b>${num(validacao.marco_final)}</b> contra
+      <b>${num(validacao.entidades)}</b> contas na tabela de entidades (fonte independente):
+      divergência de <b>${validacao.divergencia_pct}%</b>
+      ${bom ? `(dentro do limite de ${validacao.limite_aceitavel_pct}%)`
+            : `— <b>acima do limite de ${validacao.limite_aceitavel_pct}%, leitura não confiável</b>`}.
+      Como o marco final subconta, os números abaixo são <b>piso</b>.
+    </div>`;
+  })();
+  wrap.innerHTML = selo + confirmados.map(e => {
+    const color = faqFaseColor(e.fase);
+    const barW  = Math.max(1, e.pct_do_topo || 0);
+    const conv  = e.pct_da_etapa_anterior != null && e.perda_localizada
+      ? ` · ${e.pct_da_etapa_anterior}% de "${e.comparado_com}"` : '';
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;gap:8px">
+        <span style="font-size:13px;color:#D7DFE0;font-weight:600">${e.nome}</span>
+        <span style="font-size:14px;color:${color};font-weight:700;white-space:nowrap">${num(e.pessoas)}
+          <span style="font-size:11px;color:#516067;font-weight:400">
+            · ${e.pct_do_topo != null ? e.pct_do_topo+'%' : '—'} do topo${conv}
+          </span>
+        </span>
+      </div>
+      <div style="background:#002040;border-radius:4px;height:14px;overflow:hidden">
+        <div style="background:${color};height:14px;width:${barW}%;border-radius:4px;opacity:.85;transition:width .4s"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// BLOCO 2 — a perda total é confiável (os dois extremos são), mas a LOCALIZAÇÃO dela não.
+// Este bloco existe para dizer isso em voz alta. Antes daqui, o painel colava a perda no
+// passo do telefone e publicava 3.072 perdidos quando o funil inteiro perdia 3.025 —
+// impossível, e o excedente era exatamente a subcontagem do evento.
+function renderFunilPerda(perda, etapas, topo) {
+  const wrap = document.getElementById('funil-perda-wrap');
+  if (!wrap) return;
+  if (!perda) {
+    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#475569">Sem dados no período.</div>';
+    return;
+  }
+  const cegos = perda.gates_cegos || [];
+  const covs  = etapas.filter(e => e.instrumentacao_parcial && e.cobertura_pct != null)
+                      .map(e => e.cobertura_pct);
+  const faixa = covs.length ? `${Math.min(...covs).toFixed(1)}% a ${Math.max(...covs).toFixed(1)}%` : '—';
+
+  // Único sinal de perda tardia que o painel tem: passo não-gate com volume acima do
+  // marco final. Não dá para concluir abandono sem separar de conclusão em D+1.
+  const camera = etapas.find(e => /c[âa]mera permitida/i.test(e.nome || ''));
+  const refP   = etapas.find(e => e.chave === 'account_created');
+  const anomalia = (camera && refP && camera.pessoas > refP.pessoas)
+    ? `<div style="margin-top:14px;padding:12px;border-radius:8px;border:1px solid #FFC70055;background:#FFC7000F">
+         <div style="font-size:12px;color:#E8D9A0;font-weight:600;margin-bottom:4px">Única pista de perda tardia</div>
+         <div style="font-size:12px;color:#E8D9A0;line-height:1.6">
+           <b>${num(camera.pessoas)}</b> pessoas permitiram a câmera, contra <b>${num(refP.pessoas)}</b> que
+           criaram conta. Ao menos <b>${num(camera.pessoas - refP.pessoas)}</b> chegaram na profundidade do KYC
+           e não terminaram — ou terminaram no dia seguinte, o que a coorte de mesmo dia conta como perda.
+           Separar as duas coisas é a segunda investigação da fila.
+         </div>
+       </div>`
+    : '';
+
+  const semLocal = `
+    <div style="font-size:13px;color:#D7DFE0;font-weight:600;margin-bottom:8px">
+      Não concluíram no mesmo dia:
+      <span style="color:#FF5C6A">${perda.e_teto ? 'até ' : ''}${num(perda.pessoas)} pessoas</span>
+      <span style="font-size:11px;color:#516067;font-weight:400">(${perda.pct_do_topo}% de quem entrou${perda.e_teto ? ', teto' : ''})</span>
+    </div>
+    <div style="font-size:12px;color:#94a3b8;line-height:1.6">
+      Os dois extremos (<i>${perda.de}</i> e <i>${perda.para}</i>) são medidos, mas o marco final
+      subconta contra a tabela de entidades — por isso o número é <b>teto</b>, não estimativa.
+      E a coorte é de mesmo dia: quem concluir amanhã entra aqui hoje como se tivesse desistido.
+      <b style="color:#FFC700">Em que passo isso acontece, não sabemos.</b>
+      ${cegos.length} gate(s) obrigatório(s) estão cegos, com cobertura de <b>${faixa}</b> das contas
+      criadas — toda contagem intermediária é <b>piso</b>, não nível. E a cobertura é medida sobre quem
+      <i>concluiu</i>, então ela nada diz sobre quem abandonou: o padrão de subemissão que gera esses
+      números (evento no retorno do servidor, ou na navegação para a próxima tela) é justamente o que
+      dispara para o concluinte e silencia no abandonador.
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:#94a3b8;line-height:1.6">
+      <b style="color:#D7DFE0">O teste que resolve, sem tocar no pipeline:</b> comparar os envios de SMS
+      do provedor com os ${num(topo?.pessoas || 0)} cadastros iniciados. Se ele enviou ~${num(refP?.pessoas || 0)},
+      a perda está no formulário, antes do SMS. Se enviou ~${num(topo?.pessoas || 0)} e entregou poucos,
+      a perda é de entrega.
+    </div>`;
+
+  const comLocal = () => {
+    const loc = etapas.filter(e => e.perda_localizada && e.perdidos_nesta_etapa != null)
+                      .sort((a,b) => b.perdidos_nesta_etapa - a.perdidos_nesta_etapa);
+    if (!loc.length) return semLocal;
+    const maxL = loc[0].perdidos_nesta_etapa || 1;
+    return `<div style="font-size:13px;color:#D7DFE0;font-weight:600;margin-bottom:10px">
+        Perda localizada por passo</div>` + loc.map((e, i) => {
+      const barW = Math.max(1, (e.perdidos_nesta_etapa || 0) / maxL * 100);
+      const pct  = topo?.pessoas ? ((e.perdidos_nesta_etapa || 0) / topo.pessoas * 100).toFixed(1) : '0.0';
+      return `<div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;gap:8px">
+          <span style="font-size:12px;color:#D7DFE0;font-weight:600">#${i+1} · ${e.nome}</span>
+          <span style="font-size:13px;color:#FF5C6A;font-weight:700;white-space:nowrap">${num(e.perdidos_nesta_etapa)} perdidos
+            <span style="font-size:11px;color:#516067;font-weight:400"> · ${pct}% de quem entrou</span>
+          </span>
+        </div>
+        <div style="background:#002040;border-radius:4px;height:12px;overflow:hidden">
+          <div style="background:#FF5C6A;height:12px;width:${barW}%;border-radius:4px;opacity:.8"></div>
+        </div>
+      </div>`;
+    }).join('');
+  };
+
+  wrap.innerHTML = (perda.localizada ? comLocal() : semLocal) + anomalia;
+}
+
+// BLOCO 3 — saúde da instrumentação. Tabela pura, ordenada por cobertura ascendente:
+// sem barra, sem "% do topo", sem conversão, de propósito — para não ser lida nem
+// printada como funil. Essa ordenação já é o backlog priorizado de telemetria.
+function renderInstrumentacao(etapas, referencia) {
+  const wrap = document.getElementById('funil-instr-wrap');
+  const res  = document.getElementById('faq-instr-resumo');
+  if (!wrap) return;
+  const gates    = etapas.filter(e => e.is_gate);
+  const parciais = etapas.filter(e => e.instrumentacao_parcial).length;
+  if (res) res.textContent = `${parciais} de ${gates.length} gates obrigatórios estão cegos · ${etapas.length} passos no catálogo`;
+  if (!etapas.length) { wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#475569">Sem dados.</div>'; return; }
+
+  // Ordem = backlog priorizado: gate cego primeiro (pior cobertura no topo), depois gate
+  // confiável, e só então passo opcional. Ordenar só por cobertura jogaria "Reenvio do
+  // código" (3 pessoas, legitimamente raro) na frente de um gate obrigatório cego.
+  const prio = e => e.instrumentacao_parcial ? 0 : (e.is_gate ? 1 : 2);
+  const ordenado = [...etapas].sort((a, b) =>
+    prio(a) - prio(b) || (a.cobertura_pct ?? 1e9) - (b.cobertura_pct ?? 1e9));
+  const rows = ordenado.map(e => {
+    const cor = e.instrumentacao_parcial ? '#FF5C6A' : (e.is_gate ? '#CFFF6A' : '#94a3b8');
+    const status = e.instrumentacao_parcial ? 'cego'
+                 : (e.is_gate ? 'confiável' : 'opcional');
+    return `<tr>
+      <td style="padding:7px 10px;font-size:12px;color:#D7DFE0">${e.nome}</td>
+      <td style="padding:7px 10px;font-size:12px;color:#94a3b8;text-align:center">${e.is_gate ? 'sim' : '—'}</td>
+      <td style="padding:7px 10px;font-size:12px;color:#D7DFE0;text-align:right">${num(e.pessoas)}</td>
+      <td style="padding:7px 10px;font-size:12px;color:${cor};text-align:right;font-weight:600">${e.cobertura_pct != null ? e.cobertura_pct + '%' : '—'}</td>
+      <td style="padding:7px 10px;font-size:11px;color:${cor};text-align:center">${status}</td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div style="padding:12px 12px 0;font-size:11px;color:#516067;line-height:1.6">
+      Cobertura = pessoas do passo ÷ contas criadas. É <b>condicionada a quem concluiu</b>:
+      responde "esse evento dispara para quem termina?" e não diz nada sobre quem abandonou.
+      Cobertura alta não é atestado de que o passo mede perda corretamente. Um gate obrigatório
+      abaixo de 100% está cego — houve conta criada sem o evento, logo a contagem dele é piso.
+      Sem barra e sem "% do topo" aqui de propósito: esta tabela não é um funil.
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+      <thead><tr style="border-bottom:1px solid #0075FF33">
+        <th style="padding:8px 10px;font-size:11px;color:#516067;text-align:left">Passo</th>
+        <th style="padding:8px 10px;font-size:11px;color:#516067;text-align:center">Obrigatório</th>
+        <th style="padding:8px 10px;font-size:11px;color:#516067;text-align:right">Pessoas</th>
+        <th style="padding:8px 10px;font-size:11px;color:#516067;text-align:right">Cobertura</th>
+        <th style="padding:8px 10px;font-size:11px;color:#516067;text-align:center">Status</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+async function loadFunilJornadaDiario(force = false) {
+  const lbl = document.getElementById('faq-diario-loading');
+  if (lbl) lbl.textContent = 'calculando...';
+  try {
+    const json = await fetch(`/api/funil_jornada_diario?${_faqParams(force)}`).then(r => r.json());
+    if (!json.ok) throw new Error(json.error);
+    if (lbl) lbl.textContent = json.cache ? '(cache)' : '';
+    renderFunilJornadaDiario(json.data?.dias || {}, json.data?.catalogo || []);
+  } catch(e) {
+    const wrap = document.getElementById('funil-jornada-diario-wrap');
+    if (wrap) wrap.innerHTML = `<div style="padding:14px;color:#ef4444">${e.message}</div>`;
+    if (lbl) lbl.textContent = '';
+  }
+}
+
+function renderFunilJornadaDiario(dias, catalogo) {
+  const wrap = document.getElementById('funil-jornada-diario-wrap');
+  if (!wrap) return;
+  const dates = Object.keys(dias).sort();
+  if (!dates.length || !catalogo.length) {
+    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#475569">Sem dados no período.</div>';
+    return;
+  }
+  // Catálogo vem do backend (dwh.registration_steps + bookends) — nada de lista fixa
+  // aqui, para não desalinhar quando o catálogo oficial ganhar ou perder passo.
+  const cols = catalogo.map(s => ({ ...s, color: faqFaseColor(s.fase) }));
+
+  const total = {};
+  cols.forEach(s => { total[s.key] = 0; });
+  dates.forEach(d => cols.forEach(s => { total[s.key] += dias[d][s.key] || 0; }));
+
+  const ths = cols.map(s =>
+    `<th style="background:#001A30;color:${s.color};padding:8px 6px;text-align:center;font-size:9px;font-weight:700;white-space:normal;line-height:1.3;min-width:82px;max-width:104px;vertical-align:bottom">${s.nome}</th>`
+  ).join('');
+
+  function makeRow(label, d, isTotalRow) {
+    const base = d[cols[0].key] || 0;
+    const cells = cols.map((s, i) => {
+      const v = d[s.key] || 0;
+      if (i === 0) return `<td style="padding:5px 10px;text-align:right;color:${s.color};font-weight:700;border-bottom:1px solid #0075FF08">${v>0?num(v):'—'}</td>`;
+      const prevV = d[cols[i-1].key] || 0;
+      const pctPrev = prevV > 0 ? (v/prevV*100).toFixed(0)+'%' : '—';
+      const pctBase = base > 0 ? (v/base*100).toFixed(0)+'%' : '—';
+      return `<td style="padding:5px 10px;text-align:right;color:${s.color};border-bottom:1px solid #0075FF08">
+        ${v>0?num(v):'—'}
+        <div style="font-size:9px;line-height:1.3"><span style="color:#94a3b8">${pctPrev}</span><span style="color:#475569"> / ${pctBase}</span></div>
+      </td>`;
+    }).join('');
+    return `<tr ${isTotalRow ? 'style="background:#00243A;font-weight:700"' : ''}>
+      <td style="padding:5px 12px;color:#4FC2FF;white-space:nowrap;border-bottom:1px solid #0075FF08">${label}</td>
+      ${cells}
+    </tr>`;
+  }
+
+  const dateRows = dates.map(d => {
+    const parts = d.split('-');
+    const lbl = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : d;
+    return makeRow(lbl, dias[d], false);
+  }).join('');
+  const totalRow = makeRow('TOTAL', total, true);
+
+  wrap.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap">
+    <thead><tr>
+      <th style="background:#001A30;color:#4FC2FF;padding:8px 12px;text-align:left;font-size:11px;font-weight:700">DATA</th>
+      ${ths}
+    </tr></thead>
+    <tbody style="background:#00193A">${dateRows}${totalRow}</tbody>
+  </table>`;
+}
+
+async function loadFunilAtrito(force = false) {
+  try {
+    const json = await fetch(`/api/funil_atrito?${_faqParams(force)}`).then(r => r.json());
+    if (!json.ok) throw new Error(json.error);
+    _faqAtrito = json.data?.sinais || [];
+    renderFunilAtrito(_faqAtrito);
+    updateFaqKpis();
+  } catch(e) {
+    const wrap = document.getElementById('funil-atrito-wrap');
+    if (wrap) wrap.innerHTML = `<div style="padding:14px;color:#ef4444">${e.message}</div>`;
+  }
+}
+
+function renderFunilAtrito(sinais) {
+  const wrap = document.getElementById('funil-atrito-wrap');
+  if (!wrap) return;
+  if (!sinais.length) {
+    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#475569">Sem dados no período.</div>';
+    return;
+  }
+  const max = Math.max(...sinais.map(s => s.pessoas || 0), 1);
+  wrap.innerHTML = sinais.map(s => {
+    const color = s.tipo === 'atrito' ? '#FF5C6A' : '#4FC2FF';
+    const barW  = Math.max(1, (s.pessoas||0) / max * 100);
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;gap:8px">
+        <span style="font-size:12px;color:#D7DFE0;font-weight:600">${s.tipo === 'atrito' ? '⚠️ ' : ''}${s.sinal}</span>
+        <span style="font-size:13px;color:${color};font-weight:700;white-space:nowrap">${num(s.pessoas)}
+          <span style="font-size:11px;color:#516067;font-weight:400"> · ${s.pct_da_coorte != null ? s.pct_da_coorte+'%' : '—'} da coorte</span>
+        </span>
+      </div>
+      <div style="background:#002040;border-radius:4px;height:10px;overflow:hidden">
+        <div style="background:${color};height:10px;width:${barW}%;border-radius:4px;opacity:.8"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function fmtDurSeg(s) {
+  if (s == null) return '—';
+  s = parseFloat(s);
+  if (s < 60) return s.toFixed(0)+'s';
+  const m = Math.floor(s/60), r = Math.round(s%60);
+  if (m < 60) return `${m}m ${r}s`;
+  const h = Math.floor(m/60), rm = m%60;
+  return `${h}h ${rm}m`;
+}
+
+async function loadFunilTempo(force = false) {
+  try {
+    const json = await fetch(`/api/funil_tempo_passos?${_faqParams(force)}`).then(r => r.json());
+    if (!json.ok) throw new Error(json.error);
+    renderFunilTempo(json.data?.passos || []);
+  } catch(e) {
+    const wrap = document.getElementById('funil-tempo-wrap');
+    if (wrap) wrap.innerHTML = `<div style="padding:14px;color:#ef4444">${e.message}</div>`;
+  }
+}
+
+function renderFunilTempo(passos) {
+  const wrap = document.getElementById('funil-tempo-wrap');
+  if (!wrap) return;
+  if (!passos.length) {
+    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#475569">Sem dados no período.</div>';
+    return;
+  }
+  const max = Math.max(...passos.map(p => p.mediana_seg || 0), 1);
+  wrap.innerHTML = passos.map(p => {
+    const barW = Math.max(1, (p.mediana_seg||0) / max * 100);
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;gap:8px">
+        <span style="font-size:12px;color:#D7DFE0;font-weight:600">${p.nome}</span>
+        <span style="font-size:13px;color:#FFC700;font-weight:700;white-space:nowrap">${fmtDurSeg(p.mediana_seg)}
+          <span style="font-size:11px;color:#516067;font-weight:400"> · p90 ${fmtDurSeg(p.p90_seg)} · n=${num(p.pessoas)}</span>
+        </span>
+      </div>
+      <div style="background:#002040;border-radius:4px;height:10px;overflow:hidden">
+        <div style="background:#FFC700;height:10px;width:${barW}%;border-radius:4px;opacity:.8"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── LOTERIA TRADICIONAL ───
+async function loadLoteria(force = false) {
+  const data = document.getElementById('filter-data').value;
+  const ini  = document.getElementById('filter-ini')?.value || '';
+  const fim  = document.getElementById('filter-fim')?.value || '';
+  const params = new URLSearchParams({ data, ini, fim, force: force ? 1 : 0 });
+  try {
+    const res  = await fetch(`/api/loteria_diario?${params}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    const k = json.data.kpis || {};
+    document.getElementById('lot-turnover').textContent  = brl(k.turnover)  || '—';
+    document.getElementById('lot-ggr').textContent       = brl(k.ggr)       || '—';
+    document.getElementById('lot-ngr').textContent       = brl(k.ngr)       || '—';
+    document.getElementById('lot-reward').textContent    = brl(k.reward)    || '—';
+    document.getElementById('lot-jogadores').textContent = num(k.jogadores)  || '—';
+    renderLoteriaChart(json.data.dias || {});
+  } catch(e) {
+    ['lot-bars-turnover','lot-bars-ggr','lot-bars-jog'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = `<div style="padding:14px;color:#ef4444">${e.message}</div>`;
+    });
+  }
+}
+
+let _lotDias = null;
+
+const LOT_CHART_CFG = {
+  turnover: { barId: 'lot-bars-turnover', title: '🎯 TURNOVER DIÁRIO',    fn: d => d.turnover||0,   color: '#4FC2FF', fmt: v => brlK(v) },
+  ggr:      { barId: 'lot-bars-ggr',      title: '📈 GGR DIÁRIO',         fn: d => d.ggr||0,        color: '#CFFF6A', fmt: v => brlK(v) },
+  jog:      { barId: 'lot-bars-jog',      title: '👥 APOSTADORES DIÁRIOS', fn: d => d.jogadores||0,  color: '#FFC700', fmt: v => num(v)  },
+};
+
+function renderLoteriaChart(dias) {
+  _lotDias = dias;
+  const dates = Object.keys(dias).sort();
+  if (!dates.length) {
+    Object.values(LOT_CHART_CFG).forEach(c => {
+      const el = document.getElementById(c.barId);
+      if (el) el.innerHTML = '<div style="color:#475569;font-size:12px;padding:10px">Sem dados.</div>';
+    });
+    return;
+  }
+  Object.values(LOT_CHART_CFG).forEach(c => {
+    renderBarChart(c.barId, dates, d => c.fn(dias[d] || {}), c.color, c.fmt);
+  });
+}
+
+async function expandLotChart(metric) {
+  const cfg = LOT_CHART_CFG[metric];
+  if (!cfg) return;
+  const modal = document.getElementById('chart-modal');
+  if (!modal) return;
+
+  modal.style.display = 'flex';
+  document.getElementById('chart-modal-title').textContent = cfg.title;
+  document.getElementById('chart-modal-bars').innerHTML = '<div style="color:#475569;font-size:12px;padding:20px">Carregando...</div>';
+
+  try {
+    const dias = _lotDias || {};
+    const dates = Object.keys(dias).sort();
+    if (!dates.length) throw new Error('Sem dados');
+    renderBarChart('chart-modal-bars', dates, d => cfg.fn(dias[d] || {}), cfg.color, cfg.fmt);
+  } catch(e) {
+    document.getElementById('chart-modal-bars').innerHTML = `<div style="color:#ef4444;padding:10px">${e.message}</div>`;
+  }
+}
+
+// ─── COORTE ───
+async function loadCoorte(force = false) {
+  const loaderCoorte = document.getElementById('loader-coorte');
+  if (loaderCoorte) loaderCoorte.style.display = 'flex';
+  try {
+    const {ini, fim} = getCurrentFilters();
+    const frenteParam = document.getElementById('coorte-frente-select')?.value || '';
+    const url = `/api/coorte?ini=${ini}&fim=${fim}` + (frenteParam ? `&frente=${encodeURIComponent(frenteParam)}` : '');
+    const resp = await fetch(url);
+    const json = await resp.json();
+    if (!json.ok || !json.data?.length) {
+      document.getElementById('coorte-table-wrap').innerHTML = '<div style="padding:20px;color:#516067;text-align:center">Sem dados para o período selecionado.</div>';
+      return;
+    }
+    renderCoorte(json.data);
+  } catch(e) {
+    console.error('loadCoorte', e);
+    const wrap = document.getElementById('coorte-table-wrap');
+    if (wrap) wrap.innerHTML = `<div style="padding:14px;color:#ef4444">${e.message}</div>`;
+  } finally {
+    if (loaderCoorte) loaderCoorte.style.display = 'none';
+  }
+}
+
+function renderCoorte(rows) {
+  // Build cohort → offset → data map
+  const map = {};
+  let maxOffset = 0;
+  rows.forEach(r => {
+    if (!map[r.cohort_month]) map[r.cohort_month] = { size: r.cohort_size, offsets: {} };
+    map[r.cohort_month].offsets[r.month_offset] = r;
+    if (r.month_offset > maxOffset) maxOffset = r.month_offset;
+  });
+
+  const cohorts = Object.keys(map).sort();
+
+  function fmtMonth(iso) {
+    const [y, m] = iso.split('-');
+    const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return months[parseInt(m)-1] + '/' + y.slice(2);
+  }
+
+  // Header row
+  let headerCols = `<th style="background:#00243A;padding:8px 12px;text-align:left;color:#4FC2FF;font-size:12px;font-weight:700;white-space:nowrap;border-bottom:1px solid #0075FF33;min-width:100px">Coorte</th>
+    <th style="background:#00243A;padding:8px 10px;text-align:right;color:#4FC2FF;font-size:11px;font-weight:700;white-space:nowrap;border-bottom:1px solid #0075FF33">Tamanho</th>`;
+  for (let o = 0; o <= maxOffset; o++) {
+    const bg = o === 0 ? '#001E3C' : '#001229';
+    const border = o === 0 ? '2px solid #0075FF66' : '1px solid #0075FF22';
+    headerCols += `<th style="background:${bg};padding:8px 10px;text-align:center;color:#94a3b8;font-size:11px;font-weight:700;white-space:nowrap;border-bottom:${border};min-width:100px">Mês ${o}</th>`;
+  }
+
+  // Body rows
+  let bodyRows = '';
+  cohorts.forEach(cm => {
+    const cd = map[cm];
+    let tds = `<td style="padding:7px 12px;color:#4FC2FF;font-weight:700;font-size:13px;white-space:nowrap;border-bottom:1px solid #0075FF11">${fmtMonth(cm)}</td>
+      <td style="padding:7px 10px;text-align:right;color:#94a3b8;font-size:12px;border-bottom:1px solid #0075FF11">${num(cd.size)}</td>`;
+    for (let o = 0; o <= maxOffset; o++) {
+      const d = cd.offsets[o];
+      const bg = o === 0 ? 'rgba(0,117,255,0.06)' : 'transparent';
+      if (!d || d.depositantes === 0) {
+        tds += `<td style="padding:7px 10px;text-align:center;color:#334155;border-bottom:1px solid #0075FF11;background:${bg}">—</td>`;
+      } else {
+        const pct = cd.size > 0 ? (d.depositantes/cd.size*100).toFixed(0)+'%' : '—';
+        tds += `<td style="padding:7px 10px;text-align:center;border-bottom:1px solid #0075FF11;background:${bg}">
+          <div style="font-weight:700;font-size:12px;color:#4FC2FF">${num(d.depositantes)} <span style="font-size:10px;color:#475569">${pct}</span></div>
+          <div style="font-size:10px;color:#3EAA00">${brlK(d.deposito)}</div>
+          <div style="font-size:10px;color:#CFFF6A">${brlK(d.ggr)}</div>
+        </td>`;
+      }
+    }
+    bodyRows += `<tr>${tds}</tr>`;
+  });
+
+  const html = `
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid #0075FF33">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr>${headerCols}</tr></thead>
+        <tbody>${bodyRows}</tbody>
+      </table>
+    </div>`;
+
+  const wrap = document.getElementById('coorte-table-wrap');
+  if (wrap) wrap.innerHTML = html;
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeChartModal(); });
+</script>
+</body>
+</html>

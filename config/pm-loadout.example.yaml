@@ -1,0 +1,24 @@
+# Copie para config/pm-loadout.local.yaml e preencha somente valores autorizados.
+# Nunca registre tokens, credenciais, PII ou IDs confidenciais neste arquivo.
+workspace:
+  language: pt-BR
+  clickup:
+    enabled: false
+    workspace_id: null
+    write_policy: write-confirmed
+context:
+  knowledge_root: knowledge/
+  decision_log: knowledge/decisions/
+  glossary: knowledge/glossario.md
+  context_pack: optional
+sources:
+  product_data: []
+  regulatory: []
+research:
+  durable_findings_path: knowledge/research/
+  require_primary_sources: true
+persistence:
+  external_writes: write-confirmed
+  durable_knowledge: write-confirmed
+privacy:
+  redact_pii_in_handoffs: true

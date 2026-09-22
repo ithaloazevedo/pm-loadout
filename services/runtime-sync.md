@@ -19,7 +19,7 @@ fonte única em `.claude/`, sem depender de cópia manual — que já causou dri
 | `.agents/skills/clickup-spec/references/**` | **Gerado** — espelho de `.claude/skills/clickup-spec/references/**` | **Não** — editar a fonte e rodar o comando |
 | `.claude/skills/*/SKILL.md` (topo de cada skill) | Fork manual **legítimo** | Sim — cada versão pode ter adaptação de runtime intencional (ex.: banners de compatibilidade Codex, caminho de canvas, ritual de ferramenta) |
 | `.agents/skills/*/SKILL.md` (topo de cada skill) | Fork manual **legítimo** | Sim — mesma lógica acima |
-| Qualquer outra pasta em `.agents/skills/` (ex.: `query-pam`, `dashboard-tradicional`) | Fora do escopo do gerador | Sim — mas ver "Skills novas" abaixo antes do primeiro commit |
+| Qualquer outra pasta em `.agents/skills/` (ex.: `query-trad`, `dashboard-tradicional`) | Fora do escopo do gerador | Sim — mas ver "Skills novas" abaixo antes do primeiro commit |
 
 **Por que o escopo é restrito a agentes + `clickup-spec/references`**: varredura de termos de runtime
 (`codex`, `claude code`, `.claude/canvas`, `banner`) confirmou zero ocorrências nesses dois locais — são

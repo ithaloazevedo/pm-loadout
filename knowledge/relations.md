@@ -32,11 +32,11 @@ Feature (Primeiro Depósito)
 Evento: deposito_concluido
   ↓ alimenta
 Métrica: Taxa de 1º depósito
-  ↓ pertence a
-KR: Conversão cadastro→1º depósito ≥ X%
-  ↓ mede progresso em
-Objetivo: Crescimento da base ativa
 ```
+
+> Até 2026-09-09 esta cadeia continuava em "KR: Conversão cadastro→1º depósito ≥ X%" → "Objetivo: Crescimento
+> da base ativa". Desde 2026-09-10 não há mais KR/Objetivo formal no processo de produto — a cadeia termina em
+> Métrica. Ver `knowledge/domains/negocio.md`.
 
 ### Épico → Squad → Delivery
 
@@ -91,8 +91,8 @@ Métrica: Retenção 7/30 dias
 | Feature | impacta | Métrica | produto + negócio |
 | Módulo | pertence a | Produto | produto |
 | Evento | alimenta | Métrica | produto + negócio |
-| Métrica | mede | KR | negócio |
-| KR | pertence a | Objetivo | negócio |
+| Métrica | mede | KR | negócio *(descontinuada 2026-09-10 — KR sem instância viva)* |
+| KR | pertence a | Objetivo | negócio *(descontinuada 2026-09-10 — Objetivo sem instância viva)* |
 | Integração | provida por | Fornecedor | engenharia + operação |
 | Integração | consumida por | Sistema | engenharia |
 | KYC | executado por | Serasa | operação |
@@ -101,7 +101,7 @@ Métrica: Retenção 7/30 dias
 | Correção | subtarefa de | Épico / Tarefa | processo |
 | Bug | afeta | Feature em produção | processo + produto |
 | Regulação | governa | Feature / Integração | operação |
-| Stakeholder | influencia | Objetivo | pessoas + negócio |
+| Stakeholder | influencia | Objetivo | pessoas + negócio *(descontinuada 2026-09-10 — Objetivo sem instância viva)* |
 | Squad | responsável por | Módulo | pessoas + produto |
 
 ---

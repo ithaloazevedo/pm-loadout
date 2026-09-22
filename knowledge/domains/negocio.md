@@ -2,9 +2,16 @@
 
 Entidades que descrevem objetivos, métricas e aprendizados — o "porquê" por trás do trabalho de produto.
 
+> **Objetivo e KR deixaram de ser rastreados formalmente em 2026-09-10** (ver
+> `knowledge/decisions/2026-09-10-migracao-esteira-continua-para-sprints-remocao-okr-e-discovery.md`): a
+> empresa decidiu não ter OKRs formais por ora (falta de maturidade para o ciclo hoje). As duas seções abaixo
+> (Objetivo, KR) ficam mantidas como referência — podem ser retomadas no futuro — mas **hoje não há instância
+> viva** desses conceitos no processo de produto. Métrica, Hipótese e Experimento (seções seguintes) não são
+> afetados: continuam existindo normalmente como conceitos de negócio.
+
 ---
 
-## Objetivo
+## Objetivo *(descontinuado em 2026-09-10 — sem instância viva hoje)*
 
 **Definição**: Resultado qualitativo ambicioso que a empresa quer alcançar num ciclo (quarter/semestre).
 
@@ -16,7 +23,7 @@ Entidades que descrevem objetivos, métricas e aprendizados — o "porquê" por 
 
 ---
 
-## KR — Resultado-chave
+## KR — Resultado-chave *(descontinuado em 2026-09-10 — sem instância viva hoje)*
 
 **Definição**: Métrica mensurável que indica progresso em direção a um Objetivo.
 

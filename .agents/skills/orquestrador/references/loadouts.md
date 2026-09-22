@@ -29,7 +29,7 @@ Use para decisões que dependem de fatos externos, linguagem de domínio ou evid
 - `modelagem-dominio`
 - `vieses`
 
-## Strategy Loadout
+## Loadout de Estratégia
 
 Use para priorização, estratégia e sequenciamento.
 

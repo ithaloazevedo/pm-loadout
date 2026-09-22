@@ -1,6 +1,6 @@
 # Prompt: Protocolo de Handoff
 
-Padrão para transferir trabalho entre agentes com contexto completo.
+Padrão para transferir trabalho entre agentes sem repetir a investigação já concluída.
 
 ---
 
@@ -20,8 +20,8 @@ Faça handoff quando:
   "mission": "o que o agente de destino deve fazer",
   "context": {
     "problema": "o problema original",
-    "evidencias": ["lista de evidências coletadas"],
-    "decisoes": ["decisões já tomadas"],
+    "evidencias": ["fato + caminho/URL da fonte canônica"],
+    "decisoes": ["decisão + caminho/URL do registro"],
     "constraints": ["limitações conhecidas"]
   },
   "skills_recomendadas": ["skills para a missão"],
@@ -33,6 +33,8 @@ Faça handoff quando:
 ## Regras
 
 - Nunca fazer handoff sem contexto suficiente para o agente de destino continuar
-- Sempre incluir as evidências coletadas — não resuma, cite
+- Referencie evidências e artefatos canônicos; não copie o corpo de specs, cards ou decisões
+- Inclua somente questões abertas que bloqueiam a próxima ação
+- Redija PII, credenciais e dados operacionais sensíveis
 - Se o handoff é para agente-delivery, a spec deve estar completa e validada
 - Se o handoff é para agente-governanca, incluir a proposta e os trade-offs explicitados

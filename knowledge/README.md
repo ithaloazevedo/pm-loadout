@@ -8,7 +8,7 @@ O Knowledge Graph é a fonte única de verdade sobre o domínio de produto. Agen
 knowledge/
 ├── domains/          # Entidades por domínio
 │   ├── produto.md    # Feature, Módulo, Fluxo, Tela, Evento, API
-│   ├── negocio.md    # Objetivo, OKR, Métrica, KPI, Hipótese, Experimento
+│   ├── negocio.md    # Métrica, KPI, Hipótese, Experimento
 │   ├── processo.md   # Esteiras de Discovery e Delivery, tipos de item
 │   ├── engenharia.md # Sistema, Integração, DB, Fila, Webhook
 │   ├── operacao.md   # Fornecedor, Gateway, KYC, PIX, Compliance

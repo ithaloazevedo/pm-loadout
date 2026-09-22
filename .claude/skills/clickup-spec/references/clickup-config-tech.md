@@ -1,5 +1,13 @@
 # ClickUp — Configuração do Workspace (Vertical Tech)
 
+> ⚠️ **Arquivo legado, não referenciado por nenhuma skill/agente ativo.** A fonte real usada por `SKILL.md` e
+> `agente-delivery.md` é [clickup-config.md](clickup-config.md) — mais recente (verificado 2026-08-04) e já
+> corrigido para refletir a remoção do nível Iniciativa (ver `knowledge/domains/processo.md`). Este arquivo
+> ficou desatualizado (ex.: ainda trata a lista Iniciativas como ativa, ainda afirma Custom ID `VL-XXXXX`
+> confirmado quando `clickup-config.md` já corrigiu isso para `null`). Mantido só como histórico — não edite
+> nem consulte para decisões operacionais; se notar necessidade real de conteúdo daqui, migre para
+> `clickup-config.md` em vez de manter as duas cópias vivas.
+
 Mapa de IDs reais do workspace para o agente `agente-delivery` operar no espaço Vertical Tech.
 **Confirme via MCP no início de cada sessão** (IDs podem mudar se o workspace for reconfigurado).
 
@@ -77,7 +85,9 @@ Mapa de IDs reais do workspace para o agente `agente-delivery` operar no espaço
 
 ## Tipos de Tarefa
 
-Tipos existentes no workspace (verificados em 2026-07-03): `Iniciativa`, `Epic`, `Pesquisa`, `Protótipo`, `Entrevista`, `Bug`, `Correção`, `Débito técnico`, `Incidente`, `Resultado-chave` (não existem `Projeto` nem `Tarefa` — Delivery usa `Epic`).
+Tipos customizados nomeáveis via API (verificados em 2026-07-03, reconfirmados em 2026-07-23 via erro da API): `milestone`, `form_response`, `meeting_note`, `ai_skill`, `Epic`, `Pesquisa`, `Resultado-chave`, `Incidente`, `Bug`, `Débito técnico`, `Entrevista`, `Hora do Sorteio`, `Person`, `Protótipo`, `Correção`, `Iniciativa`, `Item` (não existe `Projeto` nem `Tarefa` como tipo nomeável).
+
+> **⚠️ Armadilha confirmada em 2026-07-23:** "Tarefa" **não é um `task_type` setável por nome** — tentar `task_type: "Tarefa"` retorna erro da API. O tipo **padrão do sistema** (quando nenhum `task_type` customizado é setado, ou seja `task_type: none`/`null`) é o que a UI do ClickUp exibe como **"Tarefa"** em português. **Para criar uma subtask de Delivery ("Tarefa" da hierarquia de processo), NÃO setar `task_type`** (omitir o parâmetro, ou passar `"none"` num update) — nunca usar `Item` como substituto, isso aparece diferente na UI.
 
 > **🚦 Bug vs. Correção (regra firme, definida pelo Ithalo em 2026-07-03):**
 > - **Bug** = defeito identificado **em produção**, com impacto real ou potencial no usuário final.
@@ -123,6 +133,6 @@ Um Projeto de Delivery só migra do Backlog para Execução quando tem:
 - [ ] Confirmar/configurar status das listas Discovery, Backlog e Execução
 - [x] Custom fields da lista Iniciativas criados (ver tabela acima, com IDs)
 - [x] T-Shirt Sizing ativo (campo emoji na lista Iniciativas)
-- [x] Task types verificados (`Epic` no lugar de `Projeto`; sem `Tarefa`)
+- [x] Task types verificados (`Epic` no lugar de `Projeto`; "Tarefa" = tipo padrão do sistema, não setar `task_type`)
 - [ ] Criar View "Todos os times" **no nível do Space** (não de folder) — board ou tabela agrupado por squad, agregando os 3 folders de Delivery
 - [ ] Deletar folders de template antigos: `Product Roadmap` (×2), `Product Discovery`, `Product Delivery` — **antes, migrar as tasks legadas** (ex.: VL-12231, VL-11984 no Product Discovery antigo)

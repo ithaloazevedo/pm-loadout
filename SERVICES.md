@@ -10,9 +10,9 @@ Especificações detalhadas em `services/`.
 
 | Campo | Valor |
 |---|---|
-| **Localização** | Claude built-in memory (`~/.claude/projects/.../memory/`) |
+| **Localização** | Memória do runtime (Claude ou Codex); fatos duráveis no Knowledge Graph |
 | **Responsabilidade** | Histórico de sessões, decisões, preferências, contexto do usuário |
-| **Como consumir** | Automático — Claude lê e escreve via sistema de memória nativo |
+| **Como consumir** | Use o contexto da tarefa; não assuma um caminho privado de memória |
 | **Spec** | [services/memory.md](services/memory.md) |
 
 ---
@@ -54,8 +54,8 @@ Especificações detalhadas em `services/`.
 
 | Campo | Valor |
 |---|---|
-| **Localização** | `.claude/skills/clickup-spec/references/template-*.md` |
-| **Responsabilidade** | Templates de Discovery, Delivery e Roadmap Item |
+| **Localização** | Claude: `.claude/skills/clickup-spec/references/template-*.md` · Codex: `.agents/skills/clickup-spec/references/template-*.md` |
+| **Responsabilidade** | Template de Delivery (Discovery hoje são seções incorporadas a esse template, não um item separado); template de Objetivo/Roadmap Item mantido só como histórico, deprecado desde a remoção de OKRs formais em 2026-09-10 |
 | **Como consumir** | `agente-spec` e `agente-delivery` referenciam ao criar artefatos |
 
 ---

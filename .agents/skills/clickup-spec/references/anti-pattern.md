@@ -1,32 +1,17 @@
 # Anti-patterns a Evitar — ClickUp
 
-Erros comuns em Roadmap Items, Projetos de Discovery/Delivery e subtasks — e como corrigir.
+Erros comuns em Projetos de Discovery/Delivery e subtasks — e como corrigir.
 
 ---
 
-## Roadmap Item
+## Descoberta (faixa de status dentro do Backlog)
 
 | Anti-pattern | Exemplo | Problema |
 |--------------|---------|----------|
-| Título genérico sem direção | `Melhorar o onboarding` | Não comunica aposta. Qualquer coisa se encaixa. |
-| Substantivo no lugar de verbo | `Onboarding 2026` | Parece nome de produto, não intenção |
-| Sem métricas | item sem KPI/baseline | Impossível avaliar sucesso |
-| Sem portfólio vinculado | item sem Discovery/Delivery ligados | Estratégia sem execução mapeada |
-| Priorização vazia | sem RICE/Horizonte/Squad | Não dá para sequenciar no roadmap |
-| Sem dono | sem assignee | Ninguém é accountable |
-
-> ❌ `KYC no cadastro` → ✅ `Otimizar o onboarding com KYC para elevar a conversão Cadastro → FTD`
-
----
-
-## Projeto de Discovery
-
-| Anti-pattern | Exemplo | Problema |
-|--------------|---------|----------|
-| Discovery órfão | sem Roadmap Item vinculado | Investigação desconectada da estratégia |
-| Sem critérios de saída | discovery sem gate | Nunca se sabe quando avançar para Delivery |
+| Delivery sem critérios de aceite | épico sai da faixa de descoberta sem CAs definidos | Ninguém sabe quando está pronto para entrar em sprint |
+| Sem critérios de saída | item sem gate de descoberta definido | Nunca se sabe quando avançar para `pronto p/ execução` |
 | Problema sem dados | "usuários reclamam" | Sem baseline, não há como medir melhora |
-| Questões em aberto ausentes | discovery que já "sabe a resposta" | Então não é discovery — é delivery |
+| Questões em aberto ausentes | item que já "sabe a resposta" na faixa de descoberta | Então não precisava passar por descoberta — já está pronto pra sprint |
 
 > ❌ `Pesquisar KYC` → ✅ `Investigar o gargalo de KYC no onboarding e definir a direção de solução`
 
@@ -36,7 +21,7 @@ Erros comuns em Roadmap Items, Projetos de Discovery/Delivery e subtasks — e c
 
 | Anti-pattern | Exemplo | Problema |
 |--------------|---------|----------|
-| Delivery órfão | sem Roadmap Item / Discovery | Build desconectado da decisão |
+| Delivery que entrou em sprint sem passar pela faixa de descoberta | épico pulou direto de `backlog` para a Sprint ativa | UX e escopo não fechados antes da execução — retrabalho em pleno sprint |
 | Título nominal | `Tela de KYC` | Não declara intenção nem valor |
 | Sem "Fora de Escopo" | só o que vai fazer | Sem limite, qualquer coisa entra no meio |
 | Critérios em prosa | `A verificação deve funcionar bem` | Não é verificável |
@@ -81,7 +66,7 @@ Estrutura completa e mais exemplos em [estilo-redacao.md](estilo-redacao.md).
 |--------------|---------|----------|
 | Nomes de liderança como justificativa | `Squad X (Team Lead Fulano, Tech Lead Beltrano) é dona disso` | Raciocínio interno do PM/Knowledge Graph, não informação que quem lê o card precisa |
 | Metadado de busca do agente | `Nenhum item encontrado (busca realizada em 30/07 por "X" e por "Y")` | Registro do processo do agente, não conteúdo de produto — vai no handoff, não no card |
-| Link/decisão/dúvida não confirmada pelo PM | Agente adiciona sozinho um "Objetivo candidato" ou uma questão em aberto que nunca foi validada | Compromete o card publicamente com algo que ninguém decidiu — propor no handoff, escrever só após confirmação |
+| Link/decisão/dúvida não confirmada pelo PM | Agente adiciona sozinho um vínculo candidato ou uma questão em aberto que nunca foi validada | Compromete o card publicamente com algo que ninguém decidiu — propor no handoff, escrever só após confirmação |
 
 Detalhe da regra em [estilo-redacao.md](estilo-redacao.md) → "Contexto não é relatório do agente" e
 "Links, Decisões e Aberto para refinamento técnico: só com confirmação do PM".

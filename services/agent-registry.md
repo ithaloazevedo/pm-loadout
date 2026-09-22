@@ -51,3 +51,4 @@ handoff_rules:   # quando e para onde passar o trabalho
 | `lente-produto` | `registry/lente-produto.yaml` |
 | `lente-design` | `registry/lente-design.yaml` |
 | `lente-tech` | `registry/lente-tech.yaml` |
+| `agente-dados` | `registry/agente-dados.yaml` |

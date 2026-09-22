@@ -30,6 +30,7 @@ Entidades que descrevem a superfície funcional do produto — o que é entregue
 - Jogos (catálogo, lobby, sessão)
 - Conta (perfil, preferências, documentos)
 - Responsible Gaming (limites, autoexclusão)
+- Banca de Benefícios / SMARTICO (gamificação, missões, recompensas) — **existe apenas na Tradicional**, não existe na Bravo (confirmado por Ithalo em 10/08/2026)
 
 **Relações**:
 - pertence a → Produto

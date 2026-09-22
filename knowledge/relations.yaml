@@ -76,24 +76,30 @@ relations:
     valid_from: "2026-01-01"
 
   # --- Negócio ---
+  # KR e Objetivo deixaram de ser rastreados formalmente em 2026-09-10 (ver
+  # knowledge/decisions/2026-09-10-migracao-esteira-continua-para-sprints-remocao-okr-e-discovery.md).
+  # As três relações abaixo ficam mantidas como histórico, com valid_until marcando o fim de vigência.
 
   - from: Métrica
     relation: mede_progresso_em
     to: KR
     domain: [negocio]
     valid_from: "2026-01-01"
+    valid_until: "2026-09-10"
 
   - from: KR
     relation: pertence_a
     to: Objetivo
     domain: [negocio]
     valid_from: "2026-01-01"
+    valid_until: "2026-09-10"
 
   - from: Stakeholder
     relation: influencia
     to: Objetivo
     domain: [pessoas, negocio]
     valid_from: "2026-01-01"
+    valid_until: "2026-09-10"
 
   # --- Engenharia / Operação ---
 

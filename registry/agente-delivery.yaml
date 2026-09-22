@@ -37,13 +37,14 @@ memory:
 
 success_metrics:
   - item criado com todos os campos obrigatórios preenchidos
-  - tipo de tarefa correto (Épico / Tarefa / Bug / Correção)
+  - tipo de tarefa correto (task_type exato — ver clickup-config.md, ex. `Epic` não `Épico`)
   - folder de Delivery correto para o squad
 
 failure_modes:
   - criar sem spec clara → itens órfãos, mal descritos
   - usar folder errado → Delivery no squad errado
-  - tipo de tarefa incorreto → Épico onde deveria ser Tarefa
+  - tipo de tarefa incorreto → Epic onde deveria ser Tarefa (erro de julgamento de escopo)
+  - task_type gravado com nome funcional em português (ex: Épico) em vez do valor real aceito pela API do workspace (ex: Epic) → falha silenciosa/parcial na criação da task
   - criar sem confirmação do usuário (exceto modo subagente ou rollup)
 
 handoff_rules:

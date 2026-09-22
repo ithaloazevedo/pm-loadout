@@ -2,26 +2,30 @@
 
 Vive no **folder de Delivery da squad que executa** (Experiência do jogador / Operação e afiliados /
 Provedora de conteúdo — em regra, o folder é determinado pela squad responsável pela execução; se um épico é
-executado por outra squad, ex. gestão no backoffice, ele vai para o folder dessa squad). Use quando o
-Discovery foi concluído — direção validada, escopo fechado, engenharia pode iniciar o planejamento.
-**Nasce na lista `Backlog`**; migra para `Execução` ao entrar na sprint. **Nunca** crie listas novas nos
+executado por outra squad, ex. gestão no backoffice, ele vai para o folder dessa squad). Nasce **direto no
+Backlog**, já com o tipo final — não existe mais um Discovery separado a concluir antes: a descoberta acontece
+como uma faixa de status dentro do próprio Backlog (`em refinamento` → `pronto p/ design` → `em design`,
+ordem varia por squad) até o item ficar `pronto p/ execução` / `priorizado`.
+**Nasce na lista `Backlog`**; migra para a **Sprint ativa** do squad (Sprint Folder nativo do ClickUp) ao
+entrar em execução — squad Jogos ainda migra para `Execução`, fluxo antigo. **Nunca** crie listas novas nos
 folders. IDs e status em [clickup-config.md](clickup-config.md).
 
-Os **critérios de aceite são propostos pelo PM** a partir do protótipo/discovery e validados no
-refinamento com a squad — o épico não nasce sem eles.
+Os **critérios de aceite são propostos pelo PM** a partir do protótipo e da faixa de descoberta do Backlog, e
+validados no refinamento com a squad — o épico não nasce sem eles.
 
 ---
 
 ## Template
 
-> **Sem bloco de cabeçalho.** Não repita Objetivo / Discovery / Dono no topo: o **Dono** é o assignee da
-> task e os **vínculos** vão na seção 🔗 Links. **Espaçamento:** linha em branco só **entre** seções `###`. Dentro de uma seção, sub-cabeçalhos em
-> negrito colam nos bullets — **sem linha em branco antes do sub-cabeçalho nem entre sub-blocos**. Isso
-> vale sobretudo em ✅ Critérios de Aceite (área funcional + Qualidade + Instrumentação, todos colados).
+> **Sem bloco de cabeçalho.** Não repita Dono no topo: o **Dono** é o assignee da task e os **vínculos**
+> pontuais (quando houver) vão na seção 🔗 Links. **Espaçamento:** linha em branco só **entre** seções `###`.
+> Dentro de uma seção, sub-cabeçalhos em negrito colam nos bullets — **sem linha em branco antes do
+> sub-cabeçalho nem entre sub-blocos**. Isso vale sobretudo em ✅ Critérios de Aceite (área funcional +
+> Qualidade + Instrumentação, todos colados).
 
 ```markdown
 ### 🎯 Objetivo
-[1-2 frases: o que este épico entrega e qual objetivo e KPI/KR ele move]
+[1-2 frases: o que este épico entrega e qual indicador de negócio ele move]
 
 ### 🧠 Contexto
 [Problema → Impacto → Solução: o problema validado no discovery, o dado que sustenta (quanti ou
@@ -45,7 +49,7 @@ encadeados (ver [estilo-redacao.md](estilo-redacao.md)).]
 - [ ] Telas seguem o Design System — indistinguíveis do restante do portal
 - [ ] Responsivo desktop e mobile conforme protótipo
 **Instrumentação (padrão em todo épico)**
-- [ ] Eventos [X, Y] registrados — o KPI do Objetivo é mensurável no lançamento
+- [ ] Eventos [X, Y] registrados — o indicador de negócio deste item é mensurável no lançamento
 
 ### ❓ Aberto para refinamento técnico
 [Exclusiva para decisão técnica pendente do time de engenharia — ex.: validação de arquitetura, viabilidade
@@ -57,7 +61,7 @@ aceite.]
 
 ### 🔗 Links
 - Figma: [frame específico da seção, não o arquivo inteiro]
-- Discovery: [Nome — link] · OKR: [Nome — link] (se não houver não inclua)
+- Relacionado: [Nome — link] (linked task pontual, só quando há uma relação real — ex.: Bug que referencia o Épico afetado; se não houver, não inclua)
 - Pré-requisito: [link — espelha a dependência waiting_on do sistema]
 
 ### 📜 Log de Decisões
@@ -74,9 +78,16 @@ e limpo para quem só quer entender o que construir hoje.]
 - **A decisão original de escopo vive no Contexto**, com data — é o "porquê" deste item existir do jeito que existe hoje. **Mudanças de escopo posteriores à criação** (consolidações, replanejamentos, redirecionamentos) **não reescrevem o Contexto** — vão para 📜 Log de Decisões, objetivas e sem poluir a leitura de quem só precisa entender o que construir.
 - **Qualidade e Instrumentação são áreas fixas** dos critérios. Em ferramenta interna (backoffice),
   adaptar Qualidade para o padrão da ferramenta.
-- **Delivery não entra em sprint com ❓ Aberto para refinamento técnico preenchida.**
-- **Vínculo:** linked task com o Objetivo (quando houver) **e** com o Discovery de origem; pré-requisito na
-  seção Links espelha uma dependência `waiting_on` real.
+- **Delivery não entra em sprint com ❓ Aberto para refinamento técnico preenchida — exceto `Bug` e
+  `Incidente`.** A regra existe para Épico e Tarefa: escopo de produto não pode entrar em execução com
+  pendência aberta. Bug e Incidente são o caso inverso — entram justamente porque a causa raiz ainda é
+  desconhecida, e investigá-la é o trabalho. Nesses dois tipos, a ❓ é o registro do que precisa ser
+  descoberto, não um sinal de spec incompleta. Continua valendo para eles a triagem do que **não** é
+  técnico: pendência de produto, compliance ou negócio é resolvida com o PM antes do card, em qualquer
+  tipo de item. (Regra ajustada em 2026-09-20, decisão do PM.)
+- **Vínculo:** sem nível acima do Delivery para linkar por padrão — use linked task só quando houver uma
+  relação pontual real (ex.: um Bug que referencia o Épico afetado); pré-requisito na seção Links espelha uma
+  dependência `waiting_on` real.
 - **Feature nova declara seu kill switch** — se a funcionalidade pode precisar ser desligada sem
   deploy (integração externa, mecânica de risco), a flag de desativação entra no escopo ou em
   épico de gestão dedicado.
@@ -85,7 +96,9 @@ e limpo para quem só quer entender o que construir hoje.]
 
 ## Exemplo Real: Reposicionar o KYC facial antes do FTD com processamento em background
 
-_(anterior às áreas padrão de Qualidade/Instrumentação — nos novos épicos, elas sempre entram)_
+_(anterior às áreas padrão de Qualidade/Instrumentação — nos novos épicos, elas sempre entram. Os campos
+"OKR" e "Discovery" na seção 🔗 Links abaixo também são históricos — esses níveis foram removidos em
+2026-09-10; hoje não há mais o que linkar ali.)_
 
 ### 🎯 Objetivo
 Entregar o novo fluxo de onboarding em que a captura facial do KYC ocorre **antes do FTD** e a verificação

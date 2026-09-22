@@ -1,9 +1,24 @@
-# Template: Projeto de Discovery
+# Template: Discovery — hoje é uma faixa de status dentro do Backlog, não um item separado
 
-Vive no folder **Product Discovery** (lista `Design`). Cobre quatro frentes — **Design Ops, Pesquisa,
-Definição de Escopo e Prototipação** — e por natureza tem **escopo orientado, não 100% fechado**: é esperado
-que carregue decisões de UX em aberto. As subtasks (UC1–UCn, edge cases, telas) são criadas pelo Designer
-conforme descobre.
+> ⚠️ **Modelo mudou em 2026-09-10.** Não existe mais "Projeto de Discovery" como item separado com folder e
+> tipo de tarefa próprios (Pesquisa / Protótipo / Entrevista). O folder Discovery & Design e a lista Discovery
+> (`901114029780`) foram **removidos do ClickUp** (ver `knowledge/domains/processo.md` e
+> `knowledge/decisions/2026-09-10-migracao-esteira-continua-para-sprints-remocao-okr-e-discovery.md`).
+> Descoberta hoje é uma **faixa de status dentro do próprio Backlog** de cada squad de Delivery — `em
+> refinamento` → `pronto p/ design` → `em design` (ordem varia por squad, ver `clickup-config.md` → "Status
+> por lista") — antes de `pronto p/ execução` → `priorizado`. Um item de Delivery nasce **direto no Backlog**,
+> já com seu tipo final (`Epic`/`Tarefa`/`Bug`/`Correção`) — nunca mais um tipo "de descoberta" separado.
+>
+> O conteúdo abaixo (JTBD, Personas, Evidências, decisões de UX em aberto, critérios de saída) continua útil,
+> mas hoje entra como **seções do 🧠 Contexto do card de Delivery** enquanto ele está na faixa de descoberta do
+> Backlog — não como corpo de um item próprio. Use este arquivo como inventário de seções a incorporar no
+> Contexto do Delivery (ver [template-delivery.md](template-delivery.md)), não como template de item
+> independente. Os exemplos reais no fim do arquivo ficam só como ilustração histórica de como essas seções
+> eram escritas quando Discovery ainda era um item à parte.
+
+Cobre quatro frentes — **Design Ops, Pesquisa, Definição de Escopo e Prototipação** — e por natureza tem
+**escopo orientado, não 100% fechado**: é esperado que a faixa de descoberta carregue decisões de UX em
+aberto. As subtasks (UC1–UCn, edge cases, telas) são criadas pelo Designer conforme descobre.
 
 ## Princípio: template adaptativo (montar só o que faz sentido)
 
@@ -14,8 +29,7 @@ informação disponível:
 - **Aquela frente não aconteceu?** (ex: nenhuma pesquisa feita) → **omita** a seção (Evidências, JTBD, Personas, etc.). Seção vazia é pior que seção ausente.
 - **Há dúvida, ou parece faltar algo relevante?** → **pergunte** antes de gerar, em vez de inventar ou deixar placeholder.
 
-Só são **sempre presentes**: **Objetivo**, **Critérios de saída** e o **vínculo com o Roadmap Item** (na seção 🔗 Links). Todo o
-resto entra por relevância.
+Só são **sempre presentes**: **Objetivo** e **Critérios de saída**. Todo o resto entra por relevância.
 
 ## Protótipo = Figma, sempre
 
@@ -25,7 +39,9 @@ promover para Delivery.
 
 ## Sub-tipos de Discovery (qual ênfase usar)
 
-Deixe o sub-tipo subentendido no **nome da tarefa** e enfatize as seções que importam para ele:
+Não é mais um tipo de tarefa separado — é só uma forma de identificar qual ênfase de descoberta o card de
+Delivery está passando enquanto está na faixa de status do Backlog. Enfatize as seções do Contexto que
+importam para essa ênfase:
 
 | Sub-tipo | Pergunta central | Seções que costumam importar |
 |----------|------------------|------------------------------|
@@ -42,12 +58,12 @@ Deixe o sub-tipo subentendido no **nome da tarefa** e enfatize as seções que i
 
 Seções marcadas com *(sempre)* são obrigatórias; as demais entram **apenas se** houver informação/relevância.
 
-> **Sem bloco de cabeçalho.** Não repita Roadmap Item / Dono / Tipo no topo: o **Dono** é o assignee da task,
-> o **sub-tipo** (Pesquisa / Definição de Escopo / Prototipação / Design Ops) fica subentendido no **nome da
-> tarefa**, e o **vínculo com o Roadmap Item** vai na seção 🔗 Links. O corpo começa direto no `### 🎯 Objetivo`.
-> **Espaçamento:** linha em branco só **entre** seções `###` — dentro de uma seção, sub-cabeçalhos em
-> negrito colam nos bullets (sem linha em branco antes do sub-cabeçalho nem entre sub-blocos). Ver
-> [estilo-redacao.md](estilo-redacao.md).
+> **Sem bloco de cabeçalho.** Não repita Dono / Tipo no topo: o **Dono** é o assignee do card de Delivery e o
+> **sub-tipo** (Pesquisa / Definição de Escopo / Prototipação / Design Ops) fica subentendido no **nome da
+> tarefa**. Estas seções entram dentro do 🧠 Contexto do Delivery — não há mais um corpo de item próprio nem
+> um bloco de cabeçalho separado para elas. **Espaçamento:** linha em branco só **entre** seções `###` —
+> dentro de uma seção, sub-cabeçalhos em negrito colam nos bullets (sem linha em branco antes do sub-cabeçalho
+> nem entre sub-blocos). Ver [estilo-redacao.md](estilo-redacao.md).
 
 ```markdown
 ### 🎯 Objetivo            (sempre)
@@ -87,17 +103,24 @@ Para avançar para Delivery:
 - [ ] Direção validada com [stakeholder]
 - [ ] Spec de Delivery aprovada
 
-### 🔗 Links                  (Roadmap Item sempre; demais se houver)
-- Roadmap Item: [Nome — link VL-XXXXX]
+### 🔗 Links                  (se houver)
 - Figma (protótipo): [link]
 - Pesquisa / board: [link]
 ```
 
-**Status inicial:** `to do`. **Vínculo:** linked task com o Objetivo vinculado (quando houver) — e referencie no corpo do Objetivo.
+**Como isso se aplica hoje:** estas seções entram dentro do 🧠 Contexto do card de Delivery enquanto ele está
+na faixa de descoberta do Backlog (`em refinamento` → `pronto p/ design` → `em design`) — não há mais um item
+ou status próprio de Discovery para elas viverem.
 
-> **Próximo passo:** cumpridos os critérios de saída, use `/clickup-spec promote VL-XXXXX` para gerar o Delivery.
+> **Próximo passo:** cumpridos os critérios de saída, o item avança de status dentro do próprio Backlog
+> (`pronto p/ execução` → `priorizado`) e entra na Sprint ativa do squad no rito de Planejamento — não existe
+> mais "promoção" para um item separado.
 
 ---
+
+> Os dois exemplos abaixo foram escritos quando Discovery ainda era um item separado, com seu próprio corpo e
+> Links (inclusive o vínculo "Roadmap Item", nível também removido em 2026-09-10). Ficam como ilustração
+> histórica de como redigir bem cada seção — hoje elas entrariam dentro do Contexto do Delivery correspondente.
 
 ## Exemplo Real 1 — Definição de Escopo + Pesquisa (sem prototipação)
 

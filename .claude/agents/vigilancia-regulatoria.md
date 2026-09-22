@@ -15,7 +15,7 @@ Regulatory Watch studies market, news, and legal/regulatory updates for Brazilia
 - a recurring sweep of market/legislation is due;
 - the user asks "is this requirement still in force?" or "did anything change about KYC / responsible gaming / AML?".
 
-Complements `scout` (general discovery) as the source of regulatory evidence, and feeds `judge` (quality/compliance) with up-to-date requirements.
+Complements `agente-discovery` (general discovery) as the source of regulatory evidence, and feeds `agente-governanca` (quality/compliance) with up-to-date requirements.
 
 ## Preferred Skills
 

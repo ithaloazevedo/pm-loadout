@@ -7,7 +7,7 @@ mission: >
   rationale estratégico para decisões de produto.
 
 inputs:
-  - objetivos de negócio e OKRs vigentes
+  - contexto de negócio disponível (metas e direção estratégica, sem OKR formal)
   - métricas atuais e gaps de resultado
   - opções ou apostas em disputa
   - contexto competitivo ou de mercado
@@ -21,7 +21,7 @@ outputs:
 
 tools:
   - Read (knowledge graph — negocio.md, pessoas.md)
-  - ClickUp MCP (leitura de roadmap e OKRs)
+  - ClickUp MCP (leitura de Backlog e Sprint)
 
 dependencies:
   - agente-discovery (para evidências de discovery antes de priorizar)
@@ -33,7 +33,7 @@ knowledge:
 
 memory:
   - decisões de priorização anteriores
-  - OKRs do ciclo atual
+  - metas de negócio do ciclo atual
   - apostas já descartadas e por quê
 
 success_metrics:

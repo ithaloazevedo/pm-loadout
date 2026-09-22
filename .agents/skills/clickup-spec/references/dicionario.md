@@ -1,8 +1,8 @@
 # Guia de Escrita e Dicionário — ClickUp
 
-Padrão para criar Roadmap Items, Projetos de Discovery/Delivery e subtasks no ClickUp.
+Padrão para criar Projetos de Discovery/Delivery e subtasks no ClickUp.
 
-**Filosofia:** Estratégia centralizada no Roadmap, detalhe na base.
+**Filosofia:** Contexto e intenção vivem no próprio card de Delivery — sem nível estratégico acima dele.
 **Princípio guia:** *Aim for clarity* — sem jargão, direto ao ponto.
 
 ---
@@ -20,18 +20,9 @@ O título é uma declaração de intenção, não um resumo vago. Todo título *
 
 ## 2. Dicionário de Verbos por Nível
 
-### Roadmap Item (estratégico)
-Apostas e direção de longo prazo:
-- **Otimizar:** melhorar um fluxo/resultado existente. *(Ex: Otimizar o onboarding para elevar conversão)*
-- **Expandir:** aumentar alcance ou capacidade. *(Ex: Expandir o hub de esportes para novos mercados)*
-- **Transformar:** mudar fundamentalmente uma experiência. *(Ex: Transformar a jornada de verificação de conta)*
-- **Consolidar:** unificar capacidades fragmentadas.
-- **Estabelecer:** criar algo que ainda não existe.
-- **Escalar:** preparar para crescimento de volume/mercado.
-
 ### Projetos (Discovery / Delivery — tático)
-Entregas concretas dentro de um Roadmap Item:
-- **Investigar / Descobrir:** (Discovery) entender antes de construir. *(Ex: Investigar o gargalo de KYC no onboarding)*
+Entregas concretas do processo de produto:
+- **Investigar / Descobrir:** (faixa de descoberta) entender antes de construir. *(Ex: Investigar o gargalo de KYC no onboarding)*
 - **Habilitar:** destravar uma capacidade nova ao usuário.
 - **Permitir:** autorizar uma ação ou fluxo.
 - **Reposicionar:** mudar a ordem/posição de uma etapa. *(Ex: Reposicionar o KYC facial antes do FTD)*
@@ -47,26 +38,19 @@ Entregas concretas dentro de um Roadmap Item:
 
 ## 3. Estrutura por Nível
 
-### Roadmap Item
-- **Visão e Objetivo:** por que existe, o que move
-- **Métricas associadas:** KPI primário, Guard-rail, Secundária (com baseline e meta)
-- **Portfólio de Projetos:** Discovery/Delivery vinculados
-- **Dependências Externas:** o que precisa acontecer fora do time
-- **Dono + priorização** (RICE/MoSCoW/Horizonte/Squad/_Projeto)
-
-### Projeto de Discovery
-- **Roadmap Item** vinculado + Dono
+### Projeto de Discovery (faixa de descoberta dentro do Backlog do Delivery)
+- **Dono** (assignee)
 - **Objetivo** (o que decidir)
 - **Contexto e Problema** (dados, personas, tensões)
 - **Restrições conhecidas** (fora de escopo)
 - **Questões em aberto** (checklist)
-- **Critérios de saída** (gate p/ Delivery)
+- **Critérios de saída** (gate p/ sprint)
 - **Links** (Figma/FigJam)
 
 ### Projeto de Delivery
-- **Roadmap Item** + **Discovery** vinculados + Dono
-- **Objetivo** (o que entrega, qual KPI move)
-- **Contexto** (validado no Discovery)
+- **Dono** (assignee)
+- **Objetivo** (o que entrega, qual indicador de negócio move)
+- **Contexto** (validado na faixa de descoberta)
 - **Escopo** (dentro = capacidades; fora = explícito)
 - **Critérios de Aceite** por área funcional (binários)
 - **Links**
@@ -80,4 +64,5 @@ Entregas concretas dentro de um Roadmap Item:
 3. **Fora de escopo é tão importante quanto dentro:** evita scope creep.
 4. **Critérios binários:** cada critério responde sim/não. "Funcionar bem" não é critério; "verificar em < 10s" é.
 5. **Dono nomeado:** responsabilidade compartilhada é de ninguém.
-6. **Conecte ao nível acima:** todo Projeto referencia seu Roadmap Item — por linked task e no corpo.
+6. **O card carrega seu próprio porquê:** sem nível estratégico acima do Delivery, o Contexto de cada
+   Projeto explica sozinho o problema, o impacto e o indicador de negócio que ele move.

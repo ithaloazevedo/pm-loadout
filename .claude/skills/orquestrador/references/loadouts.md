@@ -21,7 +21,7 @@ Use para entendimento de usuário e discovery de oportunidades.
 - `suposicoes`
 - `ost`
 
-## Strategy Loadout
+## Loadout de Estratégia
 
 Use para priorização, estratégia e sequenciamento.
 
