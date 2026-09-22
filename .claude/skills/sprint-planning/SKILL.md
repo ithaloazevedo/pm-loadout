@@ -6,6 +6,12 @@ description: |
   Feita para stakeholders não técnicos: o que importa é entender a entrega de valor sem abrir o ClickUp.
   Executada pelo agente agente-ritos. Rode no rito de Planejamento, ou sempre que o PM quiser revisar a composição da sprint.
   Comandos: /sprint-planning run [squad], /sprint-planning dry-run, /sprint-planning help
+invocation: user
+inputs: sprint ativa no ClickUp e o roster de papéis do time
+outputs: planning da sprint publicada como artifact navegável
+side_effects: propose
+context: references/regras-de-leitura.md, references/artifact-planning.md, knowledge/domains/pessoas.md, knowledge/tom-de-voz.md
+completion: artifact publicado, com objetivo da sprint e campos deduzidos validados pelo PM
 ---
 
 **Autor:** Ithalo Mendes <ithalo.mendes@verticalloto.com>

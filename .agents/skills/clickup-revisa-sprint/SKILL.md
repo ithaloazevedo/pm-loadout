@@ -5,6 +5,12 @@ description: |
   Varre a Sprint ativa de um squad, separa concluído de não-concluído, calcula taxa de entrega e sintetiza um relatório narrativo — o principal artefato de dados e valor para stakeholders a cada ciclo.
   Ignora tarefas operacionais, bugs sem relação com a sprint e qualquer squad ainda no fluxo antigo Backlog→Execução (Jogos). Executado pelo agente agente-delivery. Feito para rodar sob demanda no rito de Revisão, ou agendado ao fim de cada sprint.
   Comandos: /clickup-revisa-sprint run [squad], /clickup-revisa-sprint dry-run, /clickup-revisa-sprint help
+invocation: user
+inputs: squad e sprint ativa no ClickUp
+outputs: relatório narrativo de entregue vs. planejado
+side_effects: propose
+context: references de clickup-spec (config e método), sprint ativa do squad
+completion: relatório entregue com taxa de entrega e itens não concluídos identificados
 ---
 
 **Autor:** Ithalo Mendes <ithalo.mendes@verticalloto.com>

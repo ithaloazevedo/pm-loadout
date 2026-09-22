@@ -1,6 +1,12 @@
 ---
 name: orquestrador
 description: Use quando o usuário precisa de orquestração de produto, discovery, ideação, priorização, specs no ClickUp, shaping de issues, decisões de roadmap, verificações de qualidade, planejamento de métricas, planejamento de lançamento, ou ajuda para escolher qual skill de PM usar.
+invocation: user
+inputs: pedido de produto e contexto de domínio disponível
+outputs: missão classificada, loadout mínimo, artefato ou próxima ação concreta
+side_effects: propose
+context: knowledge/, knowledge/tom-de-voz.md, knowledge/decisions/, services/skill-contract.md
+completion: estágio atual definido e uma decisão, artefato ou próxima ação entregue
 ---
 
 # Orquestrador

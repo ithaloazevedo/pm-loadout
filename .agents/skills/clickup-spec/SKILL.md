@@ -4,6 +4,12 @@ description: |
   Estrutura e valida itens de produto no ClickUp (workspace Vertical Tech (`90114055709`)) na hierarquia: Projeto de Delivery → subtasks. Squads PAM e Backoffice trabalham por sprints nativas do ClickUp; squad Jogos ainda no fluxo Backlog → Execução.
   Use para: criar Projetos de Delivery, mover itens do Backlog para a Sprint ativa, postar updates (comentários) e validar itens existentes.
   Comandos: /clickup-spec create, /clickup-spec plan [ID ou nome], /clickup-spec validate [ID ou nome], /clickup-spec update [ID ou nome], /clickup-spec help
+invocation: user
+inputs: intenção de produto, squad de destino e conector MCP do ClickUp ativo
+outputs: item criado ou validado no ClickUp, com link real
+side_effects: write-confirmed
+context: references/clickup-config.md, references/template-delivery.md, references/estilo-redacao.md
+completion: item gravado no ClickUp com template aplicado e revisão de spec executada
 ---
 
 **Autor:** Ithalo Mendes <ithalo.mendes@verticalloto.com>
