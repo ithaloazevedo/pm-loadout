@@ -24,6 +24,7 @@ Agente de Discovery investiga usuários, necessidades, jobs, dores, evidências 
 - `suposicoes`
 - `ost`
 - `vieses`
+- `voz-do-cliente`
 
 ## Handoff Focus
 
