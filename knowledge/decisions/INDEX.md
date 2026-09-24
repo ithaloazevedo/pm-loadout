@@ -7,7 +7,7 @@ Lista de decisões registradas. Para cada nova decisão, adicione uma linha nest
 | Data | Título | Status | Tomada por |
 |---|---|---|---|
 | 2026-09-24 | [Hub único de pesquisas no Drive, dentro de Produto & Plataforma](2026-09-24-hub-unico-pesquisas-drive.md) | APROVADA | Ithalo Mendes (via Orquestrador) |
-| 2026-09-24 | [Automação semanal do canal Voz do Cliente vira skill e rotina agendada](2026-09-24-automacao-semanal-voz-do-cliente.md) | APROVADA (config. pendente) | Ithalo Mendes (via Orquestrador) |
+| 2026-09-24 | [Automação semanal do canal Voz do Cliente vira skill e rotina agendada](2026-09-24-automacao-semanal-voz-do-cliente.md) | APROVADA | Ithalo Mendes (via Orquestrador) |
 | 2026-09-21 | [Levantamento do furo SIGAP para a SPA cobre três ambientes, separa universo por corte de data e reporta matriz de severidade em vez de número único](2026-09-21-levantamento-sigap-tres-ambientes-matriz-severidade.md) | APROVADA | Ithalo Mendes (via Orquestrador + agente-delivery) |
 | 2026-09-18 | [Épico de integração de provedores desmembrado em 6 épicos individuais, desvinculado do OKR de Receita B2B](2026-09-18-epico-provedores-diretos-desmembrado-em-6.md) | APROVADA | Ithalo Mendes (via Orquestrador + agente-delivery) |
 | 2026-09-18 | [Três Épicos de bônus no backoffice, órfãos e sem documentação, viram épicos irmãos documentados — sem consolidar num só](2026-09-18-tres-epicos-bonus-backoffice-documentados-e-desvinculados.md) | APROVADA | Ithalo Mendes (via Orquestrador + agente-spec + agente-delivery) |

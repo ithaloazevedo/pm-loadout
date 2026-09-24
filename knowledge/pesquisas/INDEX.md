@@ -52,9 +52,10 @@ fonte citada. Tratar como lacuna, não como confirmação.
 Fonte: [Canal ClickUp — Voz do cliente](https://app.clickup.com/9006076935/chat/r/8ccvn07-71131),
 relatório semanal de análise de chamados. Sintetizada pela skill
 [`voz-do-cliente`](../../.claude/skills/voz-do-cliente/SKILL.md) (agente `agente-discovery`) — ver
-decisão [2026-09-24](../decisions/2026-09-24-automacao-semanal-voz-do-cliente.md). Rotina agendada ainda
-**pendente de configuração** (push do repo + conector ClickUp na rotina) — até lá, rode
-`/voz-do-cliente run` sob demanda ou consulte o canal diretamente.
+decisão [2026-09-24](../decisions/2026-09-24-automacao-semanal-voz-do-cliente.md). Rotina agendada e ativa
+— segunda-feira, 08:00 (América/São_Paulo), grava direto na `main`
+([rotina](https://claude.ai/code/routines/trig_01FAscMVTM96MYqEKByZX8f7)). Também roda sob demanda via
+`/voz-do-cliente run`.
 
 | Período do relatório | Resumo principal | Sinal novo vs. recorrente | Arquivo | Thread original |
 |---|---|---|---|---|

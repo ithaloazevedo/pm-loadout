@@ -2,7 +2,8 @@
 
 **Data**: 2026-09-24
 **Tomada por**: Ithalo Mendes (via Orquestrador)
-**Status**: APROVADA (com pendência de configuração — ver "O que falta")
+**Status**: APROVADA — rotina criada e ativa (`trig_01FAscMVTM96MYqEKByZX8f7`,
+https://claude.ai/code/routines/trig_01FAscMVTM96MYqEKByZX8f7)
 
 ---
 
@@ -62,17 +63,19 @@ o padrão das demais skills do PM Loadout.
   local — implica checkout próprio via GitHub e conector MCP do ClickUp anexado à rotina.
 - **Processo**: nenhuma pessoa precisa mais lembrar de abrir o canal toda semana.
 
-## O que falta (pendente de configuração, fora desta conversa)
+## Configuração final
 
-A rotina ainda não foi criada. Descobertas ao configurar via a skill `schedule`:
+Descobertas e escolhas feitas ao configurar via a skill `schedule`:
 
-1. A rotina roda num ambiente de nuvem isolado, com checkout próprio do repositório via GitHub
-   (`https://github.com/ithaloazevedo/pm-loadout`) — exige que a skill e os arquivos de `knowledge/pesquisas/`
-   estejam commitados **e enviados ao remoto** antes do primeiro disparo.
-2. Falta decidir como o resultado semanal chega de volta ao repositório: a rotina abre um PR por semana
-   (checkpoint de revisão antes de virar fonte oficial) ou commita direto na branch principal (sem
-   checkpoint). Nenhuma das duas foi escolhida ainda.
-3. A rotina precisa do conector MCP do ClickUp anexado (disponível na conta) para ler o canal.
+1. A rotina roda num ambiente de nuvem isolado (CCR, ambiente `Loadout`), com checkout próprio do
+   repositório via GitHub (`https://github.com/ithaloazevedo/pm-loadout`) — por isso a skill e os arquivos
+   de `knowledge/pesquisas/` foram commitados e enviados ao remoto (`8f9e259`) antes de criar a rotina.
+2. **Saída semanal: commit direto na branch `main`**, sem checkpoint de PR — escolha do Ithalo, priorizando
+   fidelidade ao "autônomo" original sobre o checkpoint de revisão. Se a síntese semanal falhar em algum
+   dos guardrails da skill (achado fabricado, dado pessoal vazado), revisar esta escolha primeiro.
+3. Conector MCP do ClickUp anexado à rotina (`connector_uuid afecf49d-b723-49e4-8489-e2400123a250`).
+4. Cadência: segunda-feira, 08:00 América/São_Paulo (`0 11 * * 1` UTC). Primeiro disparo: 2026-09-28.
+5. Rotina: `trig_01FAscMVTM96MYqEKByZX8f7` — https://claude.ai/code/routines/trig_01FAscMVTM96MYqEKByZX8f7
 
 ## Links
 
