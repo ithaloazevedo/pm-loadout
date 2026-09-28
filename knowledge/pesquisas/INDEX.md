@@ -59,4 +59,4 @@ decisão [2026-09-24](../decisions/2026-09-24-automacao-semanal-voz-do-cliente.m
 
 | Período do relatório | Resumo principal | Sinal novo vs. recorrente | Arquivo | Thread original |
 |---|---|---|---|---|
-| *(nenhuma entrada ainda)* | | | | |
+| 15–21/09/2026 | Incidente crítico de app fora do ar em 19/09 (RESOLVIDO) concentrou 57% dos tickets; bônus promocionais seguem sem crédito automático (PERSISTENTE, ~280 sinais); 1 caso grave de jogo problemático exigiu atenção imediata | Primeira síntese desta rotina — sem histórico anterior para comparar; classificação recorrente/novo é a do próprio relatório (ver arquivo) | [2026-09-15-relatorio-chamados.md](voz-do-cliente/2026-09-15-relatorio-chamados.md) | [thread](https://app.clickup.com/9006076935/chat/r/8ccvn07-71131/t/80110059355049) |
